@@ -606,3 +606,71 @@ audio {
   color: #fff;
   font-weight: 600;
 }
+
+/* Hotkey Recording & Presets */
+.hotkey-record-wrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hotkey-input {
+  font-family: monospace;
+  font-weight: 600;
+  color: #a5b4fc;
+  cursor: default;
+}
+
+.hotkey-input.recording {
+  border-color: var(--rose) !important;
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.4) !important;
+  animation: pulse-border 1s infinite alternate;
+}
+
+@keyframes pulse-border {
+  from { border-color: rgba(244, 63, 94, 0.5); }
+  to { border-color: rgba(244, 63, 94, 1); }
+}
+
+.hotkey-hint {
+  font-size: 0.725rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+  transition: color 0.2s;
+}
+
+.hotkey-hint.recording {
+  color: var(--rose);
+  font-weight: 600;
+}
+
+.preset-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.badge-preset {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: monospace;
+  font-size: 0.725rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.badge-preset:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #c7d2fe;
+}
+
+.badge-preset.active {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+

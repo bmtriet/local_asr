@@ -90,7 +90,9 @@ class LoRATrainer:
             out_path = Path(self.output_dir)
             out_path.mkdir(parents=True, exist_ok=True)
             adapter_config = out_path / "adapter_config.json"
-            adapter_config.write_text('{"base_model_name_or_path": "Qwen/Qwen3-ASR-0.6B", "peft_type": "LORA", "r": 8, "lora_alpha": 32}')
+            adapter_config.write_text(
+                '{"base_model_name_or_path": "Qwen/Qwen3-ASR-0.6B", "peft_type": "LORA", "r": 8, "lora_alpha": 32, "target_modules": ["q_proj", "v_proj", "k_proj", "out_proj"]}'
+            )
 
             # Mark processed samples in DB
             sample_ids = [s["id"] for s in samples]

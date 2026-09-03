@@ -133,20 +133,41 @@
         <!-- Hotkey & Settings Card -->
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title">Cấu hình Voice Typing</h2>
+            <h2 class="card-title">Cấu hình Phím tắt (Linux)</h2>
           </div>
-          <div style="margin-bottom: 1rem;">
-            <label style="font-size: 0.8125rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">
-              Phím tắt Kích hoạt (Global Hotkey):
+
+          <div style="margin-bottom: 1.25rem;">
+            <label style="font-size: 0.8125rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">
+              Phím kích hoạt đang chọn:
             </label>
-            <div style="display: flex; gap: 0.5rem;">
-              <input type="text" id="input-hotkey" class="edit-box" value="ctrl+alt+space">
-              <button class="btn btn-secondary" id="btn-save-hotkey">Lưu</button>
+            <div class="hotkey-record-wrapper">
+              <input type="text" id="input-hotkey" class="edit-box hotkey-input" value="ctrl+alt+space" readonly>
+              <button class="btn btn-secondary" id="btn-record-hotkey" title="Bấm để ghi nhận phím nhấn từ bàn phím">
+                Bắt phím
+              </button>
+            </div>
+            <p id="hotkey-hint-text" class="hotkey-hint">
+              Nhấp "Bắt phím" rồi bấm tổ hợp phím bạn muốn gán.
+            </p>
+          </div>
+
+          <!-- Gợi ý phím tắt chuẩn Linux tối ưu không xung đột -->
+          <div style="margin-bottom: 1rem;">
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+              Gợi ý phím tắt tối ưu cho Linux:
+            </span>
+            <div class="preset-badges">
+              <button class="badge-preset active" data-keys="ctrl+alt+space">ctrl+alt+space</button>
+              <button class="badge-preset" data-keys="f8">f8</button>
+              <button class="badge-preset" data-keys="f9">f9</button>
+              <button class="badge-preset" data-keys="ctrl+shift+space">ctrl+shift+space</button>
+              <button class="badge-preset" data-keys="alt+space">alt+space</button>
             </div>
           </div>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">
-            Nhấn phím tắt trên bất kỳ ứng dụng nào để nói, hệ thống sẽ tự động gõ văn bản tiếng Việt vào ô đang chọn.
-          </p>
+
+          <button class="btn btn-primary" id="btn-save-hotkey" style="width: 100%; justify-content: center;">
+            Lưu Phím tắt
+          </button>
         </div>
       </aside>
     </div>

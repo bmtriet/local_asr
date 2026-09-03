@@ -83,16 +83,41 @@ class VoiceTypingDaemon:
 
         threading.Thread(target=worker, daemon=True).start()
 
+    def _parse_hotkey(self, hotkey_input: str) -> str:
+        """Parse hotkey string for pynput GlobalHotKeys, e.g. 'ctrl+alt+space' -> '<ctrl>+<alt>+<space>'."""
+        parts = hotkey_input.lower().split("+")
+        formatted_parts = [f"<{p.strip()}>" if len(p.strip()) > 1 else p.strip() for p in parts]
+        return "+".join(formatted_parts)
+
+    def update_hotkey(self, new_hotkey: str):
+        """Dynamically rebind hotkey without restarting service."""
+        try:
+            hotkey_str = self._parse_hotkey(new_hotkey)
+            new_listener = keyboard.GlobalHotKeys({
+                hotkey_str: self.toggle_recording
+            })
+            new_listener.start()
+            if self._listener:
+                self._listener.stop()
+            self._listener = new_listener
+            self.settings.HOTKEY = new_hotkey
+            print(f"[VoiceTyping] Hotkey updated to: {hotkey_str}")
+            return True
+        except Exception as e:
+            print(f"[VoiceTyping] Failed to bind hotkey {new_hotkey}: {e}")
+            return False
+
     def start(self):
         """Start global hotkey listener and tray icon."""
         if self.tray:
             self.tray.run_in_background()
 
-        # Parse hotkey string for pynput GlobalHotKeys, e.g. '<ctrl>+<alt>+<space>'
-        parts = self.settings.HOTKEY.lower().split("+")
-        formatted_parts = [f"<{p.strip()}>" if len(p.strip()) > 1 else p.strip() for p in parts]
-        hotkey_str = "+".join(formatted_parts)
+        # Check if user saved custom hotkey in DB
+        db_hotkey = self.db.get_setting("hotkey")
+        active_hotkey = db_hotkey or self.settings.HOTKEY
+        self.settings.HOTKEY = active_hotkey
 
+        hotkey_str = self._parse_hotkey(active_hotkey)
         print(f"[VoiceTyping] Listening for global hotkey: {hotkey_str}")
         self._listener = keyboard.GlobalHotKeys({
             hotkey_str: self.toggle_recording

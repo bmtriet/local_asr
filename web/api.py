@@ -121,8 +121,10 @@ def start_train(epochs: int = 3, lr: float = 1e-4):
 
 @app.get("/api/settings")
 def get_current_settings():
+    saved_hotkey = db.get_setting("hotkey")
+    active_hotkey = saved_hotkey or settings.HOTKEY
     return {
-        "hotkey": settings.HOTKEY,
+        "hotkey": active_hotkey,
         "sample_rate": settings.SAMPLE_RATE,
         "model_name": settings.MODEL_NAME,
         "device": engine.device
@@ -131,7 +133,9 @@ def get_current_settings():
 @app.post("/api/settings")
 def update_settings(payload: SettingsUpdateRequest):
     if payload.hotkey:
-        settings.HOTKEY = payload.hotkey
+        cleaned_hotkey = payload.hotkey.strip().lower()
+        settings.HOTKEY = cleaned_hotkey
+        db.set_setting("hotkey", cleaned_hotkey)
     return {"status": "updated", "settings": get_current_settings()}
 
 static_dir = Path(__file__).resolve().parent / "static"

@@ -185,3 +185,25 @@ class Database:
             )
             conn.commit()
             return cursor.rowcount > 0
+
+    def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
+        """Get a setting value by key."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT value FROM settings WHERE key = ?", (key,))
+            row = cursor.fetchone()
+            return row["value"] if row else default
+
+    def set_setting(self, key: str, value: str) -> bool:
+        """Upsert a setting value."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO settings (key, value) VALUES (?, ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (key, value)
+            )
+            conn.commit()
+            return True

@@ -332,28 +332,116 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Settings: Load and Save Hotkey
+  // Settings: Load, Record, and Save Hotkey
+  const btnRecordHotkey = document.getElementById('btn-record-hotkey');
+  const hotkeyHintText = document.getElementById('hotkey-hint-text');
+  const presetBadges = document.querySelectorAll('.badge-preset');
+  let isRecordingHotkey = false;
+
   async function loadSettings() {
     try {
       const res = await fetch('/api/settings');
       const data = await res.json();
       if (data.hotkey) {
         inputHotkey.value = data.hotkey;
+        updatePresetActiveBadge(data.hotkey);
       }
     } catch (err) {
       console.error(err);
     }
   }
 
+  function updatePresetActiveBadge(hotkeyVal) {
+    presetBadges.forEach(badge => {
+      if (badge.dataset.keys.toLowerCase() === hotkeyVal.toLowerCase()) {
+        badge.classList.add('active');
+      } else {
+        badge.classList.remove('active');
+      }
+    });
+  }
+
+  // Preset badge click handlers
+  presetBadges.forEach(badge => {
+    badge.addEventListener('click', () => {
+      const selectedKey = badge.dataset.keys;
+      inputHotkey.value = selectedKey;
+      updatePresetActiveBadge(selectedKey);
+      if (isRecordingHotkey) stopHotkeyRecording();
+    });
+  });
+
+  // Start / Stop Hotkey Recording
+  function startHotkeyRecording() {
+    isRecordingHotkey = true;
+    inputHotkey.classList.add('recording');
+    btnRecordHotkey.textContent = 'Đang bắt...';
+    btnRecordHotkey.classList.add('btn-primary');
+    btnRecordHotkey.classList.remove('btn-secondary');
+    hotkeyHintText.textContent = '🔴 Hãy bấm tổ hợp phím trên bàn phím của bạn ngay lúc này...';
+    hotkeyHintText.classList.add('recording');
+  }
+
+  function stopHotkeyRecording() {
+    isRecordingHotkey = false;
+    inputHotkey.classList.remove('recording');
+    btnRecordHotkey.textContent = 'Bắt phím';
+    btnRecordHotkey.classList.remove('btn-primary');
+    btnRecordHotkey.classList.add('btn-secondary');
+    hotkeyHintText.textContent = 'Nhấp "Bắt phím" rồi bấm tổ hợp phím bạn muốn gán.';
+    hotkeyHintText.classList.remove('recording');
+  }
+
+  if (btnRecordHotkey) {
+    btnRecordHotkey.addEventListener('click', () => {
+      if (!isRecordingHotkey) {
+        startHotkeyRecording();
+      } else {
+        stopHotkeyRecording();
+      }
+    });
+  }
+
+  // Capture keyboard events when recording
+  window.addEventListener('keydown', (e) => {
+    if (!isRecordingHotkey) return;
+
+    // Prevent default browser shortcuts while capturing
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Ignore standalone modifier presses
+    const modifierKeys = ['Control', 'Alt', 'Shift', 'Meta'];
+    if (modifierKeys.includes(e.key)) {
+      return;
+    }
+
+    const parts = [];
+    if (e.ctrlKey) parts.push('ctrl');
+    if (e.altKey) parts.push('alt');
+    if (e.shiftKey) parts.push('shift');
+
+    let keyName = e.key.toLowerCase();
+    if (e.code === 'Space') keyName = 'space';
+    else if (keyName.startsWith('arrow')) keyName = keyName.replace('arrow', '');
+    
+    parts.push(keyName);
+
+    const combo = parts.join('+');
+    inputHotkey.value = combo;
+    updatePresetActiveBadge(combo);
+    stopHotkeyRecording();
+  });
+
   btnSaveHotkey.addEventListener('click', async () => {
     try {
       const res = await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hotkey: inputHotkey.value })
+        body: JSON.stringify({ hotkey: inputHotkey.value.trim() })
       });
       if (res.ok) {
-        alert('Đã cập nhật phím tắt!');
+        alert(`Đã lưu phím tắt thành công: ${inputHotkey.value.trim()}\nHệ thống sẵn sàng nhận diện!`);
       }
     } catch (err) {
       alert('Lỗi: ' + err.message);
