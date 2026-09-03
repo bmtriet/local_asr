@@ -30,8 +30,12 @@ trainer = LoRATrainer(db=db)
 daemon_instance: Optional[Any] = None
 
 def set_daemon_instance(d):
-    global daemon_instance
+    global daemon_instance, engine, db
     daemon_instance = d
+    if hasattr(d, "engine") and d.engine:
+        engine = d.engine
+    if hasattr(d, "db") and d.db:
+        db = d.db
 
 class CorrectionRequest(BaseModel):
     corrected_text: str
@@ -39,6 +43,8 @@ class CorrectionRequest(BaseModel):
 class SettingsUpdateRequest(BaseModel):
     hotkey: Optional[str] = None
     grammar_correction_enabled: Optional[bool] = None
+    translation_target: Optional[str] = None
+    add_origin_phrase: Optional[bool] = None
 
 @app.get("/api/status")
 def get_status():
@@ -116,11 +122,15 @@ def get_train_status():
 def start_train(epochs: int = 3, lr: float = 1e-4):
     def on_complete(adapter_dir):
         try:
+            print(f"[API] Training completed! Reloading adapter into engine from {adapter_dir}...")
             engine.load_lora_adapter(adapter_dir)
+            if daemon_instance and hasattr(daemon_instance, "engine") and daemon_instance.engine:
+                if daemon_instance.engine is not engine:
+                    daemon_instance.engine.load_lora_adapter(adapter_dir)
         except Exception as e:
             print("Failed to auto-reload LoRA adapter:", e)
 
-    started = trainer.start_training(epochs=epochs, lr=lr, on_completed=on_complete)
+    started = trainer.start_training(epochs=epochs, lr=lr, on_completed=on_complete, asr_engine=engine)
     if not started:
         raise HTTPException(status_code=400, detail=trainer.last_error or "Cannot start training")
     return {"status": "started"}
@@ -131,12 +141,17 @@ def get_current_settings():
     active_hotkey = saved_hotkey or settings.HOTKEY
     grammar_enabled_str = db.get_setting("grammar_correction_enabled", str(settings.GRAMMAR_CORRECTION_ENABLED)).lower()
     grammar_enabled = (grammar_enabled_str == "true")
+    translation_target = db.get_setting("translation_target", settings.TRANSLATION_TARGET)
+    add_origin_phrase_str = db.get_setting("add_origin_phrase", str(settings.ADD_ORIGIN_PHRASE)).lower()
+    add_origin_phrase = (add_origin_phrase_str == "true")
     return {
         "hotkey": active_hotkey,
         "sample_rate": settings.SAMPLE_RATE,
         "model_name": settings.MODEL_NAME,
         "device": engine.device,
-        "grammar_correction_enabled": grammar_enabled
+        "grammar_correction_enabled": grammar_enabled,
+        "translation_target": translation_target,
+        "add_origin_phrase": add_origin_phrase
     }
 
 @app.post("/api/settings")
@@ -151,6 +166,15 @@ def update_settings(payload: SettingsUpdateRequest):
     if payload.grammar_correction_enabled is not None:
         settings.GRAMMAR_CORRECTION_ENABLED = payload.grammar_correction_enabled
         db.set_setting("grammar_correction_enabled", str(payload.grammar_correction_enabled).lower())
+
+    if payload.translation_target is not None:
+        cleaned_target = payload.translation_target.strip().lower()
+        settings.TRANSLATION_TARGET = cleaned_target
+        db.set_setting("translation_target", cleaned_target)
+
+    if payload.add_origin_phrase is not None:
+        settings.ADD_ORIGIN_PHRASE = payload.add_origin_phrase
+        db.set_setting("add_origin_phrase", str(payload.add_origin_phrase).lower())
         
     return {"status": "updated", "settings": get_current_settings()}
 

@@ -14,10 +14,13 @@ class Settings(BaseSettings):
     MODEL_NAME: str = "Qwen/Qwen3-ASR-0.6B"
     DEVICE: str = "cuda"
     TORCH_DTYPE: str = "bfloat16"
+    CPU_THREADS: int = min(4, os.cpu_count() or 4)
     
-    # Grammar Correction Model settings
+    # Grammar Correction & Translation Model settings
     GRAMMAR_MODEL_NAME: str = "Qwen/Qwen2.5-0.5B-Instruct"
     GRAMMAR_CORRECTION_ENABLED: bool = False
+    TRANSLATION_TARGET: str = "english" # "english" or "chinese"
+    ADD_ORIGIN_PHRASE: bool = False
     
     # Hotkey & Input injection settings
     HOTKEY: str = "ctrl+alt+space"

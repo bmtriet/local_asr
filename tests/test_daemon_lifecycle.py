@@ -67,3 +67,35 @@ def test_daemon_esc_cancel(tmp_path):
     daemon.is_recording = True
     daemon.cancel_recording()
     assert daemon.is_recording is False
+
+def test_daemon_mode_timeout(tmp_path):
+    from unittest.mock import MagicMock
+    from storage.database import Database
+    db = Database(str(tmp_path / "test_timeout.db"))
+    db.init_db()
+
+    daemon = VoiceTypingDaemon(db=db, show_tray=False)
+    mock_proc = MagicMock()
+    daemon.recorder = MagicMock()
+
+    # Hotkey pressed: starts recording immediately and opens OSD
+    daemon._start_recording_and_osd()
+    assert daemon.is_recording is True
+    assert daemon.recorder.start_recording.called
+
+    # Mock osd process
+    daemon._osd_process = mock_proc
+
+    # Trigger timeout handler: OSD closes, recording continues
+    daemon._on_mode_timeout()
+
+    assert daemon.current_mode == "normal"
+    assert daemon._osd_process is None
+    assert mock_proc.terminate.called
+    assert daemon.is_recording is True
+
+    # User presses mode key while speaking: mode updates, recording continues
+    daemon._osd_process = MagicMock()
+    daemon._on_mode_key_press(MagicMock(char='e'))
+    assert daemon.current_mode == "english"
+    assert daemon.is_recording is True

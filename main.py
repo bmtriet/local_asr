@@ -41,10 +41,8 @@ def run_daemon(engine, db):
     
     try:
         daemon.start(blocking=True)
-        # Fallback if no tray blocks
-        if not daemon.tray:
-            while not stop_event.is_set():
-                time.sleep(0.5)
+        while not stop_event.is_set():
+            time.sleep(0.5)
     except KeyboardInterrupt:
         daemon.stop()
 

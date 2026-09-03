@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +31,7 @@
 
       <div class="system-status">
         <span class="status-dot" id="system-status-dot"></span>
-        <span id="system-status-text">Đang kết nối...</span>
+        <span id="system-status-text">Connecting...</span>
       </div>
     </header>
 
@@ -42,15 +42,15 @@
         <div class="card">
           <div class="card-header">
             <h2 class="card-title">
-              <span>Lịch sử Nhận dạng & Sửa từ sai</span>
+              <span>Recognition History & Corrections</span>
               <span id="history-total-badge" class="badge-count">0</span>
             </h2>
             <div class="header-actions">
-              <button class="btn btn-secondary" id="btn-collapse-all" title="Thu gọn / Mở rộng tất cả">
-                Thu gọn
+              <button class="btn btn-secondary" id="btn-collapse-all" title="Collapse / Expand All">
+                Collapse All
               </button>
               <button class="btn btn-secondary" id="btn-refresh-history">
-                Làm mới
+                Refresh
               </button>
             </div>
           </div>
@@ -61,17 +61,17 @@
               <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16">
                 <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
               </svg>
-              <input type="text" id="input-search-history" class="search-input" placeholder="Tìm kiếm nội dung câu nói...">
+              <input type="text" id="input-search-history" class="search-input" placeholder="Search spoken text history...">
             </div>
 
             <div class="filter-group">
-              <button class="filter-btn active" data-filter="all">Tất cả</button>
-              <button class="filter-btn" data-filter="unreviewed">Chưa sửa</button>
-              <button class="filter-btn" data-filter="reviewed">Đã sửa</button>
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="unreviewed">Unreviewed</button>
+              <button class="filter-btn" data-filter="reviewed">Reviewed</button>
             </div>
 
             <div class="page-size-selector">
-              <label for="select-page-size">Hiển thị:</label>
+              <label for="select-page-size">Show:</label>
               <select id="select-page-size" class="select-dropdown">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
@@ -82,16 +82,16 @@
           </div>
 
           <div id="history-container" class="history-list">
-            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">Đang tải lịch sử...</p>
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">Loading history...</p>
           </div>
 
           <!-- Pagination Bar -->
           <div id="pagination-bar" class="pagination-bar">
-            <div class="pagination-info" id="pagination-info">Trang 1 / 1</div>
+            <div class="pagination-info" id="pagination-info">Page 1 / 1</div>
             <div class="pagination-buttons">
-              <button class="btn btn-secondary pagination-btn" id="btn-prev-page" disabled>&larr; Trước</button>
+              <button class="btn btn-secondary pagination-btn" id="btn-prev-page" disabled>&larr; Prev</button>
               <div id="pagination-numbers" class="pagination-numbers"></div>
-              <button class="btn btn-secondary pagination-btn" id="btn-next-page" disabled>Sau &rarr;</button>
+              <button class="btn btn-secondary pagination-btn" id="btn-next-page" disabled>Next &rarr;</button>
             </div>
           </div>
         </div>
@@ -105,19 +105,19 @@
             <h2 class="card-title">LoRA Fine-Tuning</h2>
           </div>
           <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">
-            Cá nhân hoá model từ các mẫu giọng nói bạn đã sửa từ đúng.
+            Personalize model weights from your reviewed voice samples.
           </p>
 
           <div class="metric-row">
-            <span>Mẫu đã sửa sẵn sàng:</span>
+            <span>Reviewed samples ready:</span>
             <strong id="metric-pending-samples" style="color: var(--amber);">0</strong>
           </div>
           <div class="metric-row">
-            <span>Trạng thái Trainer:</span>
+            <span>Trainer status:</span>
             <strong id="metric-train-status" style="color: var(--emerald);">Idle</strong>
           </div>
           <div class="metric-row">
-            <span>Loss hiện tại:</span>
+            <span>Current loss:</span>
             <strong id="metric-train-loss">-</strong>
           </div>
 
@@ -126,58 +126,78 @@
           </div>
 
           <button class="btn btn-primary" id="btn-start-training" style="width: 100%; justify-content: center;">
-            Kích hoạt Huấn luyện LoRA
+            Start LoRA Training
           </button>
         </div>
 
         <!-- Grammar Correction Card -->
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title">Chuẩn hoá & Dịch thuật (AI)</h2>
+            <h2 class="card-title">Text Normalization & Translation (AI)</h2>
           </div>
           <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">
-            Tự động sửa lỗi chính tả hoặc dịch sang Tiếng Anh / Trung bằng Qwen2.5-0.5B.
+            Automatic grammar correction and multi-language translation via Qwen2.5-0.5B.
           </p>
           <style>
             .switch-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 20px; }
             .switch-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
             input:checked + .switch-slider { background-color: var(--primary); }
             input:checked + .switch-slider:before { transform: translateX(20px); }
+            .translation-options { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+            .form-group-label { font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.4rem; display: block; }
+            .origin-phrase-box { margin-top: 0.75rem; padding: 0.65rem 0.75rem; border-radius: var(--radius-sm); background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); transition: all 0.3s ease; }
           </style>
+          
           <div style="display: flex; align-items: center; justify-content: space-between;">
-            <label for="toggle-grammar" style="font-size: 0.875rem; font-weight: 500;">Bật sửa lỗi tự động:</label>
+            <label for="toggle-grammar" style="font-size: 0.875rem; font-weight: 500;">Auto Grammar Correction:</label>
             <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
               <input type="checkbox" id="toggle-grammar" style="opacity: 0; width: 0; height: 0;">
               <span class="switch-slider"></span>
             </label>
+          </div>
+
+          <div class="translation-options">
+            <div class="origin-phrase-box">
+              <label style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer;">
+                <input type="checkbox" id="toggle-add-origin-phrase" style="margin-top: 0.25rem; accent-color: var(--primary); width: 16px; height: 16px;">
+                <div>
+                  <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
+                    Add origin phrase (Include source speech when translating)
+                  </span>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; line-height: 1.4; margin-top: 0.2rem;">
+                    When translating to any target language, output includes 2 lines: line 1 shows your original spoken text, line 2 shows the translated output.
+                  </span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 
         <!-- Hotkey & Settings Card -->
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title">Cấu hình Phím tắt (Linux)</h2>
+            <h2 class="card-title">Global Shortcut Settings</h2>
           </div>
 
           <div style="margin-bottom: 1.25rem;">
             <label style="font-size: 0.8125rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">
-              Phím kích hoạt đang chọn:
+              Active trigger shortcut:
             </label>
             <div class="hotkey-record-wrapper">
               <input type="text" id="input-hotkey" class="edit-box hotkey-input" value="ctrl+alt+space" readonly>
-              <button class="btn btn-secondary" id="btn-record-hotkey" title="Bấm để ghi nhận phím nhấn từ bàn phím">
-                Bắt phím
+              <button class="btn btn-secondary" id="btn-record-hotkey" title="Record key combination from keyboard">
+                Record Key
               </button>
             </div>
             <p id="hotkey-hint-text" class="hotkey-hint">
-              Nhấp "Bắt phím" rồi bấm tổ hợp phím bạn muốn gán.
+              Click "Record Key" and press your desired shortcut combination.
             </p>
           </div>
 
-          <!-- Gợi ý phím tắt chuẩn Linux tối ưu không xung đột -->
+          <!-- Recommended presets -->
           <div style="margin-bottom: 1rem;">
             <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
-              Gợi ý phím tắt tối ưu cho Linux:
+              Recommended shortcut presets:
             </span>
             <div class="preset-badges">
               <button class="badge-preset active" data-keys="ctrl+alt+space">ctrl+alt+space</button>
@@ -189,7 +209,7 @@
           </div>
 
           <button class="btn btn-primary" id="btn-save-hotkey" style="width: 100%; justify-content: center;">
-            Lưu Phím tắt
+            Save Shortcut
           </button>
         </div>
       </aside>

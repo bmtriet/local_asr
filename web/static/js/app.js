@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       statusDot.style.background = 'var(--rose)';
       statusDot.style.boxShadow = '0 0 8px var(--rose)';
-      statusText.textContent = 'Mất kết nối Backend';
+      statusText.textContent = 'Backend Disconnected';
     }
   }
 
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnNextPage = document.getElementById('btn-next-page');
 
   function truncateWords(text, maxWords = 20) {
-    if (!text) return '(Trống)';
+    if (!text) return '(Empty)';
     const words = text.trim().split(/\s+/);
     if (words.length <= maxWords) return text;
     return words.slice(0, maxWords).join(' ') + '...';
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (items.length === 0) {
         historyContainer.innerHTML = `
           <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
-            ${searchQuery || currentFilter !== 'all' ? 'Không tìm thấy câu nói nào phù hợp bộ lọc.' : `Chưa có đoạn ghi âm nào. Hãy bấm phím tắt <code>${inputHotkey.value}</code> để nói thử một câu!`}
+            ${searchQuery || currentFilter !== 'all' ? 'No spoken records matching your filter.' : `No recordings yet. Press hotkey <code>${inputHotkey.value}</code> to record your first utterance!`}
           </div>
         `;
         return;
@@ -99,19 +99,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="item-header-meta">
               <span>${item.duration.toFixed(1)}s</span>
               <span class="item-badge ${item.is_reviewed ? 'badge-reviewed' : 'badge-unreviewed'}">
-                ${item.is_reviewed ? 'Đã sửa' : 'Gốc'}
+                ${item.is_reviewed ? 'Reviewed' : 'Raw'}
               </span>
             </div>
           </div>
 
           <div class="history-item-body">
             <div class="item-meta">
-              <span>${item.timestamp} • Độ dài: ${item.duration.toFixed(1)}s</span>
+              <span>${item.timestamp} • Duration: ${item.duration.toFixed(1)}s</span>
               <span style="font-size: 0.75rem; color: var(--text-muted);">ID: #${item.id}</span>
             </div>
 
             <div style="margin-bottom: 0.75rem;">
-              <label style="font-size: 0.75rem; color: var(--text-muted);">Mô hình nhận dạng ban đầu:</label>
+              <label style="font-size: 0.75rem; color: var(--text-muted);">Original ASR Recognition (Source Spoken Text):</label>
               <div style="font-style: italic; color: var(--text-secondary); margin-top: 0.2rem; background: rgba(0,0,0,0.25); padding: 0.4rem 0.6rem; border-radius: 4px;">
                 "${item.raw_text}"
               </div>
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <div style="margin-bottom: 0.75rem;">
               <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">
-                Văn bản chuẩn xác (Chỉnh sửa để huấn luyện LoRA):
+                Ground Truth Text (Review & correct to train LoRA adapter):
               </label>
               <textarea class="edit-box" id="edit-text-${item.id}" rows="2">${item.corrected_text}</textarea>
             </div>
@@ -127,12 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="item-actions">
               <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <audio controls preload="none" src="/api/audio/${item.id}"></audio>
-                <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Xoá đoạn ghi âm">
-                  Xoá
+                <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Delete recording">
+                  Delete
                 </button>
               </div>
               <button class="btn btn-primary" onclick="saveCorrection(${item.id})">
-                Lưu từ sửa
+                Save Review
               </button>
             </div>
           </div>
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       }).join('');
     } catch (err) {
-      historyContainer.innerHTML = '<p style="color: var(--rose); text-align: center; padding: 1.5rem;">Lỗi khi tải lịch sử: ' + err.message + '</p>';
+      historyContainer.innerHTML = '<p style="color: var(--rose); text-align: center; padding: 1.5rem;">Error loading history: ' + err.message + '</p>';
     }
   }
 
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCollapseAll) {
     btnCollapseAll.addEventListener('click', () => {
       allCollapsed = !allCollapsed;
-      btnCollapseAll.textContent = allCollapsed ? 'Mở rộng' : 'Thu gọn';
+      btnCollapseAll.textContent = allCollapsed ? 'Collapse All' : 'Expand All';
       document.querySelectorAll('.history-item').forEach(el => {
         if (allCollapsed) el.classList.remove('open');
         else el.classList.add('open');
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (paginationInfo) {
       const start = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
       const end = Math.min(currentPage * pageSize, totalCount);
-      paginationInfo.textContent = `${start}-${end} / ${totalCount} bản ghi (Trang ${currentPage}/${totalPages})`;
+      paginationInfo.textContent = `${start}-${end} of ${totalCount} records (Page ${currentPage}/${totalPages})`;
     }
 
     if (btnPrevPage) btnPrevPage.disabled = (currentPage <= 1);
@@ -253,17 +253,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Delete item
   window.deleteItem = async function(id) {
-    if (!confirm('Bạn có chắc muốn xoá bản ghi này và file âm thanh tương ứng?')) return;
+    if (!confirm('Are you sure you want to delete this record and its audio file?')) return;
     try {
       const res = await fetch(`/api/history/${id}`, { method: 'DELETE' });
       if (res.ok) {
         loadHistory();
         checkTrainStatus();
       } else {
-        alert('Không thể xoá bản ghi.');
+        alert('Could not delete record.');
       }
     } catch (err) {
-      alert('Lỗi: ' + err.message);
+      alert('Error: ' + err.message);
     }
   };
 
@@ -282,9 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.ok) {
         loadHistory();
         checkTrainStatus();
+      } else {
+        alert('Could not save correction: ' + err.message);
       }
     } catch (err) {
-      alert('Không thể lưu từ sửa: ' + err.message);
+      alert('Error: ' + err.message);
     }
   };
 
@@ -298,14 +300,14 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (data.is_training) {
         btnStartTraining.disabled = true;
-        metricTrainLoss.textContent = data.current_loss > 0 ? data.current_loss : 'Đang tính...';
+        metricTrainLoss.textContent = data.current_loss > 0 ? data.current_loss : 'Calculating...';
         const total = (data.total_epochs || 1);
         const current = data.current_epoch || 0;
         const percent = Math.min(100, Math.round((current / total) * 100));
         progressBar.style.width = `${percent}%`;
       } else {
         btnStartTraining.disabled = (data.pending_samples === 0);
-        metricTrainLoss.textContent = data.current_loss > 0 ? `${data.current_loss} (Xong)` : '-';
+        metricTrainLoss.textContent = data.current_loss > 0 ? `${data.current_loss} (Completed)` : '-';
         if (data.status === 'completed') {
           progressBar.style.width = '100%';
         }
@@ -324,11 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
         checkTrainStatus();
       } else {
         const err = await res.json();
-        alert(err.detail || 'Không thể bắt đầu train');
+        alert(err.detail || 'Failed to start training');
         btnStartTraining.disabled = false;
       }
     } catch (err) {
-      alert('Lỗi kết nối: ' + err.message);
+      alert('Connection error: ' + err.message);
       btnStartTraining.disabled = false;
     }
   });
@@ -337,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnRecordHotkey = document.getElementById('btn-record-hotkey');
   const hotkeyHintText = document.getElementById('hotkey-hint-text');
   const presetBadges = document.querySelectorAll('.badge-preset');
+  const toggleAddOriginPhrase = document.getElementById('toggle-add-origin-phrase');
   let isRecordingHotkey = false;
 
   async function loadSettings() {
@@ -349,6 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (toggleGrammar) {
         toggleGrammar.checked = data.grammar_correction_enabled;
+      }
+      if (toggleAddOriginPhrase) {
+        toggleAddOriginPhrase.checked = !!data.add_origin_phrase;
       }
     } catch (err) {
       console.error(err);
@@ -379,20 +385,20 @@ document.addEventListener('DOMContentLoaded', () => {
   function startHotkeyRecording() {
     isRecordingHotkey = true;
     inputHotkey.classList.add('recording');
-    btnRecordHotkey.textContent = 'Đang bắt...';
+    btnRecordHotkey.textContent = 'Recording...';
     btnRecordHotkey.classList.add('btn-primary');
     btnRecordHotkey.classList.remove('btn-secondary');
-    hotkeyHintText.textContent = '🔴 Hãy bấm tổ hợp phím trên bàn phím của bạn ngay lúc này...';
+    hotkeyHintText.textContent = '🔴 Press your desired key combination now...';
     hotkeyHintText.classList.add('recording');
   }
 
   function stopHotkeyRecording() {
     isRecordingHotkey = false;
     inputHotkey.classList.remove('recording');
-    btnRecordHotkey.textContent = 'Bắt phím';
+    btnRecordHotkey.textContent = 'Record Key';
     btnRecordHotkey.classList.remove('btn-primary');
     btnRecordHotkey.classList.add('btn-secondary');
-    hotkeyHintText.textContent = 'Nhấp "Bắt phím" rồi bấm tổ hợp phím bạn muốn gán.';
+    hotkeyHintText.textContent = 'Click "Record Key" and press your shortcut combination.';
     hotkeyHintText.classList.remove('recording');
   }
 
@@ -445,10 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ hotkey: inputHotkey.value.trim() })
       });
       if (res.ok) {
-        alert(`Đã lưu phím tắt thành công: ${inputHotkey.value.trim()}\nHệ thống sẵn sàng nhận diện!`);
+        alert(`Shortcut saved successfully: ${inputHotkey.value.trim()}\nSystem is ready to transcribe!`);
       }
     } catch (err) {
-      alert('Lỗi: ' + err.message);
+      alert('Error: ' + err.message);
     }
   });
 
@@ -461,7 +467,21 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({ grammar_correction_enabled: e.target.checked })
         });
       } catch (err) {
-        alert('Lỗi lưu cài đặt chuẩn hoá: ' + err.message);
+        alert('Error saving grammar correction setting: ' + err.message);
+      }
+    });
+  }
+
+  if (toggleAddOriginPhrase) {
+    toggleAddOriginPhrase.addEventListener('change', async (e) => {
+      try {
+        await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ add_origin_phrase: e.target.checked })
+        });
+      } catch (err) {
+        alert('Error saving Add origin phrase setting: ' + err.message);
       }
     });
   }

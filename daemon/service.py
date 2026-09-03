@@ -3,6 +3,8 @@ import time
 import subprocess
 import os
 import sys
+import platform
+import shutil
 from typing import Optional
 from pynput import keyboard
 from config import get_settings
@@ -29,6 +31,8 @@ class VoiceTypingDaemon:
         self.grammar = GrammarCorrector(lazy_load=True)
         self.recorder = AudioRecorder(sample_rate=self.settings.SAMPLE_RATE)
         self.injector = TextInjector()
+        from asr_engine.normalizer import VietnameseNormalizer
+        self.normalizer = VietnameseNormalizer(db=self.db)
         self._on_exit_cb = on_exit
         self._on_restart_cb = on_restart
         self.tray = TrayIndicator(on_exit=self.stop, on_restart=self.restart) if show_tray else None
@@ -37,6 +41,7 @@ class VoiceTypingDaemon:
         self.current_mode = "normal"
         self._osd_process = None
         self._mode_listener = None
+        self._mode_timer = None
         self._esc_listener = None
         
         self._listener: Optional[keyboard.GlobalHotKeys] = None
@@ -46,30 +51,55 @@ class VoiceTypingDaemon:
         """Toggle recording state via hotkey."""
         with self._lock:
             if not self.is_recording:
-                if self._osd_process:
-                    self._cleanup_osd()
-                    return
-                self._wait_for_mode()
+                self._start_recording_and_osd()
             else:
                 self._stop_and_process()
 
-    def _wait_for_mode(self):
-        print("[VoiceTyping] Hotkey pressed -> Waiting for translation mode...")
-        # Launch OSD
+    def _start_recording_and_osd(self):
+        print("[VoiceTyping] Hotkey pressed -> Starting recording immediately...")
+        # 1. Reset mode and mark recording active immediately
+        self.current_mode = "normal"
+        self.is_recording = True
+        if self.tray:
+            self.tray.set_state("recording")
+        
+        # 2. Begin audio capture without delay
+        self.recorder.start_recording()
+
+        # 3. Start ESC listener during speaking/recording to allow instant cancel
+        if self._esc_listener:
+            self._esc_listener.stop()
+        self._esc_listener = keyboard.Listener(on_press=self._on_esc_press)
+        self._esc_listener.start()
+
+        # 4. Launch OSD concurrently for optional mode selection
         osd_path = os.path.join(os.path.dirname(__file__), "osd.py")
         self._osd_process = subprocess.Popen([sys.executable, osd_path])
         
-        # Start keyboard listener for next key
+        # 5. Start keyboard listener for mode selection keys (e, z, space)
+        if self._mode_listener:
+            self._mode_listener.stop()
         self._mode_listener = keyboard.Listener(on_press=self._on_mode_key_press)
         self._mode_listener.start()
 
+        # 6. Auto-dismiss OSD after 2 seconds (recording continues uninterrupted)
+        if self._mode_timer:
+            self._mode_timer.cancel()
+        self._mode_timer = threading.Timer(2.0, self._on_mode_timeout)
+        self._mode_timer.daemon = True
+        self._mode_timer.start()
+
+    def _on_mode_timeout(self):
+        with self._lock:
+            if self._osd_process:
+                print("[VoiceTyping] 2s OSD timeout -> Dismissing OSD, recording continues in normal mode.")
+                self._cleanup_osd()
+
     def _on_mode_key_press(self, key):
-        # 1. If ESC is pressed, cancel OSD and return to idle
+        # 1. If ESC is pressed, cancel recording completely and return to idle
         if key == keyboard.Key.esc:
-            print("[VoiceTyping] ESC pressed -> OSD cancelled.")
-            self._cleanup_osd()
-            if self.tray:
-                self.tray.set_state("idle")
+            print("[VoiceTyping] ESC pressed -> Recording cancelled.")
+            self.cancel_recording()
             return False
 
         should_backspace = False
@@ -82,30 +112,32 @@ class VoiceTypingDaemon:
                 elif char == 'z':
                     self.current_mode = "chinese"
                     should_backspace = True
-                else:
+                elif char == ' ':
                     self.current_mode = "normal"
                     should_backspace = True
             elif key == keyboard.Key.space:
                 self.current_mode = "normal"
                 should_backspace = True
-            else:
-                self.current_mode = "normal"
         except Exception:
-            self.current_mode = "normal"
-            
-        print(f"[VoiceTyping] Mode selected: {self.current_mode}")
-        self._cleanup_osd()
+            pass
 
-        # Erase the mode key (e, z, space) from active window so it is not left in text
         if should_backspace:
-            try:
-                time.sleep(0.06)
-                subprocess.run(["xdotool", "key", "--clearmodifiers", "BackSpace"], check=False)
-            except Exception as e:
-                print(f"[VoiceTyping] Error removing mode key: {e}")
+            print(f"[VoiceTyping] Mode selected: {self.current_mode} (recording continues...)")
+            self._cleanup_osd()
+            self._send_backspace()
+            return False
 
-        self._start()
-        return False # Stop the listener
+    def _send_backspace(self):
+        """Cross-platform backspace tap to erase mode selection key from focused window."""
+        try:
+            time.sleep(0.06)
+            if platform.system() == "Linux" and shutil.which("xdotool"):
+                subprocess.run(["xdotool", "key", "--clearmodifiers", "BackSpace"], check=False)
+            else:
+                from pynput.keyboard import Controller, Key
+                Controller().tap(Key.backspace)
+        except Exception as e:
+            print(f"[VoiceTyping] Error removing mode key: {e}")
 
     def _on_esc_press(self, key):
         if key == keyboard.Key.esc:
@@ -129,6 +161,9 @@ class VoiceTypingDaemon:
                 self.tray.set_state("idle")
 
     def _cleanup_osd(self):
+        if self._mode_timer:
+            self._mode_timer.cancel()
+            self._mode_timer = None
         if self._osd_process:
             self._osd_process.terminate()
             self._osd_process = None
@@ -152,6 +187,7 @@ class VoiceTypingDaemon:
     def _stop_and_process(self):
         print("[VoiceTyping] Hotkey pressed -> Stopping recording & processing...")
         self.is_recording = False
+        self._cleanup_osd()
         if self._esc_listener:
             self._esc_listener.stop()
             self._esc_listener = None
@@ -170,30 +206,58 @@ class VoiceTypingDaemon:
         # Run transcription in separate worker to keep hotkey responsive
         def worker():
             try:
-                text = self.engine.transcribe(audio_path)
+                # Retrieve user reviewed vocabulary & keywords for instant adaptation
+                user_vocab = self.db.get_reviewed_vocabulary()
+                if user_vocab:
+                    print(f"[VoiceTyping] Applying user vocabulary context ({len(user_vocab)} chars)...")
+
+                text = self.engine.transcribe(audio_path, context=user_vocab)
                 if text:
+                    # Apply ITN / digit sequence normalization immediately
+                    text = self.normalizer.normalize(text)
                     text = text.strip()
-                    text = text[0].upper() + text[1:]
+                    if text:
+                        text = text[0].upper() + text[1:]
                 print(f"[VoiceTyping] Transcribed: '{text}' ({duration:.1f}s)")
                 if text:
+                    # Determine active translation/grammar mode
+                    default_mode = self.db.get_setting("translation_mode", "normal")
+                    active_mode = self.current_mode if self.current_mode != "normal" else default_mode
+
                     # Check if grammar correction is enabled
                     is_grammar_enabled = self.settings.GRAMMAR_CORRECTION_ENABLED
                     if str(self.db.get_setting("grammar_correction_enabled", "false")).lower() == "true":
                         is_grammar_enabled = True
                     
                     final_text = text
-                    if is_grammar_enabled or self.current_mode != "normal":
-                        print(f"[VoiceTyping] Applying grammar correction/translation (mode: {self.current_mode})...")
-                        final_text = self.grammar.correct(text, mode=self.current_mode)
+                    if is_grammar_enabled or active_mode != "normal":
+                        print(f"[VoiceTyping] Applying grammar correction/translation (mode: {active_mode})...")
+                        translated = self.grammar.correct(text, mode=active_mode, custom_vocab=user_vocab)
+                        if active_mode == "normal":
+                            translated = self.normalizer.normalize(translated)
+                        
+                        # Check "add origin phrase" setting when translating
+                        if active_mode != "normal":
+                            add_origin = self.settings.ADD_ORIGIN_PHRASE
+                            if str(self.db.get_setting("add_origin_phrase", "false")).lower() == "true":
+                                add_origin = True
+                            
+                            if add_origin:
+                                final_text = f"{text}\n{translated}"
+                            else:
+                                final_text = translated
+                        else:
+                            final_text = translated
                     
                     # 1. Inject into focused window
                     self.injector.inject_text(final_text)
-                    # 2. Save into SQLite database
+                    # 2. Save into SQLite database (keep only source spoken text for LoRA training)
+                    stored_corrected_text = text if active_mode != "normal" else final_text
                     self.db.save_transcription(
                         audio_path=audio_path,
                         duration=duration,
                         raw_text=text,
-                        corrected_text=final_text
+                        corrected_text=stored_corrected_text
                     )
             except Exception as e:
                 print(f"[VoiceTyping] Error during transcription/injection: {e}")

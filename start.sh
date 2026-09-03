@@ -27,8 +27,8 @@ else
     sleep 0.5
 
     # Run in background detached without terminal
-    nohup "$PYTHON" -u "$SCRIPT_DIR/main.py" --service all </dev/null >> "$SCRIPT_DIR/logs/app.log" 2>&1 &
+    nohup "$PYTHON" -u "$SCRIPT_DIR/main.py" --service all >> "$SCRIPT_DIR/logs/app.log" 2>&1 &
     PID=$!
-    disown $PID
+    disown -h $PID 2>/dev/null || true
     echo "Local ASR started in background (PID: $PID). Logs: $SCRIPT_DIR/logs/app.log"
 fi

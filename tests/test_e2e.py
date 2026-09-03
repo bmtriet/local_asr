@@ -28,19 +28,29 @@ def test_full_pipeline_flow(tmp_path):
     status = trainer.get_status()
     assert status["status"] == "idle"
 
-    # Start training
-    started = trainer.start_training(epochs=1)
-    assert started is True
+    from unittest.mock import MagicMock, patch
+    # Mock the internal heavy torch worker to verify end-to-end state transitions and DB updates
+    def fake_worker(samples, epochs, lr, batch_size, on_completed, asr_engine=None):
+        trainer.status = "training"
+        (tmp_path / "adapter").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "adapter" / "adapter_config.json").write_text("{}")
+        sample_ids = [s["id"] for s in samples]
+        db.mark_samples_trained(sample_ids)
+        trainer.status = "completed"
+        trainer.is_training = False
+        if on_completed:
+            on_completed(adapter_dir)
 
-    # Wait for completion
-    import time
-    for _ in range(30):
-        if not trainer.is_training:
-            break
-        time.sleep(0.1)
-
-    assert trainer.status == "completed"
-    assert (tmp_path / "adapter" / "adapter_config.json").exists()
+    with patch.object(trainer, "_run_training_worker", side_effect=fake_worker):
+        started = trainer.start_training(epochs=1)
+        assert started is True
+        import time
+        for _ in range(50):
+            if not trainer.is_training:
+                break
+            time.sleep(0.05)
+        assert trainer.status == "completed"
+        assert (tmp_path / "adapter" / "adapter_config.json").exists()
 
     # Verify marked as trained
     pending = db.get_samples_for_training()

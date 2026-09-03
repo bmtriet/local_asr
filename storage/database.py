@@ -208,4 +208,58 @@ class Database:
                 (key, value)
             )
             conn.commit()
-            return True
+            return cursor.rowcount > 0
+
+    def get_reviewed_vocabulary(self) -> str:
+        """Extract user-reviewed keywords, corrections, and proper nouns as context."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT raw_text, corrected_text
+                FROM transcriptions
+                WHERE is_reviewed = 1
+                ORDER BY id DESC
+                LIMIT 50
+                """
+            )
+            rows = cursor.fetchall()
+            
+        vocab_set = set()
+        for row in rows:
+            raw = row["raw_text"].strip()
+            corr = row["corrected_text"].strip()
+            if corr:
+                # Extract words with uppercase, digits, or distinct corrected phrases
+                words = corr.split()
+                for w in words:
+                    w_clean = w.strip(".,?!;:-_\"'()[]{}")
+                    if any(c.isupper() or c.isdigit() for c in w_clean) and len(w_clean) > 1:
+                        vocab_set.add(w_clean)
+                if raw != corr and len(corr) < 50:
+                    vocab_set.add(corr)
+
+        return ", ".join(sorted(vocab_set))
+
+    def get_user_phrase_replacements(self) -> dict:
+        """Fetch user-reviewed custom replacements mapping raw spoken phrases to preferred output."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT raw_text, corrected_text
+                FROM transcriptions
+                WHERE is_reviewed = 1 AND raw_text != corrected_text
+                ORDER BY id DESC
+                LIMIT 100
+                """
+            )
+            rows = cursor.fetchall()
+            
+        replacements = {}
+        for r in rows:
+            raw = r["raw_text"].strip()
+            corr = r["corrected_text"].strip()
+            if raw and corr and len(raw) < 120:
+                replacements[raw.lower()] = corr
+        return replacements

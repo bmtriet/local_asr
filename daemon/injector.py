@@ -60,11 +60,46 @@ class TextInjector:
             return False
 
     def _inject_windows(self, text: str) -> bool:
-        """Windows clipboard + SendKeys/ctypes paste."""
+        """Windows clipboard paste via Win32 API and simulated Ctrl+V."""
         try:
             import ctypes
-            # Will be implemented when porting to Windows
+            import time
+
+            # Win32 Clipboard constants
+            CF_UNICODETEXT = 13
+            GMEM_MOVEABLE = 0x0002
+
+            user32 = ctypes.windll.user32
+            kernel32 = ctypes.windll.kernel32
+
+            # Open clipboard with retry
+            opened = False
+            for _ in range(10):
+                if user32.OpenClipboard(None):
+                    opened = True
+                    break
+                time.sleep(0.01)
+
+            if opened:
+                try:
+                    user32.EmptyClipboard()
+                    data = text.encode("utf-16le") + b"\x00\x00"
+                    h_mem = kernel32.GlobalAlloc(GMEM_MOVEABLE, len(data))
+                    if h_mem:
+                        p_mem = kernel32.GlobalLock(h_mem)
+                        ctypes.memmove(p_mem, data, len(data))
+                        kernel32.GlobalUnlock(h_mem)
+                        user32.SetClipboardData(CF_UNICODETEXT, h_mem)
+                finally:
+                    user32.CloseClipboard()
+
+            # Simulate Ctrl+V using pynput
+            time.sleep(0.05)
+            from pynput.keyboard import Controller, Key
+            kbd = Controller()
+            with kbd.pressed(Key.ctrl):
+                kbd.tap('v')
             return True
         except Exception as e:
-            print("Windows injection error:", e)
+            print(f"Windows injection error: {e}")
             return False
