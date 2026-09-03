@@ -2,78 +2,216 @@
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
+set "LOG_FILE=%~dp0setup_windows.log"
+echo ================================================================= > "%LOG_FILE%"
+echo Local ASR Windows Setup Log - %DATE% %TIME% >> "%LOG_FILE%"
+echo ================================================================= >> "%LOG_FILE%"
+
 echo =================================================================
 echo        Local ASR - Windows Automated Setup (GPU / CPU-Only)
 echo =================================================================
 echo.
+echo [*] Chi tiet qua trinh cai dat se duoc ghi vao file:
+echo     setup_windows.log
+echo.
 
-:: 1. Check Python installation
+:: -----------------------------------------------------------------
+:: 1. Kiem tra Python va phien ban phu hop (3.10 - 3.12, 64-bit)
+:: -----------------------------------------------------------------
+set "ERR_STEP=Kiem tra phien ban Python tren may"
+echo [*] Dang kiem tra Python tren may cua ban...
+set "PYTHON_CMD="
+
+:: Kiem tra lenh 'python' co ton tai va chay duoc khong (khong phai shortcut ao cua Microsoft Store)
 where python >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Python 3.10+ is not found in PATH!
-    echo Please install Python from https://www.python.org/downloads/
-    echo Remember to check "Add python.exe to PATH" during installation.
+if !ERRORLEVEL! EQU 0 (
+    python -c "import sys; valid = sys.version_info >= (3, 10) and sys.version_info < (3, 13) and sys.maxsize > 2**32; sys.exit(0 if valid else 1)" >> "%LOG_FILE%" 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        set "PYTHON_CMD=python"
+    )
+)
+
+:: Neu 'python' khong hop le, thu kiem tra trinh khoi chay 'py' (Python Launcher san co tren Windows)
+if "!PYTHON_CMD!"=="" (
+    where py >nul 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        py -3.11 -c "import sys; sys.exit(0 if sys.maxsize > 2**32 else 1)" >> "%LOG_FILE%" 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            set "PYTHON_CMD=py -3.11"
+        ) else (
+            py -3.10 -c "import sys; sys.exit(0 if sys.maxsize > 2**32 else 1)" >> "%LOG_FILE%" 2>&1
+            if !ERRORLEVEL! EQU 0 (
+                set "PYTHON_CMD=py -3.10"
+            ) else (
+                py -3.12 -c "import sys; sys.exit(0 if sys.maxsize > 2**32 else 1)" >> "%LOG_FILE%" 2>&1
+                if !ERRORLEVEL! EQU 0 (
+                    set "PYTHON_CMD=py -3.12"
+                ) else (
+                    py -3 -c "import sys; valid = sys.version_info >= (3, 10) and sys.version_info < (3, 13) and sys.maxsize > 2**32; sys.exit(0 if valid else 1)" >> "%LOG_FILE%" 2>&1
+                    if !ERRORLEVEL! EQU 0 (
+                        set "PYTHON_CMD=py -3"
+                    )
+                )
+            )
+        )
+    )
+)
+
+:: Neu van khong tim thay Python phu hop
+if "!PYTHON_CMD!"=="" (
+    echo.
+    echo =================================================================
+    echo [ERROR] KHONG TIM THAY PHIEN BAN PYTHON PHU HOP!
+    echo =================================================================
+    echo.
+    echo YEU CAU HE THONG:
+    echo  - Can cai dat Python 3.10, 3.11 hoac 3.12 (BAN 64-BIT).
+    echo  - KHUYEN NGHI CAI DAT TOT NHAT: Python 3.11.9 (64-bit)
+    echo    Link tai truc tiep:
+    echo    https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+    echo.
+    echo -----------------------------------------------------------------
+    echo LUU Y CUCT KY QUAN TRONG KHI CAI PYTHON:
+    echo  1. O man hinh dau tien cua bo cai dat, BAT BUOC TICK CHON vao o:
+    echo     [x] "Add python.exe to PATH"
+    echo.
+    echo  2. Neu Windows tu dong bat Microsoft Store khi go lenh python:
+    echo     Vao: Windows Settings -^> Apps -^> Advanced app settings -^> App execution aliases
+    echo     Chuyen 2 muc sau sang TAT (OFF):
+    echo       - App Installer (python.exe)
+    echo       - App Installer (python3.exe)
+    echo =================================================================
+    echo.
+    echo Chi tiet da duoc ghi vao file: %LOG_FILE%
+    echo.
     pause
     exit /b 1
 )
 
-:: 2. Create Virtual Environment
-if not exist ".venv" (
-    echo [*] Creating virtual environment (.venv)...
-    python -m venv .venv
-    if %ERRORLEVEL% NEQ 0 (
-        echo [ERROR] Failed to create virtual environment.
-        pause
-        exit /b 1
+echo [OK] Phat hien Python phu hop: !PYTHON_CMD!
+!PYTHON_CMD! -c "import sys; print(f'[*] Phien ban: Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({sys.maxsize > 2**32 and \"64-bit\" or \"32-bit\"})')"
+!PYTHON_CMD! -c "import sys; print(f'[*] Phien ban: Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({sys.maxsize > 2**32 and \"64-bit\" or \"32-bit\"})')" >> "%LOG_FILE%" 2>&1
+
+:: -----------------------------------------------------------------
+:: 2. Tao moi truong ao (.venv)
+:: -----------------------------------------------------------------
+set "ERR_STEP=Khoi tao moi truong ao (.venv)"
+if not exist ".venv\Scripts\python.exe" (
+    echo.
+    echo [*] Dang tao moi truong ao .venv (Co the mat vai giay)...
+    !PYTHON_CMD! -m venv .venv >> "%LOG_FILE%" 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        echo [ERROR] Khong the tao thu muc .venv!
+        goto :ON_ERROR
     )
+    echo [OK] Da tao thanh cong moi truong ao .venv.
 ) else (
-    echo [*] Virtual environment .venv already exists.
+    echo [*] Thu muc moi truong ao .venv da ton tai san.
 )
 
 set "VENV_PIP=.venv\Scripts\pip.exe"
 set "VENV_PYTHON=.venv\Scripts\python.exe"
 
-echo [*] Upgrading pip...
-"%VENV_PIP%" install --upgrade pip
-
-:: 3. Hardware Auto-Detection (GPU vs CPU-Only)
-echo.
-echo [*] Checking for NVIDIA GPU...
-where nvidia-smi >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    echo [OK] NVIDIA GPU detected!
-    echo [*] Installing PyTorch with CUDA 12.1 support...
-    "%VENV_PIP%" install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-) else (
-    echo [!] No NVIDIA GPU detected. Switching to CPU-Only mode.
-    echo [*] Installing lightweight PyTorch for CPU (~200MB)...
-    "%VENV_PIP%" install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+if not exist "!VENV_PIP!" (
+    echo [ERROR] Khong tim thay tap tin .venv\Scripts\pip.exe!
+    set "ERR_STEP=Kiem tra tep tin pip trong .venv"
+    goto :ON_ERROR
 )
 
-:: 4. Install Dependencies
+set "ERR_STEP=Nang cap pip trong moi truong ao"
 echo.
-echo [*] Installing project dependencies from requirements.txt...
-"%VENV_PIP%" install -r requirements.txt
+echo [*] Dang kiem tra va nang cap pip...
+"!VENV_PIP!" install --upgrade pip >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! NEQ 0 (
+    echo [CANH BAO] Khong the nang cap pip, tiep tuc su dung phien ban hien tai...
+)
 
-:: 5. Setup Windows Autostart (Startup Folder)
+:: -----------------------------------------------------------------
+:: 3. Tu dong nhan dien Card do hoa (NVIDIA GPU vs CPU-Only)
+:: -----------------------------------------------------------------
+set "ERR_STEP=Cai dat PyTorch phu hop voi phan cung"
 echo.
-set /p AUTOSTART="[*] Do you want Local ASR to start automatically when Windows boots? (Y/N, default Y): "
-if "%AUTOSTART%"=="" set AUTOSTART=Y
-if /i "%AUTOSTART%"=="Y" (
-    echo [*] Creating startup shortcut in Windows Startup folder...
+echo [*] Dang kiem tra phan cung do hoa (GPU / CPU)...
+where nvidia-smi >nul 2>&1
+if !ERRORLEVEL! EQU 0 (
+    echo [OK] Tim thay Card do hoa NVIDIA GPU!
+    echo [*] Dang cai dat PyTorch voi ho tro tang toc CUDA 12.1...
+    echo     (Vui long cho vai phut, dung luong goi CUDA khoang 2.5GB)...
+    "!VENV_PIP!" install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 >> "%LOG_FILE%" 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        echo.
+        echo [CANH BAO] Cai dat ban CUDA gap loi. Tu dong chuyen sang ban CPU nhe...
+        "!VENV_PIP!" install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu >> "%LOG_FILE%" 2>&1
+        if !ERRORLEVEL! NEQ 0 goto :ON_ERROR
+    )
+) else (
+    echo [!] Khong phat hien GPU NVIDIA. Tu dong chuyen sang che do CPU-Only.
+    echo [*] Dang cai dat ban PyTorch sieu nhe danh cho CPU (~200MB)...
+    "!VENV_PIP!" install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu >> "%LOG_FILE%" 2>&1
+    if !ERRORLEVEL! NEQ 0 goto :ON_ERROR
+)
+
+:: -----------------------------------------------------------------
+:: 4. Cai dat cac goi thu vien con lai tu requirements.txt
+:: -----------------------------------------------------------------
+set "ERR_STEP=Cai dat cac thu vien du an tu requirements.txt"
+echo.
+echo [*] Dang cai dat cac goi thu vien phu thuoc (FastAPI, Transformers, PEFT, SoundDevice,...)...
+"!VENV_PIP!" install -r requirements.txt >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! NEQ 0 (
+    echo [ERROR] Cai dat thu vien tu requirements.txt that bai!
+    goto :ON_ERROR
+)
+
+:: -----------------------------------------------------------------
+:: 5. Thiet lap tu dong khoi dong cung Windows (Startup folder)
+:: -----------------------------------------------------------------
+set "ERR_STEP=Tao loi tat khoi dong cung Windows"
+echo.
+set /p AUTOSTART="[*] Ban co muon Local ASR tu dong chay khi bat may tinh Windows? (Y/N, mac dinh Y): "
+if "!AUTOSTART!"=="" set AUTOSTART=Y
+if /i "!AUTOSTART!"=="Y" (
+    echo [*] Dang tao shortcut trong thu muc Startup...
     set "TARGET=%~dp0start.vbs"
     set "SHORTCUT=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\LocalASR.lnk"
-    powershell -NoProfile -Command "$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut('%SHORTCUT%'); $s.TargetPath = '%TARGET%'; $s.WorkingDirectory = '%~dp0'; $s.Description = 'Local ASR Voice Typing Daemon'; $s.Save()"
-    echo [OK] Autostart shortcut created at:
+    powershell -NoProfile -Command "$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut('%SHORTCUT%'); $s.TargetPath = '%TARGET%'; $s.WorkingDirectory = '%~dp0'; $s.Description = 'Local ASR Voice Typing Daemon'; $s.Save()" >> "%LOG_FILE%" 2>&1
+    echo [OK] Da tao loi tat tu khoi dong tai:
     echo      !SHORTCUT!
 )
 
+:: -----------------------------------------------------------------
+:: 6. Hoan tat cai dat
+:: -----------------------------------------------------------------
 echo.
 echo =================================================================
-echo [SUCCESS] Setup completed successfully!
+echo [THANH CONG] Qua trinh cai dat tren Windows da hoan tat 100%!
 echo.
-echo - To run silently in background: Double-click 'start.vbs'
-echo - To run with debug console:    Double-click 'start.bat'
+echo  - De chay ngam (khong hien cua so):   Nhay dup vao 'start.vbs'
+echo  - De chay che do xem log (Debug):     Nhay dup vao 'start.bat'
+echo.
+echo Toan bo log cai dat da duoc luu tai:
+echo %LOG_FILE%
 echo =================================================================
 echo.
 pause
+exit /b 0
+
+:: -----------------------------------------------------------------
+:: Xu ly khi gap loi (Khong bao gio tu dong tat man hinh)
+:: -----------------------------------------------------------------
+:ON_ERROR
+echo.
+echo =================================================================
+echo [LOI] QUA TRINH CAI DAT BI DUNG LAI!
+echo =================================================================
+echo  - Buoc xay ra loi: !ERR_STEP!
+echo  - Ma loi tra ve (Exit code): !ERRORLEVEL!
+echo.
+echo Vui long mo tep nhat ky chi tiet sau de xem nguyen nhan cu the:
+echo %LOG_FILE%
+echo.
+echo Neu can ho tro, ban co the gui noi dung file %LOG_FILE% nay.
+echo =================================================================
+echo.
+pause
+exit /b 1

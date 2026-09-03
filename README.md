@@ -126,14 +126,24 @@ python main.py --service all
 
 ## 🪟 3. Hướng dẫn Cài đặt & Chạy trên Windows (Windows 10 / 11, 64-bit)
 
+### Yêu cầu phiên bản Python trên Windows:
+- **Phiên bản tương thích:** Python **3.10**, **3.11** hoặc **3.12** (**Bản 64-bit**).
+- **Khuyến nghị tốt nhất:** [Python 3.11.9 (64-bit)](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) (Phiên bản ổn định và tương thích tối đa với các gói PyTorch & transformers wheel).
+- **2 Lưu ý cực kỳ quan trọng khi cài đặt Python trên Windows:**
+  1. Ở màn hình cài đặt đầu tiên, **BẮT BUỘC TICK CHỌN: `[x] Add python.exe to PATH`**.
+  2. Nếu máy bạn khi gõ lệnh `python` tự động bật cửa sổ Microsoft Store:
+     - Mở **Windows Settings** $\rightarrow$ **Apps** $\rightarrow$ **Advanced app settings** $\rightarrow$ **App execution aliases**.
+     - Tìm và chuyển sang **TẮT (OFF)** cho hai mục: `App Installer (python.exe)` và `App Installer (python3.exe)`.
+
 ### Cách 1: Cài đặt tự động 1-Click (Khuyên dùng)
-1. Đảm bảo máy đã cài đặt [Python 3.10+](https://www.python.org/downloads/) (Khi cài đặt, **BẮT BUỘC tick chọn "Add python.exe to PATH"**).
+1. Đảm bảo đã cài Python 64-bit theo hướng dẫn trên.
 2. Nhấp đúp chuột vào file:
    ```text
    setup_windows.bat
    ```
 3. Script cài đặt sẽ tự động hoàn toàn:
-   - Tạo môi trường ảo `.venv`.
+   - Tự kiểm tra phiên bản Python tương thích (kiểm tra cả `python`, `py -3.11`, `py -3.10`).
+   - Tự động ghi toàn bộ nhật ký chi tiết vào file `setup_windows.log`. Nếu có bất kỳ lỗi nào xảy ra, cửa sổ CMD **luôn giữ nguyên để bạn đọc thông báo lỗi** (không bao giờ tự động tắt đột ngột).
    - Kiểm tra card đồ họa NVIDIA. Nếu có GPU sẽ tải PyTorch CUDA, nếu không có GPU sẽ tự động tải bản PyTorch CPU siêu nhẹ (~200MB thay vì 3GB).
    - Cài đặt đầy đủ các gói thư viện tương thích Windows.
    - Hỏi bạn có muốn tạo lối tắt tự khởi động cùng Windows (`shell:startup`) hay không.
