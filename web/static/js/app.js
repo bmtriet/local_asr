@@ -49,6 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnPrevPage = document.getElementById('btn-prev-page');
   const btnNextPage = document.getElementById('btn-next-page');
 
+  function truncateWords(text, maxWords = 20) {
+    if (!text) return '(Trống)';
+    const words = text.trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
+  }
+
   // Load transcription history with pagination and search
   async function loadHistory() {
     try {
@@ -76,7 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       historyContainer.innerHTML = items.map(item => {
-        const preview = (item.corrected_text || item.raw_text || '').replace(/"/g, '&quot;');
+        const fullText = (item.corrected_text || item.raw_text || '').trim();
+        const preview = truncateWords(fullText, 20).replace(/"/g, '&quot;');
+        const safeFull = fullText.replace(/"/g, '&quot;');
         return `
         <div class="history-item ${allCollapsed ? '' : 'open'}" id="item-${item.id}">
           <div class="history-item-header" onclick="toggleItemAccordion(${item.id})">
@@ -84,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <svg class="item-arrow" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
               </svg>
-              <span class="item-preview-text" title="${preview}">${preview || '(Trống)'}</span>
+              <span class="item-preview-text" title="${safeFull}">${preview}</span>
             </div>
             <div class="item-header-meta">
               <span>${item.duration.toFixed(1)}s</span>
