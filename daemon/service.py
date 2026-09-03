@@ -62,6 +62,9 @@ class VoiceTypingDaemon:
         def worker():
             try:
                 text = self.engine.transcribe(audio_path)
+                if text:
+                    text = text.strip()
+                    text = text[0].upper() + text[1:]
                 print(f"[VoiceTyping] Transcribed: '{text}' ({duration:.1f}s)")
                 if text:
                     # 1. Inject into focused window

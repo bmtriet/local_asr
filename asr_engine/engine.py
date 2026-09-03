@@ -105,4 +105,7 @@ class ASREngine:
         text = getattr(first_res, "text", "")
         if not text and isinstance(first_res, dict):
             text = first_res.get("text", "")
-        return str(text).strip()
+        text = str(text).strip()
+        if text:
+            text = text[0].upper() + text[1:]
+        return text
