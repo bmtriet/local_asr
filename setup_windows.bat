@@ -24,39 +24,39 @@ set "PYTHON_CMD="
 
 :: Kiem tra lenh 'python' co ton tai va chay duoc khong (khong phai shortcut ao cua Microsoft Store)
 where python >nul 2>&1
+if !ERRORLEVEL! NEQ 0 goto :CHECK_PY_LAUNCHER
+python -c "import sys, struct; sys.exit(0 if sys.version_info[0]==3 and sys.version_info[1] in (10,11,12) and struct.calcsize('P')==8 else 1)" >> "%LOG_FILE%" 2>&1
 if !ERRORLEVEL! EQU 0 (
-    python -c "import sys; valid = sys.version_info >= (3, 10) and sys.version_info < (3, 13) and sys.maxsize > 2**32; sys.exit(0 if valid else 1)" >> "%LOG_FILE%" 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        set "PYTHON_CMD=python"
-    )
+    set "PYTHON_CMD=python"
+    goto :PYTHON_FOUND
 )
 
+:CHECK_PY_LAUNCHER
 :: Neu 'python' khong hop le, thu kiem tra trinh khoi chay 'py' (Python Launcher san co tren Windows)
-if "!PYTHON_CMD!"=="" (
-    where py >nul 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        py -3.11 -c "import sys; sys.exit(0 if sys.maxsize > 2**32 else 1)" >> "%LOG_FILE%" 2>&1
-        if !ERRORLEVEL! EQU 0 (
-            set "PYTHON_CMD=py -3.11"
-        ) else (
-            py -3.10 -c "import sys; sys.exit(0 if sys.maxsize > 2**32 else 1)" >> "%LOG_FILE%" 2>&1
-            if !ERRORLEVEL! EQU 0 (
-                set "PYTHON_CMD=py -3.10"
-            ) else (
-                py -3.12 -c "import sys; sys.exit(0 if sys.maxsize > 2**32 else 1)" >> "%LOG_FILE%" 2>&1
-                if !ERRORLEVEL! EQU 0 (
-                    set "PYTHON_CMD=py -3.12"
-                ) else (
-                    py -3 -c "import sys; valid = sys.version_info >= (3, 10) and sys.version_info < (3, 13) and sys.maxsize > 2**32; sys.exit(0 if valid else 1)" >> "%LOG_FILE%" 2>&1
-                    if !ERRORLEVEL! EQU 0 (
-                        set "PYTHON_CMD=py -3"
-                    )
-                )
-            )
-        )
-    )
+where py >nul 2>&1
+if !ERRORLEVEL! NEQ 0 goto :PYTHON_NOT_FOUND
+py -3.11 -c "import sys, struct; sys.exit(0 if struct.calcsize('P')==8 else 1)" >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! EQU 0 (
+    set "PYTHON_CMD=py -3.11"
+    goto :PYTHON_FOUND
+)
+py -3.10 -c "import sys, struct; sys.exit(0 if struct.calcsize('P')==8 else 1)" >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! EQU 0 (
+    set "PYTHON_CMD=py -3.10"
+    goto :PYTHON_FOUND
+)
+py -3.12 -c "import sys, struct; sys.exit(0 if struct.calcsize('P')==8 else 1)" >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! EQU 0 (
+    set "PYTHON_CMD=py -3.12"
+    goto :PYTHON_FOUND
+)
+py -3 -c "import sys, struct; sys.exit(0 if sys.version_info[0]==3 and sys.version_info[1] in (10,11,12) and struct.calcsize('P')==8 else 1)" >> "%LOG_FILE%" 2>&1
+if !ERRORLEVEL! EQU 0 (
+    set "PYTHON_CMD=py -3"
+    goto :PYTHON_FOUND
 )
 
+:PYTHON_NOT_FOUND
 :: Neu van khong tim thay Python phu hop
 if "!PYTHON_CMD!"=="" (
     echo.
@@ -89,8 +89,8 @@ if "!PYTHON_CMD!"=="" (
 )
 
 echo [OK] Phat hien Python phu hop: !PYTHON_CMD!
-!PYTHON_CMD! -c "import sys; print(f'[*] Phien ban: Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({sys.maxsize > 2**32 and \"64-bit\" or \"32-bit\"})')"
-!PYTHON_CMD! -c "import sys; print(f'[*] Phien ban: Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({sys.maxsize > 2**32 and \"64-bit\" or \"32-bit\"})')" >> "%LOG_FILE%" 2>&1
+!PYTHON_CMD! -c "import sys, struct; arch = str(struct.calcsize('P') * 8) + '-bit'; print(f'[*] Phien ban: Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({arch})')"
+!PYTHON_CMD! -c "import sys, struct; arch = str(struct.calcsize('P') * 8) + '-bit'; print(f'[*] Phien ban: Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({arch})')" >> "%LOG_FILE%" 2>&1
 
 :: -----------------------------------------------------------------
 :: 2. Tao moi truong ao (.venv)
