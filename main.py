@@ -16,6 +16,8 @@ def run_web(settings):
 def run_daemon(engine, db):
     print("[Main] Starting Voice Typing Daemon with Tray Icon...")
     daemon = VoiceTypingDaemon(engine=engine, db=db, show_tray=True)
+    from web.api import set_daemon_instance
+    set_daemon_instance(daemon)
     daemon.start()
     try:
         while True:

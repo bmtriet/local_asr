@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Any
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -27,6 +27,11 @@ db = Database()
 db.init_db()
 engine = ASREngine(lazy_load=True)
 trainer = LoRATrainer(db=db)
+daemon_instance: Optional[Any] = None
+
+def set_daemon_instance(d):
+    global daemon_instance
+    daemon_instance = d
 
 class CorrectionRequest(BaseModel):
     corrected_text: str
@@ -136,6 +141,8 @@ def update_settings(payload: SettingsUpdateRequest):
         cleaned_hotkey = payload.hotkey.strip().lower()
         settings.HOTKEY = cleaned_hotkey
         db.set_setting("hotkey", cleaned_hotkey)
+        if daemon_instance:
+            daemon_instance.update_hotkey(cleaned_hotkey)
     return {"status": "updated", "settings": get_current_settings()}
 
 static_dir = Path(__file__).resolve().parent / "static"
