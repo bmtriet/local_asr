@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+data/recordings/
+data/*.db
+data/adapters/
+.pytest_cache/
+.superpowers/
