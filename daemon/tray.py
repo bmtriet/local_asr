@@ -88,5 +88,8 @@ class TrayIndicator:
         self._animating = False
         if self.icon:
             self.icon.stop()
-        if self.on_exit:
-            self.on_exit()
+            self.icon = None
+        callback = self.on_exit
+        self.on_exit = None
+        if callback:
+            callback()

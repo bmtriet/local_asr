@@ -43,12 +43,14 @@ def main():
         engine = ASREngine(lazy_load=False)
         run_daemon(engine, db)
     elif args.service == "all":
-        # Run Web Server in background thread and Daemon in main thread
+        # Preload engine on GPU first so model is immediately ready
+        engine = ASREngine(lazy_load=False)
+
+        # Run Web Server in background thread
         web_thread = threading.Thread(target=run_web, args=(settings,), daemon=True)
         web_thread.start()
 
-        # Engine starts in daemon thread / main thread
-        engine = ASREngine(lazy_load=True)
+        # Run Daemon in main thread
         run_daemon(engine, db)
 
 if __name__ == "__main__":

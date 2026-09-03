@@ -98,7 +98,11 @@ class VoiceTypingDaemon:
 
     def stop(self):
         print("[VoiceTyping] Stopping daemon...")
-        if self._listener:
-            self._listener.stop()
-        if self.tray:
-            self.tray._stop()
+        listener = self._listener
+        self._listener = None
+        if listener:
+            listener.stop()
+        tray = self.tray
+        self.tray = None
+        if tray:
+            tray._stop()
