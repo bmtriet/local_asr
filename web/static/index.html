@@ -43,14 +43,56 @@
           <div class="card-header">
             <h2 class="card-title">
               <span>Lịch sử Nhận dạng & Sửa từ sai</span>
+              <span id="history-total-badge" class="badge-count">0</span>
             </h2>
-            <button class="btn btn-secondary" id="btn-refresh-history">
-              Làm mới
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" id="btn-collapse-all" title="Thu gọn / Mở rộng tất cả">
+                Thu gọn
+              </button>
+              <button class="btn btn-secondary" id="btn-refresh-history">
+                Làm mới
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter & Search Toolbar -->
+          <div class="history-toolbar">
+            <div class="search-box-wrapper">
+              <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
+              <input type="text" id="input-search-history" class="search-input" placeholder="Tìm kiếm nội dung câu nói...">
+            </div>
+
+            <div class="filter-group">
+              <button class="filter-btn active" data-filter="all">Tất cả</button>
+              <button class="filter-btn" data-filter="unreviewed">Chưa sửa</button>
+              <button class="filter-btn" data-filter="reviewed">Đã sửa</button>
+            </div>
+
+            <div class="page-size-selector">
+              <label for="select-page-size">Hiển thị:</label>
+              <select id="select-page-size" class="select-dropdown">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </div>
           </div>
 
           <div id="history-container" class="history-list">
             <p style="color: var(--text-muted); text-align: center; padding: 2rem;">Đang tải lịch sử...</p>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div id="pagination-bar" class="pagination-bar">
+            <div class="pagination-info" id="pagination-info">Trang 1 / 1</div>
+            <div class="pagination-buttons">
+              <button class="btn btn-secondary pagination-btn" id="btn-prev-page" disabled>&larr; Trước</button>
+              <div id="pagination-numbers" class="pagination-numbers"></div>
+              <button class="btn btn-secondary pagination-btn" id="btn-next-page" disabled>Sau &rarr;</button>
+            </div>
           </div>
         </div>
       </main>

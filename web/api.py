@@ -45,9 +45,32 @@ def get_status():
     }
 
 @app.get("/api/history")
-def get_history(limit: int = 50, offset: int = 0):
-    items = db.get_transcriptions(limit=limit, offset=offset)
-    return {"items": items}
+def get_history(
+    page: int = 1,
+    limit: int = 10,
+    filter_type: str = "all",
+    search: str = ""
+):
+    page = max(1, page)
+    limit = max(1, min(100, limit))
+    offset = (page - 1) * limit
+    total = db.get_transcriptions_count(filter_type=filter_type, search=search)
+    items = db.get_transcriptions(limit=limit, offset=offset, filter_type=filter_type, search=search)
+    total_pages = max(1, (total + limit - 1) // limit) if total > 0 else 1
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "total_pages": total_pages
+    }
+
+@app.delete("/api/history/{item_id}")
+def delete_transcription(item_id: int):
+    success = db.delete_transcription(item_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"status": "success", "id": item_id}
 
 @app.post("/api/history/{item_id}/correct")
 def correct_transcription(item_id: int, payload: CorrectionRequest):

@@ -55,21 +55,74 @@ class Database:
             conn.commit()
             return cursor.lastrowid
 
-    def get_transcriptions(self, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
-        """Retrieve latest transcriptions."""
+    def get_transcriptions_count(self, filter_type: str = "all", search: str = "") -> int:
+        """Count total transcriptions matching filter and search."""
+        query = "SELECT COUNT(*) FROM transcriptions WHERE 1=1"
+        params = []
+        if filter_type == "reviewed":
+            query += " AND is_reviewed = 1"
+        elif filter_type == "unreviewed":
+            query += " AND is_reviewed = 0"
+
+        if search:
+            query += " AND (raw_text LIKE ? OR corrected_text LIKE ?)"
+            params.extend([f"%{search}%", f"%{search}%"])
+
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                """
-                SELECT id, timestamp, audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training
-                FROM transcriptions
-                ORDER BY id DESC
-                LIMIT ? OFFSET ?
-                """,
-                (limit, offset)
-            )
+            cursor.execute(query, params)
+            return cursor.fetchone()[0]
+
+    def get_transcriptions(
+        self,
+        limit: int = 10,
+        offset: int = 0,
+        filter_type: str = "all",
+        search: str = ""
+    ) -> List[Dict[str, Any]]:
+        """Retrieve latest transcriptions with pagination, filter, and search."""
+        query = """
+            SELECT id, timestamp, audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training
+            FROM transcriptions
+            WHERE 1=1
+        """
+        params = []
+        if filter_type == "reviewed":
+            query += " AND is_reviewed = 1"
+        elif filter_type == "unreviewed":
+            query += " AND is_reviewed = 0"
+
+        if search:
+            query += " AND (raw_text LIKE ? OR corrected_text LIKE ?)"
+            params.extend([f"%{search}%", f"%{search}%"])
+
+        query += " ORDER BY id DESC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
+
+    def delete_transcription(self, item_id: int) -> bool:
+        """Delete a transcription and its audio file if present."""
+        item = self.get_transcription_by_id(item_id)
+        if not item:
+            return False
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM transcriptions WHERE id = ?", (item_id,))
+            conn.commit()
+            success = cursor.rowcount > 0
+        if success and item.get("audio_path"):
+            try:
+                import os
+                if os.path.exists(item["audio_path"]):
+                    os.remove(item["audio_path"])
+            except Exception:
+                pass
+        return success
 
     def get_transcription_by_id(self, item_id: int) -> Optional[Dict[str, Any]]:
         with self._get_connection() as conn:

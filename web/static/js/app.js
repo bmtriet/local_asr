@@ -30,57 +30,232 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Load transcription history
+  // Pagination & Filter State
+  let currentPage = 1;
+  let pageSize = 10;
+  let currentFilter = 'all';
+  let searchQuery = '';
+  let totalCount = 0;
+  let totalPages = 1;
+  let allCollapsed = true;
+
+  const historyTotalBadge = document.getElementById('history-total-badge');
+  const btnCollapseAll = document.getElementById('btn-collapse-all');
+  const inputSearchHistory = document.getElementById('input-search-history');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const selectPageSize = document.getElementById('select-page-size');
+  const paginationInfo = document.getElementById('pagination-info');
+  const paginationNumbers = document.getElementById('pagination-numbers');
+  const btnPrevPage = document.getElementById('btn-prev-page');
+  const btnNextPage = document.getElementById('btn-next-page');
+
+  // Load transcription history with pagination and search
   async function loadHistory() {
     try {
-      const res = await fetch('/api/history?limit=30');
+      const url = `/api/history?page=${currentPage}&limit=${pageSize}&filter_type=${currentFilter}&search=${encodeURIComponent(searchQuery)}`;
+      const res = await fetch(url);
       const data = await res.json();
       const items = data.items || [];
+      totalCount = data.total || 0;
+      totalPages = data.total_pages || 1;
+      currentPage = data.page || 1;
+
+      if (historyTotalBadge) {
+        historyTotalBadge.textContent = totalCount;
+      }
+
+      renderPagination();
 
       if (items.length === 0) {
         historyContainer.innerHTML = `
           <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
-            Chưa có đoạn ghi âm nào. Hãy bấm phím tắt <code>${inputHotkey.value}</code> để nói thử một câu!
+            ${searchQuery || currentFilter !== 'all' ? 'Không tìm thấy câu nói nào phù hợp bộ lọc.' : `Chưa có đoạn ghi âm nào. Hãy bấm phím tắt <code>${inputHotkey.value}</code> để nói thử một câu!`}
           </div>
         `;
         return;
       }
 
-      historyContainer.innerHTML = items.map(item => `
-        <div class="history-item" id="item-${item.id}">
-          <div class="item-meta">
-            <span>${item.timestamp} • ${item.duration.toFixed(1)}s</span>
-            <span class="item-badge ${item.is_reviewed ? 'badge-reviewed' : 'badge-unreviewed'}">
-              ${item.is_reviewed ? 'Đã chỉnh sửa (Sẵn sàng LoRA)' : 'Nguyên bản (Chưa soát)'}
-            </span>
-          </div>
-
-          <div style="margin-bottom: 0.5rem;">
-            <label style="font-size: 0.75rem; color: var(--text-muted);">Kết quả ASR nhận dạng ban đầu:</label>
-            <div style="font-style: italic; color: var(--text-secondary); margin-bottom: 0.5rem;">
-              "${item.raw_text}"
+      historyContainer.innerHTML = items.map(item => {
+        const preview = (item.corrected_text || item.raw_text || '').replace(/"/g, '&quot;');
+        return `
+        <div class="history-item ${allCollapsed ? '' : 'open'}" id="item-${item.id}">
+          <div class="history-item-header" onclick="toggleItemAccordion(${item.id})">
+            <div class="item-summary">
+              <svg class="item-arrow" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+              </svg>
+              <span class="item-preview-text" title="${preview}">${preview || '(Trống)'}</span>
+            </div>
+            <div class="item-header-meta">
+              <span>${item.duration.toFixed(1)}s</span>
+              <span class="item-badge ${item.is_reviewed ? 'badge-reviewed' : 'badge-unreviewed'}">
+                ${item.is_reviewed ? 'Đã sửa' : 'Gốc'}
+              </span>
             </div>
           </div>
 
-          <div>
-            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">
-              Văn bản chuẩn xác (Click để sửa lại các từ sai):
-            </label>
-            <textarea class="edit-box" id="edit-text-${item.id}" rows="2">${item.corrected_text}</textarea>
-          </div>
+          <div class="history-item-body">
+            <div class="item-meta">
+              <span>${item.timestamp} • Độ dài: ${item.duration.toFixed(1)}s</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">ID: #${item.id}</span>
+            </div>
 
-          <div class="item-actions">
-            <audio controls src="/api/audio/${item.id}"></audio>
-            <button class="btn btn-primary" onclick="saveCorrection(${item.id})">
-              Lưu từ sửa
-            </button>
+            <div style="margin-bottom: 0.75rem;">
+              <label style="font-size: 0.75rem; color: var(--text-muted);">Mô hình nhận dạng ban đầu:</label>
+              <div style="font-style: italic; color: var(--text-secondary); margin-top: 0.2rem; background: rgba(0,0,0,0.25); padding: 0.4rem 0.6rem; border-radius: 4px;">
+                "${item.raw_text}"
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.75rem;">
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">
+                Văn bản chuẩn xác (Chỉnh sửa để huấn luyện LoRA):
+              </label>
+              <textarea class="edit-box" id="edit-text-${item.id}" rows="2">${item.corrected_text}</textarea>
+            </div>
+
+            <div class="item-actions">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <audio controls preload="none" src="/api/audio/${item.id}"></audio>
+                <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Xoá đoạn ghi âm">
+                  Xoá
+                </button>
+              </div>
+              <button class="btn btn-primary" onclick="saveCorrection(${item.id})">
+                Lưu từ sửa
+              </button>
+            </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
     } catch (err) {
-      historyContainer.innerHTML = '<p style="color: var(--rose);">Lỗi khi tải lịch sử.</p>';
+      historyContainer.innerHTML = '<p style="color: var(--rose); text-align: center; padding: 1.5rem;">Lỗi khi tải lịch sử: ' + err.message + '</p>';
     }
   }
+
+  // Toggle item accordion
+  window.toggleItemAccordion = function(id) {
+    const itemEl = document.getElementById(`item-${id}`);
+    if (itemEl) {
+      itemEl.classList.toggle('open');
+    }
+  };
+
+  // Toggle Collapse/Expand all
+  if (btnCollapseAll) {
+    btnCollapseAll.addEventListener('click', () => {
+      allCollapsed = !allCollapsed;
+      btnCollapseAll.textContent = allCollapsed ? 'Mở rộng' : 'Thu gọn';
+      document.querySelectorAll('.history-item').forEach(el => {
+        if (allCollapsed) el.classList.remove('open');
+        else el.classList.add('open');
+      });
+    });
+  }
+
+  // Render pagination bar
+  function renderPagination() {
+    if (paginationInfo) {
+      const start = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+      const end = Math.min(currentPage * pageSize, totalCount);
+      paginationInfo.textContent = `${start}-${end} / ${totalCount} bản ghi (Trang ${currentPage}/${totalPages})`;
+    }
+
+    if (btnPrevPage) btnPrevPage.disabled = (currentPage <= 1);
+    if (btnNextPage) btnNextPage.disabled = (currentPage >= totalPages);
+
+    if (paginationNumbers) {
+      paginationNumbers.innerHTML = '';
+      const maxButtons = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage + 1 < maxButtons) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      for (let p = startPage; p <= endPage; p++) {
+        const btn = document.createElement('button');
+        btn.className = `page-num-btn ${p === currentPage ? 'active' : ''}`;
+        btn.textContent = p;
+        btn.onclick = () => {
+          if (currentPage !== p) {
+            currentPage = p;
+            loadHistory();
+          }
+        };
+        paginationNumbers.appendChild(btn);
+      }
+    }
+  }
+
+  // Prev / Next page handlers
+  if (btnPrevPage) {
+    btnPrevPage.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        loadHistory();
+      }
+    });
+  }
+
+  if (btnNextPage) {
+    btnNextPage.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        loadHistory();
+      }
+    });
+  }
+
+  // Filter click handlers
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      currentPage = 1;
+      loadHistory();
+    });
+  });
+
+  // Page size dropdown
+  if (selectPageSize) {
+    selectPageSize.addEventListener('change', (e) => {
+      pageSize = parseInt(e.target.value, 10);
+      currentPage = 1;
+      loadHistory();
+    });
+  }
+
+  // Search input debounced
+  let searchTimer = null;
+  if (inputSearchHistory) {
+    inputSearchHistory.addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        currentPage = 1;
+        loadHistory();
+      }, 300);
+    });
+  }
+
+  // Delete item
+  window.deleteItem = async function(id) {
+    if (!confirm('Bạn có chắc muốn xoá bản ghi này và file âm thanh tương ứng?')) return;
+    try {
+      const res = await fetch(`/api/history/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        loadHistory();
+        checkTrainStatus();
+      } else {
+        alert('Không thể xoá bản ghi.');
+      }
+    } catch (err) {
+      alert('Lỗi: ' + err.message);
+    }
+  };
 
   // Save correction
   window.saveCorrection = async function(id) {

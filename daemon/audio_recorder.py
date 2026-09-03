@@ -41,14 +41,16 @@ class AudioRecorder:
             if not self.is_recording:
                 return None
             self.is_recording = False
-            if self._stream:
-                self._stream.stop()
-                self._stream.close()
-                self._stream = None
+            stream = self._stream
+            self._stream = None
 
+        if stream:
+            stream.stop()
+            stream.close()
+
+        with self._lock:
             if not self._frames:
                 return None
-
             audio_data = np.concatenate(self._frames, axis=0)
 
         duration = float(len(audio_data)) / self.sample_rate
