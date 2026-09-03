@@ -1,0 +1,618 @@
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Model loaded successfully on GPU.
+[Main] Starting Web UI Server on http://127.0.0.1:8000[Main] Starting Voice Typing Daemon with Tray Icon...
+
+[VoiceTyping] Listening for global hotkey: <alt>+z
+INFO:     Started server process [1096721]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:47552 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47552 - "GET /css/style.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:47554 - "GET /js/app.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:47554 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47570 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47552 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/history?page=1&limit=10&filter_type=all&search= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47558 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55522 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55522 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55536 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35112 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35126 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35126 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35126 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: normal
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+[VoiceTyping] Transcribed: 'I'm speaking English for now, but I'm expecting the output to be correctly.' (7.0s)
+[VoiceTyping] Applying grammar correction/translation (mode: normal)...
+[GrammarCorrector] Loading Qwen/Qwen2.5-0.5B-Instruct onto cuda (torch.bfloat16)...
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+Device set to use cuda:0
+[GrammarCorrector] Model loaded successfully.
+[GrammarCorrector] Correcting: 'I'm speaking English for now, but I'm expecting the output to be correctly.'
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[GrammarCorrector] Result: 'Tôi đang nói tiếng Anh hiện tại, nhưng tôi tin rằng output sẽ đúng.'
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: normal
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+[VoiceTyping] Transcribed: 'I'm speaking English for now, but I'm expecting the output to be fitting for the grammar.' (7.0s)
+[VoiceTyping] Applying grammar correction/translation (mode: normal)...
+[GrammarCorrector] Correcting: 'I'm speaking English for now, but I'm expecting the output to be fitting for the grammar.'
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[GrammarCorrector] Result: 'Tôi đang nói tiếng Anh hiện tại, nhưng tôi mong đợi output phù hợp với ngữ pháp.'
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: normal
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57746 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37008 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37008 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Transcribed: 'Hiện tại bây giờ cái output nó tự động nó dịch qua tiếng khác ví dụ như tôi đang bấm tôi bấm vào phím tắt kết quả lên thì có bảo hiện ba option thứ nhất là tiếng việt tiếng anh tiếng anh tiếng hoa và phím cách thì khi tôi nói tiếng anh thì nó tự động chuyển qua là tiếng việt nên là co co lại cái system form nha' (18.7s)
+[VoiceTyping] Applying grammar correction/translation (mode: normal)...
+[GrammarCorrector] Correcting: 'Hiện tại bây giờ cái output nó tự động nó dịch qua tiếng khác ví dụ như tôi đang bấm tôi bấm vào phím tắt kết quả lên thì có bảo hiện ba option thứ nhất là tiếng việt tiếng anh tiếng anh tiếng hoa và phím cách thì khi tôi nói tiếng anh thì nó tự động chuyển qua là tiếng việt nên là co co lại cái system form nha'
+[GrammarCorrector] Result: 'Hiện tại, lúc này cái output nó tự động nó dịch qua tiếng khác ví dụ như tôi đang bấm vào phím tắt, kết quả sẽ hiển thị lên thì có bảo hiện ba lựa chọn thứ nhất là tiếng Việt, tiếng Anh, tiếng Anh, tiếng Hoa và phím cách thì khi tôi nói tiếng Anh thì nó tự động chuyển qua là tiếng Việt nên là co co lại cái hệ thống form nha'
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37020 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57064 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57064 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34710 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34710 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34726 - "GET /api/train/status HTTP/1.1" 200 OK
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Model loaded successfully on GPU.
+[Main] Starting Web UI Server on http://127.0.0.1:8000
+[Main] Starting Voice Typing Daemon with Tray Icon...
+[VoiceTyping] Listening for global hotkey: <alt>+z
+INFO:     Started server process [1121392]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:44572 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44572 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44572 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44602 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44578 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/history?page=1&limit=10&filter_type=all&search= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey updated to: <alt>+d
+INFO:     127.0.0.1:44586 - "POST /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: normal
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44586 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Restarting daemon & application...
+[Main] Restarting application via os.execv...
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Model loaded successfully on GPU.
+[Main] Starting Web UI Server on http://127.0.0.1:8000[Main] Starting Voice Typing Daemon with Tray Icon...
+
+[VoiceTyping] Listening for global hotkey: <alt>+d
+INFO:     Started server process [1121392]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:37126 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37126 - "GET /api/train/status HTTP/1.1" 200 OK
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Model loaded successfully on GPU.
+[Main] Starting Web UI Server on http://127.0.0.1:8000[Main] Starting Voice Typing Daemon with Tray Icon...
+
+[VoiceTyping] Listening for global hotkey: <alt>+d
+INFO:     Started server process [1125368]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:35426 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:35426 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35442 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35456 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/history?page=1&limit=10&filter_type=all&search= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: normal
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Transcribed: 'Hiện tại mình đang nói tiếng gì khan đó là không biết là nó có bắt được cái ngôn ngữ của mình hay không nên là mong rằng nó sẽ output tốt' (6.9s)
+[VoiceTyping] Applying grammar correction/translation (mode: normal)...
+[GrammarCorrector] Loading Qwen/Qwen2.5-0.5B-Instruct onto cuda (torch.bfloat16)...
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+Device set to use cuda:0
+[GrammarCorrector] Model loaded successfully.
+[GrammarCorrector] Correcting: 'Hiện tại mình đang nói tiếng gì khan đó là không biết là nó có bắt được cái ngôn ngữ của mình hay không nên là mong rằng nó sẽ output tốt'
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[GrammarCorrector] Result: 'Tôi hiện tại đang nói tiếng Anh. Tôi không thể hiểu rõ hơn về ngữ cảnh hoặc ngôn ngữ của bạn. Bạn muốn tôi giúp gì?'
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35444 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54166 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54166 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54166 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54166 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54166 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: english
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+[VoiceTyping] Transcribed: 'Rất vui được gặp' (5.9s)
+[VoiceTyping] Applying grammar correction/translation (mode: english)...
+[GrammarCorrector] Correcting: 'Rất vui được gặp'
+[GrammarCorrector] Result: 'Very happy to meet you'
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: english
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+[VoiceTyping] Transcribed: 'Rất vui được chào mừng bạn đến với việt nam chúng tôi rất thân thiện và hiếu khách' (6.6s)
+[VoiceTyping] Applying grammar correction/translation (mode: english)...
+[GrammarCorrector] Correcting: 'Rất vui được chào mừng bạn đến với việt nam chúng tôi rất thân thiện và hiếu khách'
+[GrammarCorrector] Result: 'We are very pleased to welcome you to Vietnam. We are very friendly and hospitable.'
+INFO:     127.0.0.1:54174 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42688 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42688 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42688 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: chinese
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+[VoiceTyping] Transcribed: 'Rất vui được chào mừng bạn đến với việt nam chúng tôi rất thân thiện và hiếu khách' (6.6s)
+[VoiceTyping] Applying grammar correction/translation (mode: chinese)...
+[GrammarCorrector] Correcting: 'Rất vui được chào mừng bạn đến với việt nam chúng tôi rất thân thiện và hiếu khách'
+[GrammarCorrector] Result: '非常高兴欢迎您来到我们国家，我们非常友好且热情。'
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Waiting for translation mode...
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Mode selected: normal
+[VoiceTyping] Hotkey pressed -> Starting recording...
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+[VoiceTyping] Transcribed: 'Rất vui được chào mừng bạn đến với việt nam chúng tôi rất thân thiện và hiếu khách' (7.3s)
+[VoiceTyping] Applying grammar correction/translation (mode: normal)...
+[GrammarCorrector] Correcting: 'Rất vui được chào mừng bạn đến với việt nam chúng tôi rất thân thiện và hiếu khách'
+[GrammarCorrector] Result: 'Rất vui được chào mừng bạn đến với Việt Nam chúng tôi rất thân thiện và hiếu khách.'
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50878 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50878 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50878 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50878 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50890 - "GET /api/train/status HTTP/1.1" 200 OK
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Model loaded successfully on GPU.
+[Main] Starting Web UI Server on http://127.0.0.1:8000
+[Main] Starting Voice Typing Daemon with Tray Icon...
+[VoiceTyping] Listening for global hotkey: <alt>+d
+INFO:     Started server process [1148709]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)

@@ -38,6 +38,7 @@ class CorrectionRequest(BaseModel):
 
 class SettingsUpdateRequest(BaseModel):
     hotkey: Optional[str] = None
+    grammar_correction_enabled: Optional[bool] = None
 
 @app.get("/api/status")
 def get_status():
@@ -128,11 +129,14 @@ def start_train(epochs: int = 3, lr: float = 1e-4):
 def get_current_settings():
     saved_hotkey = db.get_setting("hotkey")
     active_hotkey = saved_hotkey or settings.HOTKEY
+    grammar_enabled_str = db.get_setting("grammar_correction_enabled", str(settings.GRAMMAR_CORRECTION_ENABLED)).lower()
+    grammar_enabled = (grammar_enabled_str == "true")
     return {
         "hotkey": active_hotkey,
         "sample_rate": settings.SAMPLE_RATE,
         "model_name": settings.MODEL_NAME,
-        "device": engine.device
+        "device": engine.device,
+        "grammar_correction_enabled": grammar_enabled
     }
 
 @app.post("/api/settings")
@@ -143,6 +147,11 @@ def update_settings(payload: SettingsUpdateRequest):
         db.set_setting("hotkey", cleaned_hotkey)
         if daemon_instance:
             daemon_instance.update_hotkey(cleaned_hotkey)
+            
+    if payload.grammar_correction_enabled is not None:
+        settings.GRAMMAR_CORRECTION_ENABLED = payload.grammar_correction_enabled
+        db.set_setting("grammar_correction_enabled", str(payload.grammar_correction_enabled).lower())
+        
     return {"status": "updated", "settings": get_current_settings()}
 
 static_dir = Path(__file__).resolve().parent / "static"

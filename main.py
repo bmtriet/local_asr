@@ -15,13 +15,36 @@ def run_web(settings):
 
 def run_daemon(engine, db):
     print("[Main] Starting Voice Typing Daemon with Tray Icon...")
-    daemon = VoiceTypingDaemon(engine=engine, db=db, show_tray=True)
+    stop_event = threading.Event()
+
+    def handle_exit():
+        stop_event.set()
+        import os
+        os._exit(0)
+
+    def handle_restart():
+        stop_event.set()
+        import os
+        import sys
+        print("[Main] Restarting application via os.execv...")
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    daemon = VoiceTypingDaemon(
+        engine=engine,
+        db=db,
+        show_tray=True,
+        on_exit=handle_exit,
+        on_restart=handle_restart
+    )
     from web.api import set_daemon_instance
     set_daemon_instance(daemon)
-    daemon.start()
+    
     try:
-        while True:
-            time.sleep(1)
+        daemon.start(blocking=True)
+        # Fallback if no tray blocks
+        if not daemon.tray:
+            while not stop_event.is_set():
+                time.sleep(0.5)
     except KeyboardInterrupt:
         daemon.stop()
 

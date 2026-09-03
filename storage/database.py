@@ -41,8 +41,10 @@ class Database:
             """)
             conn.commit()
 
-    def save_transcription(self, audio_path: str, duration: float, raw_text: str) -> int:
-        """Save a new transcription log with initial raw_text equal to corrected_text."""
+    def save_transcription(self, audio_path: str, duration: float, raw_text: str, corrected_text: Optional[str] = None) -> int:
+        """Save a new transcription log."""
+        if corrected_text is None:
+            corrected_text = raw_text
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -50,7 +52,7 @@ class Database:
                 INSERT INTO transcriptions (audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training)
                 VALUES (?, ?, ?, ?, 0, 0)
                 """,
-                (audio_path, duration, raw_text, raw_text)
+                (audio_path, duration, raw_text, corrected_text)
             )
             conn.commit()
             return cursor.lastrowid

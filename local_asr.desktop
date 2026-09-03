@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Local ASR Voice Typing
+Comment=Local Speech-to-Text & Continual Learning Daemon
+Exec=/home/sgvg-gmo050/Desktop/Projects/local_asr/start.sh
+Icon=audio-input-microphone
+Terminal=false
+Categories=Utility;Audio;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

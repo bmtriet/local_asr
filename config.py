@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     DEVICE: str = "cuda"
     TORCH_DTYPE: str = "bfloat16"
     
+    # Grammar Correction Model settings
+    GRAMMAR_MODEL_NAME: str = "Qwen/Qwen2.5-0.5B-Instruct"
+    GRAMMAR_CORRECTION_ENABLED: bool = False
+    
     # Hotkey & Input injection settings
     HOTKEY: str = "ctrl+alt+space"
     SAMPLE_RATE: int = 16000

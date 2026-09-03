@@ -67,3 +67,18 @@ class AudioRecorder:
 
         sf.write(file_path, audio_data, self.sample_rate)
         return file_path, duration
+
+    def cancel_recording(self):
+        """Stop capture and discard recorded audio frames without saving to file."""
+        with self._lock:
+            self.is_recording = False
+            self._frames = []
+            stream = self._stream
+            self._stream = None
+
+        if stream:
+            try:
+                stream.stop()
+                stream.close()
+            except Exception:
+                pass

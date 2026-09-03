@@ -5,10 +5,11 @@ import pystray
 
 class TrayIndicator:
     """Manages the system tray icon with animated feedback."""
-    def __init__(self, on_exit=None):
+    def __init__(self, on_exit=None, on_restart=None):
         self.state = "idle"  # idle | recording | transcribing
         self.icon = None
         self.on_exit = on_exit
+        self.on_restart = on_restart
         self._animating = False
         self._thread = None
         self._anim_step = 0
@@ -55,16 +56,16 @@ class TrayIndicator:
                     self.icon.icon = self._create_icon_image(self.state, self._anim_step)
             time.sleep(0.12)
 
-    def run_in_background(self):
-        """Start the system tray icon in a dedicated daemon thread."""
+    def _setup_icon(self):
         self._animating = True
         anim_thread = threading.Thread(target=self._animation_loop, daemon=True)
         anim_thread.start()
 
         menu = pystray.Menu(
-            pystray.MenuItem("Local ASR Voice Typing", lambda: None, enabled=False),
+            pystray.MenuItem("Local ASR Voice Typing", lambda *args: None, enabled=False),
             pystray.MenuItem("Open Web UI", self._open_web_ui),
             pystray.Menu.SEPARATOR,
+            pystray.MenuItem("Restart App", self._restart),
             pystray.MenuItem("Exit", self._stop)
         )
 
@@ -75,16 +76,38 @@ class TrayIndicator:
             menu=menu
         )
 
+    def run_in_background(self):
+        """Start the system tray icon in a dedicated daemon thread."""
+        self._setup_icon()
         tray_thread = threading.Thread(target=self.icon.run, daemon=True)
         tray_thread.start()
 
-    def _open_web_ui(self):
+    def run_blocking(self):
+        """Start the system tray icon blocking the current thread (required for Linux GTK)."""
+        self._setup_icon()
+        self.icon.run()
+
+    def _open_web_ui(self, *args):
         import webbrowser
         from config import get_settings
         s = get_settings()
         webbrowser.open(f"http://{s.HOST}:{s.PORT}")
 
-    def _stop(self):
+    def _restart(self, *args):
+        self._animating = False
+        if self.icon:
+            self.icon.stop()
+            self.icon = None
+        callback = self.on_restart
+        self.on_restart = None
+        if callback:
+            callback()
+        else:
+            import sys
+            import os
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    def _stop(self, *args):
         self._animating = False
         if self.icon:
             self.icon.stop()
@@ -93,3 +116,6 @@ class TrayIndicator:
         self.on_exit = None
         if callback:
             callback()
+        else:
+            import os
+            os._exit(0)

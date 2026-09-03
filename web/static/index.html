@@ -130,6 +130,29 @@
           </button>
         </div>
 
+        <!-- Grammar Correction Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Chuẩn hoá & Dịch thuật (AI)</h2>
+          </div>
+          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Tự động sửa lỗi chính tả hoặc dịch sang Tiếng Anh / Trung bằng Qwen2.5-0.5B.
+          </p>
+          <style>
+            .switch-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 20px; }
+            .switch-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+            input:checked + .switch-slider { background-color: var(--primary); }
+            input:checked + .switch-slider:before { transform: translateX(20px); }
+          </style>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label for="toggle-grammar" style="font-size: 0.875rem; font-weight: 500;">Bật sửa lỗi tự động:</label>
+            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+              <input type="checkbox" id="toggle-grammar" style="opacity: 0; width: 0; height: 0;">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+        </div>
+
         <!-- Hotkey & Settings Card -->
         <div class="card">
           <div class="card-header">

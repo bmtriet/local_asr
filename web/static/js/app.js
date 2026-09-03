@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const inputHotkey = document.getElementById('input-hotkey');
   const btnSaveHotkey = document.getElementById('btn-save-hotkey');
+  const toggleGrammar = document.getElementById('toggle-grammar');
 
   // Check system status
   async function checkStatus() {
@@ -346,6 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
         inputHotkey.value = data.hotkey;
         updatePresetActiveBadge(data.hotkey);
       }
+      if (toggleGrammar) {
+        toggleGrammar.checked = data.grammar_correction_enabled;
+      }
     } catch (err) {
       console.error(err);
     }
@@ -447,6 +451,20 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Lỗi: ' + err.message);
     }
   });
+
+  if (toggleGrammar) {
+    toggleGrammar.addEventListener('change', async (e) => {
+      try {
+        await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ grammar_correction_enabled: e.target.checked })
+        });
+      } catch (err) {
+        alert('Lỗi lưu cài đặt chuẩn hoá: ' + err.message);
+      }
+    });
+  }
 
   btnRefresh.addEventListener('click', loadHistory);
 
