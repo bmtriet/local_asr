@@ -26,5 +26,33 @@
       "pi a bi"
     ],
     "description": "PAB Department"
+  },
+  {
+    "target": "agent",
+    "aliases": [
+      "e rằng"
+    ],
+    "description": "agent"
+  },
+  {
+    "target": "hub",
+    "aliases": [
+      "hấp"
+    ],
+    "description": ""
+  },
+  {
+    "target": "Syno",
+    "aliases": [
+      "Cino"
+    ],
+    "description": ""
+  },
+  {
+    "target": "UI",
+    "aliases": [
+      "dù ai"
+    ],
+    "description": ""
   }
 ]
