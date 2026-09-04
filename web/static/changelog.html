@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local ASR - Changelog & Release Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .changelog-container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .back-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      transition: color 0.2s ease;
+    }
+    .back-nav:hover {
+      color: var(--primary);
+    }
+    .release-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    .release-tag {
+      background: var(--emerald);
+      color: #0b0f19;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+      border-left: 2px solid rgba(255, 255, 255, 0.08);
+      margin-top: 1.5rem;
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -2.55rem;
+      top: 0.35rem;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+      border: 3px solid var(--bg-primary);
+    }
+    .release-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+    }
+    .release-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .release-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .release-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .release-date {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+    .feature-icon {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-top: 0.15rem;
+    }
+    .icon-new { background: rgba(16, 185, 129, 0.15); color: var(--emerald); }
+    .icon-imp { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .feature-body strong {
+      color: #fff;
+    }
+    .feature-body p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="container changelog-container">
+    <a href="/" class="back-nav">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Voice Studio
+    </a>
+
+    <header class="header" style="margin-bottom: 1.5rem; padding-bottom: 1.25rem;">
+      <div class="logo-group">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        </div>
+        <div class="title-group">
+          <h1>Product Changelog & Updates</h1>
+          <p>Version release history and new feature highlights for Local ASR</p>
+        </div>
+      </div>
+      <span class="release-badge">
+        <span class="release-tag">Current</span>
+        Version 0.1.1
+      </span>
+    </header>
+
+    <div class="timeline">
+      <!-- Version 0.1.1 Release Card -->
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background: var(--emerald); box-shadow: 0 0 12px var(--emerald-glow);"></div>
+        <div class="release-card">
+          <div class="release-header">
+            <div class="release-title-group">
+              <h2 class="release-title">Version 0.1.1 - Clipboard Protection & UX Polish</h2>
+              <span class="badge-active-pill" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">Latest</span>
+            </div>
+            <span class="release-date">September 4, 2026</span>
+          </div>
+
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feature-icon icon-new">📋</div>
+              <div class="feature-body">
+                <strong>User Clipboard Data Preservation</strong>
+                <p>Automatically backs up the user's existing clipboard contents before simulated paste injection and restores it 100% untouched afterwards (Linux X11, macOS, and Windows). You will never lose previously copied text.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-new">🔗</div>
+              <div class="feature-body">
+                <strong>"About & GitHub" Author & Source Navigation</strong>
+                <p>Added an intuitive System Tray menu item and a Web UI header "About" button directing to the official repository by Triet Bui: <a href="https://github.com/bmtriet/local_asr" target="_blank" style="color: #818cf8; text-decoration: underline;">github.com/bmtriet/local_asr</a>.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">🔍</div>
+              <div class="feature-body">
+                <strong>System Tray Idle Icon Enlarged (~100%)</strong>
+                <p>Doubled the diameter of the idle microphone badge for sharp visibility on high-resolution system taskbars while retaining smooth pulsing animations during recording.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">🛠️</div>
+              <div class="feature-body">
+                <strong>Application Restart Mechanism Re-engineered (Restart App Fix)</strong>
+                <p>Replaced fragile in-process exec calls with clean detached subprocess spawning and clean exit, eliminating system freezes and socket conflicts when restarting the service.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Version 0.1.0 Release Card -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="release-card">
+          <div class="release-header">
+            <div class="release-title-group">
+              <h2 class="release-title">Version 0.1.0 - The Genesis & UX Enhancement</h2>
+              <span class="badge-active-pill" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3);">Milestone</span>
+            </div>
+            <span class="release-date">September 4, 2026</span>
+          </div>
+
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feature-icon icon-new">✨</div>
+              <div class="feature-body">
+                <strong>Audio Feedback Cues (Synthetic Sound Effects)</strong>
+                <p>Plays subtle, elegant sine wave chimes upon starting recording, typing completion, and an alert sound on cancellation (ESC). Generates tones on the fly via SoundDevice with zero disk dependencies.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-new">📊</div>
+              <div class="feature-body">
+                <strong>Real-Time Audio VU Meter on OSD</strong>
+                <p>Added a dynamic microphone decibel level gauge right below the OSD status header, transitioning dynamically from cyan to emerald to confirm active microphone pickup.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">⚡</div>
+              <div class="feature-body">
+                <strong>Push-to-Talk (Hold-to-Talk) Mode</strong>
+                <p>Supports both activation models: Toggle Mode (press once to start, press again to stop) and Hold-to-Talk (hold shortcut down to speak, release to type immediately).</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">🎙️</div>
+              <div class="feature-body">
+                <strong>Auto-Stop on Silence (Silence VAD)</strong>
+                <p>Integrated Voice Activity Detection (VAD) automatically detects pauses in speech and triggers transcription without needing a manual shortcut press.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-new">🚀</div>
+              <div class="feature-body">
+                <strong>Zero-Latency Audio Recording</strong>
+                <p>Microphone audio stream captures from the very first millisecond of hotkey activation, preventing missing or truncated syllables at the start of utterances.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">🔢</div>
+              <div class="feature-body">
+                <strong>Vietnamese Inverse Text Normalization (ITN)</strong>
+                <p>Automatically converts spoken numbers (phone numbers, OTP codes, date/time, credit card numbers) into clean, standard digits in &lt; 0.001s.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-new">🌐</div>
+              <div class="feature-body">
+                <strong>OSD Language Selection & Bilingual Translation</strong>
+                <p>Fast translation routing to English <code>[E]</code>, Traditional Chinese <code>[Z]</code>, or press space to preserve original speech. Includes optional two-line bilingual output.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">🎯</div>
+              <div class="feature-body">
+                <strong>Continual LoRA Fine-Tuning & Hotwords Context Biasing</strong>
+                <p>Automatically learns from reviewed phrases and fine-tunes custom LoRA adapters on local GPU hardware without needing cloud connections.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

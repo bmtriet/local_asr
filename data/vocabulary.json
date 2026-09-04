@@ -1,0 +1,89 @@
+[
+  {
+    "target": "IFM",
+    "aliases": [
+      "ifm",
+      "i f m",
+      "ai ép em",
+      "ai ef em"
+    ],
+    "description": "IFM System"
+  },
+  {
+    "target": "Global User",
+    "aliases": [
+      "global user",
+      "globaluser",
+      "glo bal user"
+    ],
+    "description": "Global User Account"
+  },
+  {
+    "target": "PAB",
+    "aliases": [
+      "pab",
+      "p a b",
+      "pi a bi"
+    ],
+    "description": "PAB Department"
+  },
+  {
+    "target": "Việt",
+    "aliases": [
+      "việt"
+    ],
+    "description": "vn"
+  },
+  {
+    "target": "%",
+    "aliases": [
+      "phần trăm"
+    ],
+    "description": "%"
+  },
+  {
+    "target": "100",
+    "aliases": [
+      "một trăm"
+    ],
+    "description": "100"
+  },
+  {
+    "target": "UI",
+    "aliases": [
+      "duai"
+    ],
+    "description": "UI"
+  },
+  {
+    "target": "active",
+    "aliases": [
+      "ác tị"
+    ],
+    "description": "active"
+  },
+  {
+    "target": "update",
+    "aliases": [
+      "up đến"
+    ],
+    "description": "update"
+  },
+  {
+    "target": "model",
+    "aliases": [
+      "mô đò",
+      "mầu độ",
+      "mô đồ",
+      "mô độ"
+    ],
+    "description": "model"
+  },
+  {
+    "target": "đuối",
+    "aliases": [
+      "đuí"
+    ],
+    "description": "đuối"
+  }
+]

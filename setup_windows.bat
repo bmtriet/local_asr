@@ -164,7 +164,35 @@ if !ERRORLEVEL! NEQ 0 (
 )
 
 :: -----------------------------------------------------------------
-:: 5. Thiet lap tu dong khoi dong cung Windows (Startup folder)
+:: 5. Tuy chon: Cai dat Mo hinh Dich thuat & Ngu phap Qwen2.5 (0.5B)
+:: -----------------------------------------------------------------
+echo.
+echo =================================================================
+echo [*] CAU HINH TINH NANG DICH THUAT & SUA NGU PHAP (QWEN2.5-0.5B):
+echo  - Neu CHON (Y): He thong se tai mo hinh Qwen2.5-0.5B (~1.0GB)
+echo    de ho tro dich sang Tieng Anh [E], Tieng Trung [Z] va sua loi.
+echo  - Neu KHONG (N): Che do STT Thuan Tuy (Tiet kiem ~1.0GB dung luong,
+echo    chi nhan dien giong noi Tieng Viet, toi uu may yeu/RAM it).
+echo =================================================================
+set /p INSTALL_TRANSLATE="[*] Ban co muon tai them mo hinh Dich thuat Qwen2.5 khong? (Y/N, mac dinh N): "
+if "!INSTALL_TRANSLATE!"=="" set INSTALL_TRANSLATE=N
+if /i "!INSTALL_TRANSLATE!"=="Y" (
+    echo.
+    echo [*] Dang tai va khoi tao bo nho dem cho Qwen2.5-0.5B-Instruct (~1.0GB)...
+    "!VENV_PYTHON!" -c "from transformers import AutoModelForCausalLM, AutoTokenizer; m='Qwen/Qwen2.5-0.5B-Instruct'; AutoTokenizer.from_pretrained(m); AutoModelForCausalLM.from_pretrained(m)" >> "%LOG_FILE%" 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        echo [OK] Da tai va luu tru thanh cong mo hinh dich thuat Qwen2.5!
+    ) else (
+        echo [CANH BAO] Khong the tai truoc Qwen2.5, se duoc tai tu dong khi kich hoat dich.
+    )
+) else (
+    echo.
+    echo [OK] Ban da chon che do STT Thuan Tuy (Pure STT Mode).
+    echo      Bo qua tai Qwen2.5, tiet kiem ~1.0GB dung luong o cung va RAM!
+)
+
+:: -----------------------------------------------------------------
+:: 6. Thiet lap tu dong khoi dong cung Windows (Startup folder)
 :: -----------------------------------------------------------------
 set "ERR_STEP=Tao loi tat khoi dong cung Windows"
 echo.
@@ -180,7 +208,7 @@ if /i "!AUTOSTART!"=="Y" (
 )
 
 :: -----------------------------------------------------------------
-:: 6. Hoan tat cai dat
+:: 7. Hoan tat cai dat
 :: -----------------------------------------------------------------
 echo.
 echo =================================================================

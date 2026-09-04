@@ -1,0 +1,46 @@
+[
+  {
+    "target": "IFM",
+    "aliases": [
+      "ifm",
+      "i f m",
+      "ai ép em",
+      "ai ef em"
+    ],
+    "description": "IFM System"
+  },
+  {
+    "target": "Global User",
+    "aliases": [
+      "global user",
+      "globaluser",
+      "glo bal user"
+    ],
+    "description": "Global User Account"
+  },
+  {
+    "target": "PAB",
+    "aliases": [
+      "pab",
+      "p a b",
+      "pi a bi"
+    ],
+    "description": "PAB Department"
+  },
+  {
+    "target": "FinTech",
+    "aliases": [
+      "fin tech",
+      "tai chinh cong nghe"
+    ],
+    "description": "Fintech domain"
+  },
+  {
+    "target": "BioTech",
+    "aliases": [
+      "bio tech",
+      "cong nghe sinh hoc"
+    ],
+    "description": "Biotech domain"
+  }
+]

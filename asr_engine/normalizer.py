@@ -23,8 +23,16 @@ TEEN_WORDS = {
 class VietnameseNormalizer:
     """Fast Inverse Text Normalization (ITN) and user phrase replacement for Vietnamese ASR."""
     
-    def __init__(self, db=None):
+    def __init__(self, db=None, vocab_mgr=None):
         self.db = db
+        if vocab_mgr is not None:
+            self.vocab_mgr = vocab_mgr
+        else:
+            try:
+                from asr_engine.vocabulary import VocabularyManager
+                self.vocab_mgr = VocabularyManager()
+            except Exception:
+                self.vocab_mgr = None
 
     def normalize(self, text: str) -> str:
         if not text or not text.strip():
@@ -32,7 +40,14 @@ class VietnameseNormalizer:
 
         normalized = text.strip()
 
-        # 1. First check user custom phrase replacements from database
+        # 1. Apply user custom vocabulary mapping from vocabulary.json (exact, spaced out, case variants)
+        if self.vocab_mgr:
+            try:
+                normalized = self.vocab_mgr.apply(normalized)
+            except Exception as e:
+                print(f"[Normalizer] Error applying vocabulary mapping: {e}")
+
+        # 2. Check user custom phrase replacements from database
         if self.db:
             try:
                 replacements = self.db.get_user_phrase_replacements()
@@ -103,6 +118,7 @@ class VietnameseNormalizer:
         """Normalize expressions like 'không phẩy năm' -> '0.5', 'mười phần trăm' -> '10%'."""
         # Decimal: "X phẩy Y" / "X chấm Y" where X and Y are digits
         text = re.sub(r'(\b\d+)\s*(phẩy|chấm)\s*(\d+)\b', r'\1.\3', text, flags=re.IGNORECASE)
-        # Percentage: "X phần trăm" -> "X%"
-        text = re.sub(r'(\b\d+)\s*phần\s*trăm\b', r'\1%', text, flags=re.IGNORECASE)
+        # Percentage: "X phần trăm" or "X %" -> "X%"
+        text = re.sub(r'(\b\d+)\s*(?:phần\s*trăm|%)\b', r'\1%', text, flags=re.IGNORECASE)
+        text = re.sub(r'(\b\d+)\s+%', r'\1%', text)
         return text

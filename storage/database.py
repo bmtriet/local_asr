@@ -30,7 +30,8 @@ class Database:
                     raw_text TEXT NOT NULL,
                     corrected_text TEXT NOT NULL,
                     is_reviewed INTEGER DEFAULT 0,
-                    used_in_training INTEGER DEFAULT 0
+                    used_in_training INTEGER DEFAULT 0,
+                    profile_id TEXT DEFAULT 'default'
                 )
             """)
             cursor.execute("""
@@ -39,28 +40,135 @@ class Database:
                     value TEXT NOT NULL
                 )
             """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS profiles (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    description TEXT DEFAULT '',
+                    is_active INTEGER DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
+            # Migration: Ensure profile_id column exists in transcriptions table
+            cursor.execute("PRAGMA table_info(transcriptions)")
+            columns = [row["name"] for row in cursor.fetchall()]
+            if "profile_id" not in columns:
+                cursor.execute("ALTER TABLE transcriptions ADD COLUMN profile_id TEXT DEFAULT 'default'")
+
+            # Ensure default profile exists
+            cursor.execute("SELECT id FROM profiles WHERE id = 'default'")
+            if not cursor.fetchone():
+                cursor.execute(
+                    "INSERT INTO profiles (id, name, description, is_active) VALUES ('default', 'Default Profile', 'Standard User Profile', 1)"
+                )
+            else:
+                # Ensure at least one active profile
+                cursor.execute("SELECT id FROM profiles WHERE is_active = 1")
+                if not cursor.fetchone():
+                    cursor.execute("UPDATE profiles SET is_active = 1 WHERE id = 'default'")
+
             conn.commit()
 
-    def save_transcription(self, audio_path: str, duration: float, raw_text: str, corrected_text: Optional[str] = None) -> int:
+    # Profile Management Methods
+    def get_profiles(self) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, name, description, is_active, created_at FROM profiles ORDER BY created_at ASC")
+            return [dict(row) for row in cursor.fetchall()]
+
+    def get_active_profile(self) -> Dict[str, Any]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, name, description, is_active, created_at FROM profiles WHERE is_active = 1 LIMIT 1")
+            row = cursor.fetchone()
+            if row:
+                return dict(row)
+            return {"id": "default", "name": "Default Profile", "description": "", "is_active": 1}
+
+    def set_active_profile(self, profile_id: str) -> bool:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM profiles WHERE id = ?", (profile_id,))
+            if not cursor.fetchone():
+                return False
+            cursor.execute("UPDATE profiles SET is_active = 0")
+            cursor.execute("UPDATE profiles SET is_active = 1 WHERE id = ?", (profile_id,))
+            conn.commit()
+            return True
+
+    def create_profile(self, profile_id: str, name: str, description: str = "") -> bool:
+        profile_id = profile_id.strip().lower()
+        if not profile_id:
+            return False
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM profiles WHERE id = ?", (profile_id,))
+            if cursor.fetchone():
+                return False
+            cursor.execute(
+                "INSERT INTO profiles (id, name, description, is_active) VALUES (?, ?, ?, 0)",
+                (profile_id, name.strip() or profile_id, description.strip())
+            )
+            conn.commit()
+            return True
+
+    def update_profile(self, profile_id: str, name: str, description: str = "") -> bool:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE profiles SET name = ?, description = ? WHERE id = ?",
+                (name.strip(), description.strip(), profile_id)
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def delete_profile(self, profile_id: str) -> bool:
+        if profile_id == "default":
+            return False
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            # If deleting active profile, activate default
+            cursor.execute("SELECT is_active FROM profiles WHERE id = ?", (profile_id,))
+            row = cursor.fetchone()
+            if row and row["is_active"] == 1:
+                cursor.execute("UPDATE profiles SET is_active = 1 WHERE id = 'default'")
+            cursor.execute("DELETE FROM profiles WHERE id = ?", (profile_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def save_transcription(
+        self,
+        audio_path: str,
+        duration: float,
+        raw_text: str,
+        corrected_text: Optional[str] = None,
+        profile_id: Optional[str] = None
+    ) -> int:
         """Save a new transcription log."""
         if corrected_text is None:
             corrected_text = raw_text
+        if not profile_id:
+            profile_id = self.get_active_profile().get("id", "default")
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO transcriptions (audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training)
-                VALUES (?, ?, ?, ?, 0, 0)
+                INSERT INTO transcriptions (audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training, profile_id)
+                VALUES (?, ?, ?, ?, 0, 0, ?)
                 """,
-                (audio_path, duration, raw_text, corrected_text)
+                (audio_path, duration, raw_text, corrected_text, profile_id)
             )
             conn.commit()
             return cursor.lastrowid
 
-    def get_transcriptions_count(self, filter_type: str = "all", search: str = "") -> int:
-        """Count total transcriptions matching filter and search."""
+    def get_transcriptions_count(self, filter_type: str = "all", search: str = "", profile_id: Optional[str] = None) -> int:
+        """Count total transcriptions matching filter, search and profile."""
         query = "SELECT COUNT(*) FROM transcriptions WHERE 1=1"
         params = []
+        if profile_id:
+            query += " AND profile_id = ?"
+            params.append(profile_id)
         if filter_type == "reviewed":
             query += " AND is_reviewed = 1"
         elif filter_type == "unreviewed":
@@ -80,15 +188,19 @@ class Database:
         limit: int = 10,
         offset: int = 0,
         filter_type: str = "all",
-        search: str = ""
+        search: str = "",
+        profile_id: Optional[str] = None
     ) -> List[Dict[str, Any]]:
-        """Retrieve latest transcriptions with pagination, filter, and search."""
+        """Retrieve latest transcriptions with pagination, filter, search, and profile."""
         query = """
-            SELECT id, timestamp, audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training
+            SELECT id, timestamp, audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training, profile_id
             FROM transcriptions
             WHERE 1=1
         """
         params = []
+        if profile_id:
+            query += " AND profile_id = ?"
+            params.append(profile_id)
         if filter_type == "reviewed":
             query += " AND is_reviewed = 1"
         elif filter_type == "unreviewed":
@@ -155,17 +267,20 @@ class Database:
             conn.commit()
             return cursor.rowcount > 0
 
-    def get_samples_for_training(self) -> List[Dict[str, Any]]:
-        """Retrieve samples marked as reviewed that have not yet been used in training."""
+    def get_samples_for_training(self, profile_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Retrieve samples marked as reviewed that have not yet been used in training for given profile."""
+        if not profile_id:
+            profile_id = self.get_active_profile().get("id", "default")
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT id, audio_path, duration, raw_text, corrected_text
+                SELECT id, audio_path, duration, raw_text, corrected_text, profile_id
                 FROM transcriptions
-                WHERE is_reviewed = 1 AND used_in_training = 0
+                WHERE is_reviewed = 1 AND used_in_training = 0 AND profile_id = ?
                 ORDER BY id ASC
-                """
+                """,
+                (profile_id,)
             )
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
@@ -210,18 +325,21 @@ class Database:
             conn.commit()
             return cursor.rowcount > 0
 
-    def get_reviewed_vocabulary(self) -> str:
-        """Extract user-reviewed keywords, corrections, and proper nouns as context."""
+    def get_reviewed_vocabulary(self, profile_id: Optional[str] = None) -> str:
+        """Extract user-reviewed keywords, corrections, and proper nouns as context for active profile."""
+        if not profile_id:
+            profile_id = self.get_active_profile().get("id", "default")
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
                 SELECT raw_text, corrected_text
                 FROM transcriptions
-                WHERE is_reviewed = 1
+                WHERE is_reviewed = 1 AND profile_id = ?
                 ORDER BY id DESC
                 LIMIT 50
-                """
+                """,
+                (profile_id,)
             )
             rows = cursor.fetchall()
             
@@ -241,18 +359,21 @@ class Database:
 
         return ", ".join(sorted(vocab_set))
 
-    def get_user_phrase_replacements(self) -> dict:
-        """Fetch user-reviewed custom replacements mapping raw spoken phrases to preferred output."""
+    def get_user_phrase_replacements(self, profile_id: Optional[str] = None) -> dict:
+        """Fetch user-reviewed custom replacements mapping raw spoken phrases to preferred output for active profile."""
+        if not profile_id:
+            profile_id = self.get_active_profile().get("id", "default")
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
                 SELECT raw_text, corrected_text
                 FROM transcriptions
-                WHERE is_reviewed = 1 AND raw_text != corrected_text
+                WHERE is_reviewed = 1 AND raw_text != corrected_text AND profile_id = ?
                 ORDER BY id DESC
                 LIMIT 100
-                """
+                """,
+                (profile_id,)
             )
             rows = cursor.fetchall()
             

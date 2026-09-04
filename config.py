@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     RECORDINGS_DIR: Path = DATA_DIR / "recordings"
     ADAPTERS_DIR: Path = DATA_DIR / "adapters"
     DB_PATH: str = str(DATA_DIR / "local_asr.db")
+    VOCABULARY_PATH: Path = DATA_DIR / "vocabulary.json"
     
     # ASR Model settings
     MODEL_NAME: str = "Qwen/Qwen3-ASR-0.6B"
@@ -17,6 +18,7 @@ class Settings(BaseSettings):
     CPU_THREADS: int = min(4, os.cpu_count() or 4)
     
     # Grammar Correction & Translation Model settings
+    QWEN25_ENABLED: bool = True
     GRAMMAR_MODEL_NAME: str = "Qwen/Qwen2.5-0.5B-Instruct"
     GRAMMAR_CORRECTION_ENABLED: bool = False
     TRANSLATION_TARGET: str = "english" # "english" or "chinese"
@@ -26,6 +28,11 @@ class Settings(BaseSettings):
     HOTKEY: str = "ctrl+alt+space"
     SAMPLE_RATE: int = 16000
     AUDIO_CHANNELS: int = 1
+    
+    # OSD Overlay Settings
+    OSD_POSITION: str = "top-left" # top-left, top-right, bottom-left, bottom-right, center
+    OSD_DURATION: float = 2.0
+    OSD_ALWAYS_ON: bool = False
     
     # Server settings
     HOST: str = "127.0.0.1"

@@ -26,8 +26,12 @@ def run_daemon(engine, db):
         stop_event.set()
         import os
         import sys
-        print("[Main] Restarting application via os.execv...")
-        os.execv(sys.executable, [sys.executable] + sys.argv)
+        import subprocess
+        print("[Main] Restarting application via subprocess...")
+        sys.stdout.flush()
+        sys.stderr.flush()
+        subprocess.Popen([sys.executable] + sys.argv, close_fds=True)
+        os._exit(0)
 
     daemon = VoiceTypingDaemon(
         engine=engine,

@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from config import get_settings
 from storage.database import Database
 from asr_engine.engine import ASREngine
+from asr_engine.vocabulary import VocabularyManager
 from training.lora_trainer import LoRATrainer
 
 app = FastAPI(title="Local ASR System", version="1.0.0")
@@ -27,33 +28,124 @@ db = Database()
 db.init_db()
 engine = ASREngine(lazy_load=True)
 trainer = LoRATrainer(db=db)
+vocab_mgr = VocabularyManager()
 daemon_instance: Optional[Any] = None
 
 def set_daemon_instance(d):
-    global daemon_instance, engine, db
+    global daemon_instance, engine, db, vocab_mgr
     daemon_instance = d
     if hasattr(d, "engine") and d.engine:
         engine = d.engine
     if hasattr(d, "db") and d.db:
         db = d.db
+    if hasattr(d, "normalizer") and getattr(d.normalizer, "vocab_mgr", None):
+        vocab_mgr = d.normalizer.vocab_mgr
 
 class CorrectionRequest(BaseModel):
     corrected_text: str
 
+class VocabularyItem(BaseModel):
+    target: str
+    aliases: List[str] = []
+    description: Optional[str] = ""
+
+class TestVocabularyRequest(BaseModel):
+    text: str
+
 class SettingsUpdateRequest(BaseModel):
     hotkey: Optional[str] = None
+    qwen25_enabled: Optional[bool] = None
     grammar_correction_enabled: Optional[bool] = None
     translation_target: Optional[str] = None
     add_origin_phrase: Optional[bool] = None
+    osd_position: Optional[str] = None
+    osd_duration: Optional[float] = None
+    osd_always_on: Optional[bool] = None
+    sound_cues_enabled: Optional[bool] = None
+    hotkey_mode: Optional[str] = None
+    vad_enabled: Optional[bool] = None
+    vad_silence_timeout: Optional[float] = None
+
+class ProfileCreateRequest(BaseModel):
+    id: str
+    name: str
+    description: Optional[str] = ""
+
+class ProfileSwitchRequest(BaseModel):
+    profile_id: str
+
+@app.get("/api/profiles")
+def get_profiles_list():
+    """Retrieve all profiles with active state."""
+    profiles = db.get_profiles()
+    active = db.get_active_profile()
+    return {
+        "profiles": profiles,
+        "active_profile": active
+    }
+
+@app.post("/api/profiles")
+def create_profile_endpoint(payload: ProfileCreateRequest):
+    """Create a new user profile."""
+    clean_id = payload.id.strip().lower()
+    if not clean_id:
+        raise HTTPException(status_code=400, detail="Profile ID cannot be empty")
+    success = db.create_profile(clean_id, payload.name, payload.description or "")
+    if not success:
+        raise HTTPException(status_code=400, detail="Profile ID already exists or is invalid")
+    return {"status": "created", "profile_id": clean_id}
+
+@app.post("/api/profiles/active")
+def switch_active_profile_endpoint(payload: ProfileSwitchRequest):
+    """Switch the current active profile."""
+    clean_id = payload.profile_id.strip().lower()
+    success = db.set_active_profile(clean_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    # Switch vocabulary and trainer profile
+    vocab_mgr.switch_profile(clean_id)
+    trainer.switch_profile(clean_id)
+    engine.switch_profile_adapter(clean_id)
+
+    # Sync with daemon if running
+    if daemon_instance and hasattr(daemon_instance, "switch_profile"):
+        daemon_instance.switch_profile(clean_id)
+
+    return {"status": "switched", "active_profile": db.get_active_profile()}
+
+@app.delete("/api/profiles/{profile_id}")
+def delete_profile_endpoint(profile_id: str):
+    """Delete a user profile (except default)."""
+    clean_id = profile_id.strip().lower()
+    if clean_id == "default":
+        raise HTTPException(status_code=400, detail="Cannot delete default profile")
+    
+    # If active profile was deleted, switch active to default
+    was_active = (db.get_active_profile().get("id") == clean_id)
+    success = db.delete_profile(clean_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    if was_active:
+        vocab_mgr.switch_profile("default")
+        trainer.switch_profile("default")
+        engine.switch_profile_adapter("default")
+        if daemon_instance and hasattr(daemon_instance, "switch_profile"):
+            daemon_instance.switch_profile("default")
+
+    return {"status": "deleted", "profile_id": clean_id}
 
 @app.get("/api/status")
 def get_status():
+    active_prof = db.get_active_profile()
     return {
         "status": "ok",
         "model": settings.MODEL_NAME,
         "device": engine.device,
         "is_model_loaded": engine.is_loaded,
-        "active_lora": engine.active_adapter_name
+        "active_lora": engine.active_adapter_name,
+        "active_profile": active_prof
     }
 
 @app.get("/api/history")
@@ -61,20 +153,29 @@ def get_history(
     page: int = 1,
     limit: int = 10,
     filter_type: str = "all",
-    search: str = ""
+    search: str = "",
+    profile_id: Optional[str] = None
 ):
     page = max(1, page)
     limit = max(1, min(100, limit))
     offset = (page - 1) * limit
-    total = db.get_transcriptions_count(filter_type=filter_type, search=search)
-    items = db.get_transcriptions(limit=limit, offset=offset, filter_type=filter_type, search=search)
+    
+    # Default to current active profile if not specified
+    if profile_id is None:
+        profile_id = db.get_active_profile().get("id", "default")
+    elif profile_id == "all":
+        profile_id = None
+
+    total = db.get_transcriptions_count(filter_type=filter_type, search=search, profile_id=profile_id)
+    items = db.get_transcriptions(limit=limit, offset=offset, filter_type=filter_type, search=search, profile_id=profile_id)
     total_pages = max(1, (total + limit - 1) // limit) if total > 0 else 1
     return {
         "items": items,
         "total": total,
         "page": page,
         "limit": limit,
-        "total_pages": total_pages
+        "total_pages": total_pages,
+        "profile_id": profile_id
     }
 
 @app.delete("/api/history/{item_id}")
@@ -114,8 +215,10 @@ async def public_transcribe(file: UploadFile = File(...)):
 @app.get("/api/train/status")
 def get_train_status():
     status = trainer.get_status()
-    pending_samples = len(db.get_samples_for_training())
+    active_profile_id = db.get_active_profile().get("id", "default")
+    pending_samples = len(db.get_samples_for_training(profile_id=active_profile_id))
     status["pending_samples"] = pending_samples
+    status["profile_id"] = active_profile_id
     return status
 
 @app.post("/api/train/start")
@@ -139,19 +242,49 @@ def start_train(epochs: int = 3, lr: float = 1e-4):
 def get_current_settings():
     saved_hotkey = db.get_setting("hotkey")
     active_hotkey = saved_hotkey or settings.HOTKEY
+    qwen25_enabled_str = db.get_setting("qwen25_enabled", str(getattr(settings, "QWEN25_ENABLED", True))).lower()
+    qwen25_enabled = (qwen25_enabled_str == "true")
     grammar_enabled_str = db.get_setting("grammar_correction_enabled", str(settings.GRAMMAR_CORRECTION_ENABLED)).lower()
     grammar_enabled = (grammar_enabled_str == "true")
     translation_target = db.get_setting("translation_target", settings.TRANSLATION_TARGET)
     add_origin_phrase_str = db.get_setting("add_origin_phrase", str(settings.ADD_ORIGIN_PHRASE)).lower()
     add_origin_phrase = (add_origin_phrase_str == "true")
+    osd_position = db.get_setting("osd_position", settings.OSD_POSITION)
+    osd_duration_str = db.get_setting("osd_duration", str(settings.OSD_DURATION))
+    try:
+        osd_duration = float(osd_duration_str)
+    except Exception:
+        osd_duration = settings.OSD_DURATION
+    osd_always_on_str = db.get_setting("osd_always_on", str(settings.OSD_ALWAYS_ON)).lower()
+    osd_always_on = (osd_always_on_str == "true")
+
+    sound_cues_str = db.get_setting("sound_cues_enabled", "true").lower()
+    sound_cues_enabled = (sound_cues_str == "true")
+    hotkey_mode = db.get_setting("hotkey_mode", "toggle").lower()
+    vad_enabled_str = db.get_setting("vad_enabled", "false").lower()
+    vad_enabled = (vad_enabled_str == "true")
+    vad_timeout_str = db.get_setting("vad_silence_timeout", "2.0")
+    try:
+        vad_silence_timeout = float(vad_timeout_str)
+    except Exception:
+        vad_silence_timeout = 2.0
+
     return {
         "hotkey": active_hotkey,
         "sample_rate": settings.SAMPLE_RATE,
         "model_name": settings.MODEL_NAME,
         "device": engine.device,
+        "qwen25_enabled": qwen25_enabled,
         "grammar_correction_enabled": grammar_enabled,
         "translation_target": translation_target,
-        "add_origin_phrase": add_origin_phrase
+        "add_origin_phrase": add_origin_phrase,
+        "osd_position": osd_position,
+        "osd_duration": osd_duration,
+        "osd_always_on": osd_always_on,
+        "sound_cues_enabled": sound_cues_enabled,
+        "hotkey_mode": hotkey_mode,
+        "vad_enabled": vad_enabled,
+        "vad_silence_timeout": vad_silence_timeout
     }
 
 @app.post("/api/settings")
@@ -162,7 +295,13 @@ def update_settings(payload: SettingsUpdateRequest):
         db.set_setting("hotkey", cleaned_hotkey)
         if daemon_instance:
             daemon_instance.update_hotkey(cleaned_hotkey)
-            
+
+    if payload.qwen25_enabled is not None:
+        settings.QWEN25_ENABLED = payload.qwen25_enabled
+        db.set_setting("qwen25_enabled", str(payload.qwen25_enabled).lower())
+        if daemon_instance and hasattr(daemon_instance, "set_qwen25_enabled"):
+            daemon_instance.set_qwen25_enabled(payload.qwen25_enabled)
+
     if payload.grammar_correction_enabled is not None:
         settings.GRAMMAR_CORRECTION_ENABLED = payload.grammar_correction_enabled
         db.set_setting("grammar_correction_enabled", str(payload.grammar_correction_enabled).lower())
@@ -175,8 +314,198 @@ def update_settings(payload: SettingsUpdateRequest):
     if payload.add_origin_phrase is not None:
         settings.ADD_ORIGIN_PHRASE = payload.add_origin_phrase
         db.set_setting("add_origin_phrase", str(payload.add_origin_phrase).lower())
+
+    if payload.osd_position is not None:
+        cleaned_pos = payload.osd_position.strip().lower()
+        settings.OSD_POSITION = cleaned_pos
+        db.set_setting("osd_position", cleaned_pos)
+
+    if payload.osd_duration is not None:
+        settings.OSD_DURATION = max(0.5, float(payload.osd_duration))
+        db.set_setting("osd_duration", str(settings.OSD_DURATION))
+
+    if payload.osd_always_on is not None:
+        settings.OSD_ALWAYS_ON = payload.osd_always_on
+        db.set_setting("osd_always_on", str(payload.osd_always_on).lower())
+
+    if payload.sound_cues_enabled is not None:
+        db.set_setting("sound_cues_enabled", str(payload.sound_cues_enabled).lower())
+
+    if payload.hotkey_mode is not None:
+        cleaned_mode = payload.hotkey_mode.strip().lower()
+        if cleaned_mode in ["toggle", "hold"]:
+            db.set_setting("hotkey_mode", cleaned_mode)
+
+    if payload.vad_enabled is not None:
+        db.set_setting("vad_enabled", str(payload.vad_enabled).lower())
+
+    if payload.vad_silence_timeout is not None:
+        db.set_setting("vad_silence_timeout", str(max(0.5, float(payload.vad_silence_timeout))))
+
+    if daemon_instance and hasattr(daemon_instance, "update_ux_settings"):
+        daemon_instance.update_ux_settings(
+            sound_cues=payload.sound_cues_enabled,
+            hotkey_mode=payload.hotkey_mode,
+            vad_enabled=payload.vad_enabled,
+            vad_timeout=payload.vad_silence_timeout
+        )
         
     return {"status": "updated", "settings": get_current_settings()}
+
+@app.get("/api/vocabulary")
+def get_vocabulary():
+    """Retrieve all vocabulary entries."""
+    return {"items": vocab_mgr.get_all()}
+
+@app.post("/api/vocabulary")
+def upsert_vocabulary(item: VocabularyItem):
+    """Add or update a vocabulary entry."""
+    success = vocab_mgr.upsert(item.target, item.aliases, item.description or "")
+    if not success:
+        raise HTTPException(status_code=400, detail="Invalid target word or failed to save")
+    return {"status": "success", "item": item.model_dump()}
+
+@app.delete("/api/vocabulary/{target}")
+def delete_vocabulary(target: str):
+    """Delete a vocabulary entry by target word."""
+    success = vocab_mgr.delete(target)
+    if not success:
+        raise HTTPException(status_code=404, detail="Vocabulary item not found")
+    return {"status": "success", "target": target}
+
+@app.post("/api/vocabulary/test")
+def test_vocabulary_mapping(payload: TestVocabularyRequest):
+    """Test mapping an input phrase to its normalized vocabulary form."""
+    mapped_text = vocab_mgr.apply(payload.text)
+    return {
+        "original": payload.text,
+        "mapped": mapped_text,
+        "changed": payload.text.strip() != mapped_text.strip()
+    }
+
+@app.get("/api/vocabulary/export")
+def export_vocabulary(profile_id: Optional[str] = None):
+    """Export the vocabulary.json file for current or specified profile."""
+    if not profile_id:
+        profile_id = db.get_active_profile().get("id", "default")
+    
+    clean_id = profile_id.strip().lower()
+    if clean_id == "default":
+        vocab_path = settings.VOCABULARY_PATH
+    else:
+        vocab_path = settings.DATA_DIR / "profiles" / clean_id / "vocabulary.json"
+
+    if not vocab_path.exists():
+        vocab_mgr.save()
+
+    return FileResponse(
+        str(vocab_path),
+        media_type="application/json",
+        filename=f"vocabulary_{clean_id}.json"
+    )
+
+@app.get("/api/train/export")
+def export_lora_adapter(profile_id: Optional[str] = None):
+    """Export the trained LoRA adapter weights for specified or active profile as a zip archive."""
+    import shutil
+    import tempfile
+
+    if not profile_id:
+        profile_id = db.get_active_profile().get("id", "default")
+    clean_id = profile_id.strip().lower()
+
+    # Look for adapter directory
+    adapter_path = settings.ADAPTERS_DIR / clean_id
+    if not adapter_path.exists() and clean_id == "default":
+        legacy = settings.ADAPTERS_DIR / "lora_latest"
+        if legacy.exists():
+            adapter_path = legacy
+
+    if not adapter_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"No trained LoRA adapter found for profile '{clean_id}'. Please run training first."
+        )
+
+    # Check that adapter weights exist
+    has_config = (adapter_path / "adapter_config.json").exists()
+    has_weights = (adapter_path / "adapter_model.safetensors").exists() or (adapter_path / "adapter_model.bin").exists()
+    if not has_config or not has_weights:
+        raise HTTPException(
+            status_code=404,
+            detail=f"LoRA adapter in '{adapter_path.name}' is incomplete or lacks trained weights."
+        )
+
+    # Create temporary zip archive
+    temp_dir = tempfile.mkdtemp()
+    zip_base_name = os.path.join(temp_dir, f"lora_adapter_{clean_id}")
+    archive_file = shutil.make_archive(zip_base_name, "zip", str(adapter_path))
+
+    return FileResponse(
+        archive_file,
+        media_type="application/zip",
+        filename=f"lora_adapter_{clean_id}.zip"
+    )
+
+@app.get("/api/profiles/export-bundle")
+def export_profile_bundle(profile_id: Optional[str] = None):
+    """Export complete bundle (vocabulary.json + LoRA weights) for a profile as a zip archive."""
+    import shutil
+    import tempfile
+
+    if not profile_id:
+        profile_id = db.get_active_profile().get("id", "default")
+    clean_id = profile_id.strip().lower()
+
+    temp_bundle_dir = tempfile.mkdtemp()
+    bundle_root = Path(temp_bundle_dir) / f"profile_{clean_id}"
+    bundle_root.mkdir(parents=True, exist_ok=True)
+
+    # 1. Copy vocabulary.json
+    if clean_id == "default":
+        vocab_path = settings.VOCABULARY_PATH
+    else:
+        vocab_path = settings.DATA_DIR / "profiles" / clean_id / "vocabulary.json"
+
+    if vocab_path.exists():
+        shutil.copy2(str(vocab_path), str(bundle_root / "vocabulary.json"))
+    else:
+        with open(bundle_root / "vocabulary.json", "w", encoding="utf-8") as f:
+            f.write("[]")
+
+    # 2. Copy LoRA adapter weights if available
+    adapter_path = settings.ADAPTERS_DIR / clean_id
+    if not adapter_path.exists() and clean_id == "default":
+        legacy = settings.ADAPTERS_DIR / "lora_latest"
+        if legacy.exists():
+            adapter_path = legacy
+
+    if adapter_path.exists():
+        adapter_dest = bundle_root / "lora_adapter"
+        shutil.copytree(str(adapter_path), str(adapter_dest), dirs_exist_ok=True)
+
+    # 3. Create zip archive
+    zip_path = shutil.make_archive(os.path.join(temp_bundle_dir, f"local_asr_profile_{clean_id}"), "zip", str(bundle_root))
+
+    return FileResponse(
+        zip_path,
+        media_type="application/zip",
+        filename=f"local_asr_profile_{clean_id}.zip"
+    )
+
+@app.post("/api/vocabulary/import")
+async def import_vocabulary(file: UploadFile = File(...)):
+    """Import a vocabulary.json file."""
+    import json
+    try:
+        content = await file.read()
+        parsed = json.loads(content.decode("utf-8"))
+        if not isinstance(parsed, list):
+            raise ValueError("Root JSON must be a list of vocabulary objects")
+        vocab_mgr.save(parsed)
+        return {"status": "success", "count": len(parsed)}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to import vocabulary: {str(e)}")
 
 static_dir = Path(__file__).resolve().parent / "static"
 if static_dir.exists():

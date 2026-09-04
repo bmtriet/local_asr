@@ -91,16 +91,32 @@ class ASREngine:
         self.active_adapter_name = adapter_name
         print(f"[ASREngine] Loaded and activated LoRA adapter: {adapter_name} from {adapter_dir}")
 
-    def unload_lora_adapter(self):
-        """Unload LoRA adapter, returning to base model weights."""
-        from peft import PeftModel
-        target_model = self._get_thinker_model()
-        if isinstance(target_model, PeftModel):
-            raw_model = getattr(self.model, "model", self.model)
-            if hasattr(raw_model, "thinker"):
-                raw_model.thinker.model = target_model.get_base_model()
-            self.active_adapter_name = None
-            print("[ASREngine] Unloaded LoRA adapter.")
+    def switch_profile_adapter(self, profile_id: str):
+        """Switch active LoRA adapter to profile's adapter if it exists, otherwise unload."""
+        from config import get_settings
+        settings = get_settings()
+        clean_id = profile_id.strip().lower() or "default"
+        
+        # Check both data/adapters/<profile_id> and data/adapters/lora_latest (for default legacy)
+        adapter_path = settings.ADAPTERS_DIR / clean_id
+        if not adapter_path.exists() and clean_id == "default":
+            legacy_path = settings.ADAPTERS_DIR / "lora_latest"
+            if legacy_path.exists():
+                adapter_path = legacy_path
+
+        has_config = (adapter_path / "adapter_config.json").exists()
+        has_weights = (adapter_path / "adapter_model.safetensors").exists() or (adapter_path / "adapter_model.bin").exists()
+
+        if has_config and has_weights:
+            try:
+                self.load_lora_adapter(str(adapter_path), adapter_name=clean_id)
+                print(f"[ASREngine] Switched to LoRA adapter for profile '{clean_id}'")
+            except Exception as e:
+                print(f"[ASREngine] Failed loading adapter for profile '{clean_id}': {e}")
+        else:
+            if self.active_adapter_name:
+                self.unload_lora_adapter()
+                print(f"[ASREngine] Profile '{clean_id}' has no trained adapter. Reverted to base model.")
 
     def transcribe(self, audio_source: Union[str, np.ndarray], sample_rate: int = 16000, context: str = "") -> str:
         """Transcribe audio with optional context hotword biasing."""

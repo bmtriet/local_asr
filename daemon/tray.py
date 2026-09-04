@@ -13,6 +13,7 @@ class TrayIndicator:
         self._animating = False
         self._thread = None
         self._anim_step = 0
+        self._lock = threading.Lock()
 
     def _create_icon_image(self, state: str, step: int = 0) -> Image.Image:
         size = (64, 64)
@@ -32,28 +33,39 @@ class TrayIndicator:
             angle = (step * 45) % 360
             draw.arc([14, 14, 50, 50], start=angle, end=angle + 90, fill=(255, 255, 255, 255), width=6)
         else:
-            # Idle: Sleek Emerald green microphone badge
-            draw.ellipse([16, 16, 48, 48], fill=(16, 185, 129, 255))
-            # Inner white mic shape
-            draw.rounded_rectangle([28, 22, 36, 38], radius=4, fill=(255, 255, 255, 255))
-            draw.arc([24, 28, 40, 42], start=0, end=180, fill=(255, 255, 255, 255), width=2)
-            draw.line([32, 42, 32, 48], fill=(255, 255, 255, 255), width=2)
+            # Idle: Sleek Emerald green microphone badge (Enlarged by ~100% for clear visibility)
+            draw.ellipse([4, 4, 60, 60], fill=(16, 185, 129, 255))
+            # Inner white mic capsule
+            draw.rounded_rectangle([25, 15, 39, 39], radius=7, fill=(255, 255, 255, 255))
+            # Mic cradle arc
+            draw.arc([19, 24, 45, 46], start=0, end=180, fill=(255, 255, 255, 255), width=3)
+            # Mic stand stem & base
+            draw.line([32, 46, 32, 53], fill=(255, 255, 255, 255), width=3)
+            draw.line([25, 53, 39, 53], fill=(255, 255, 255, 255), width=3)
 
         return image
 
     def set_state(self, state: str):
         """Set indicator state: 'idle', 'recording', 'transcribing'."""
         self.state = state
-        if self.icon:
-            self.icon.icon = self._create_icon_image(self.state, self._anim_step)
-            self.icon.title = f"Local ASR ({self.state.title()})"
+        with self._lock:
+            if self.icon:
+                try:
+                    self.icon.icon = self._create_icon_image(self.state, self._anim_step)
+                    self.icon.title = f"Local ASR ({self.state.title()})"
+                except Exception:
+                    pass
 
     def _animation_loop(self):
         while self._animating:
             if self.state in ["recording", "transcribing"]:
                 self._anim_step += 1
-                if self.icon:
-                    self.icon.icon = self._create_icon_image(self.state, self._anim_step)
+                with self._lock:
+                    if self.icon:
+                        try:
+                            self.icon.icon = self._create_icon_image(self.state, self._anim_step)
+                        except Exception:
+                            pass
             time.sleep(0.12)
 
     def _setup_icon(self):
@@ -63,6 +75,7 @@ class TrayIndicator:
 
         menu = pystray.Menu(
             pystray.MenuItem("Local ASR Voice Typing", lambda *args: None, enabled=False),
+            pystray.MenuItem("About & GitHub", self._open_about),
             pystray.MenuItem("Open Web UI", self._open_web_ui),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Restart App", self._restart),
@@ -87,6 +100,10 @@ class TrayIndicator:
         self._setup_icon()
         self.icon.run()
 
+    def _open_about(self, *args):
+        import webbrowser
+        webbrowser.open("https://github.com/bmtriet/local_asr")
+
     def _open_web_ui(self, *args):
         import webbrowser
         from config import get_settings
@@ -105,7 +122,10 @@ class TrayIndicator:
         else:
             import sys
             import os
-            os.execv(sys.executable, [sys.executable] + sys.argv)
+            import subprocess
+            # Spawn fresh independent process
+            subprocess.Popen([sys.executable] + sys.argv, close_fds=True)
+            os._exit(0)
 
     def _stop(self, *args):
         self._animating = False

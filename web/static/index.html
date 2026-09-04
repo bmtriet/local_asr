@@ -25,13 +25,39 @@
         </div>
         <div class="title-group">
           <h1>Local ASR Voice Studio</h1>
-          <p>Qwen3-ASR-0.6B Continual Learning & Voice Typing Engine</p>
         </div>
       </div>
 
-      <div class="system-status">
-        <span class="status-dot" id="system-status-dot"></span>
-        <span id="system-status-text">Connecting...</span>
+      <div class="header-right">
+        <!-- Changelog Link -->
+        <a href="/changelog.html" class="btn btn-secondary" title="View Version 0.1.1 Updates & Changelog" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem;">
+          <span>Changelog</span>
+          <span class="badge-count" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; font-size: 0.7rem; padding: 0.1rem 0.4rem;">v0.1.1</span>
+        </a>
+
+        <!-- About Button -->
+        <button class="btn btn-secondary" id="btn-open-about-modal" title="About Local ASR & GitHub" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          <span>About</span>
+        </button>
+
+        <!-- Profile Selector -->
+        <div class="profile-selector-box">
+          <span class="profile-selector-label">Profile:</span>
+          <select id="select-active-profile" class="profile-select-dropdown">
+            <option value="default">Default Profile</option>
+          </select>
+          <button class="btn btn-secondary btn-profile-manage" id="btn-open-profile-modal" title="Manage Profiles">
+            Manage
+          </button>
+        </div>
+
+        <div class="system-status">
+          <span class="status-dot" id="system-status-dot"></span>
+          <span id="system-status-text">Connecting...</span>
+        </div>
       </div>
     </header>
 
@@ -95,6 +121,74 @@
             </div>
           </div>
         </div>
+
+        <!-- Custom Vocabulary Card -->
+        <div class="card vocab-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span>Custom Vocabulary & Keyword Mapping</span>
+              <span id="vocab-total-badge" class="badge-count">0</span>
+            </h2>
+            <div class="vocab-actions">
+              <button class="btn btn-secondary" id="btn-export-vocab" title="Download vocabulary.json">
+                Export
+              </button>
+              <button class="btn btn-secondary" id="btn-import-vocab-trigger" title="Upload vocabulary.json">
+                Import
+              </button>
+              <input type="file" id="input-import-vocab-file" accept=".json" style="display: none;">
+              <button class="btn btn-primary" id="btn-add-vocab">
+                + Add Word
+              </button>
+            </div>
+          </div>
+
+          <!-- Vocabulary Table -->
+          <div class="vocab-table-container">
+            <table class="vocab-table">
+              <thead>
+                <tr>
+                  <th style="width: 25%;">Target Word</th>
+                  <th style="width: 45%;">Aliases / Spoken Variants</th>
+                  <th style="width: 20%;">Description</th>
+                  <th style="width: 10%; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="vocab-table-body">
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                    Loading custom vocabulary...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Vocabulary Pagination Bar -->
+          <div id="vocab-pagination-bar" class="pagination-bar" style="margin-top: 0.75rem; padding-top: 0.75rem;">
+            <div class="pagination-info" id="vocab-pagination-info">Showing 1-5 of 0 words</div>
+            <div class="pagination-buttons">
+              <button class="btn btn-secondary pagination-btn" id="btn-vocab-prev-page" disabled>&larr; Prev</button>
+              <div id="vocab-pagination-numbers" class="pagination-numbers"></div>
+              <button class="btn btn-secondary pagination-btn" id="btn-vocab-next-page" disabled>Next &rarr;</button>
+            </div>
+          </div>
+
+          <!-- Playground / Live Mapping Simulator -->
+          <div class="vocab-test-box">
+            <div class="vocab-test-title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+              </svg>
+              <span>Test Mapping Simulator</span>
+            </div>
+            <div class="vocab-test-input-row">
+              <input type="text" id="input-test-vocab" class="search-input" placeholder="Type test phrase (e.g. 'using ifm and pab for global user')...">
+              <button class="btn btn-secondary" id="btn-run-test-vocab">Test Mapping</button>
+            </div>
+            <div id="vocab-test-result" class="vocab-test-result"></div>
+          </div>
+        </div>
       </main>
 
       <!-- Sidebar: Training & Settings -->
@@ -104,9 +198,6 @@
           <div class="card-header">
             <h2 class="card-title">LoRA Fine-Tuning</h2>
           </div>
-          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">
-            Personalize model weights from your reviewed voice samples.
-          </p>
 
           <div class="metric-row">
             <span>Reviewed samples ready:</span>
@@ -125,9 +216,14 @@
             <div class="progress-bar" id="training-progress-bar"></div>
           </div>
 
-          <button class="btn btn-primary" id="btn-start-training" style="width: 100%; justify-content: center;">
-            Start LoRA Training
-          </button>
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <button class="btn btn-primary" id="btn-start-training" style="flex: 1; justify-content: center;">
+              Start LoRA Training
+            </button>
+            <button class="btn btn-secondary" id="btn-export-lora" title="Download trained LoRA adapter weights (.zip) to use in other tools" style="justify-content: center;">
+              Export LoRA
+            </button>
+          </div>
         </div>
 
         <!-- Grammar Correction Card -->
@@ -135,42 +231,166 @@
           <div class="card-header">
             <h2 class="card-title">Text Normalization & Translation (AI)</h2>
           </div>
-          <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem;">
-            Automatic grammar correction and multi-language translation via Qwen2.5-0.5B.
-          </p>
           <style>
             .switch-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 20px; }
             .switch-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
             input:checked + .switch-slider { background-color: var(--primary); }
             input:checked + .switch-slider:before { transform: translateX(20px); }
-            .translation-options { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+            .translation-options { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
             .form-group-label { font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.4rem; display: block; }
-            .origin-phrase-box { margin-top: 0.75rem; padding: 0.65rem 0.75rem; border-radius: var(--radius-sm); background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); transition: all 0.3s ease; }
+            .origin-phrase-box { padding: 0.65rem 0.75rem; border-radius: var(--radius-sm); background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); transition: all 0.3s ease; }
+            .qwen-box { padding: 0.75rem; border-radius: var(--radius-sm); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); margin-bottom: 0.85rem; }
+            .qwen-box.disabled { background: rgba(148, 163, 184, 0.08); border-color: rgba(148, 163, 184, 0.2); }
           </style>
+
+          <!-- Master Toggle: Load Qwen2.5 Model -->
+          <div id="qwen-master-card" class="qwen-box">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <label for="toggle-qwen25-enabled" style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); cursor: pointer; display: block;">
+                  Load Qwen2.5-0.5B Model
+                </label>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                  For Translation & Smart Grammar
+                </div>
+              </div>
+              <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px; flex-shrink: 0;">
+                <input type="checkbox" id="toggle-qwen25-enabled" checked style="opacity: 0; width: 0; height: 0;">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+            <div id="qwen-status-hint" style="font-size: 0.75rem; color: var(--emerald); margin-top: 0.5rem; line-height: 1.35;">
+              Active: Translation & Grammar available (~1.0GB VRAM/RAM).
+            </div>
+          </div>
           
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <label for="toggle-grammar" style="font-size: 0.875rem; font-weight: 500;">Auto Grammar Correction:</label>
+          <div id="qwen-features-group" style="transition: opacity 0.3s ease;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <label for="toggle-grammar" style="font-size: 0.875rem; font-weight: 500;">Auto Grammar Correction:</label>
+              <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                <input type="checkbox" id="toggle-grammar" style="opacity: 0; width: 0; height: 0;">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="translation-options">
+              <div class="origin-phrase-box">
+                <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer;">
+                  <input type="checkbox" id="toggle-add-origin-phrase" style="accent-color: var(--primary); width: 16px; height: 16px;">
+                  <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
+                    Add origin phrase (Bilingual output)
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OSD Overlay Settings Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">OSD Overlay Display Settings</h2>
+          </div>
+
+          <!-- OSD Position -->
+          <div style="margin-bottom: 0.85rem;">
+            <label for="select-osd-position" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+              Screen Position:
+            </label>
+            <select id="select-osd-position" class="edit-box" style="width: 100%; cursor: pointer; padding: 0.5rem 0.75rem; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+              <option value="top-left">Top-Left</option>
+              <option value="top-right">Top-Right</option>
+              <option value="bottom-left">Bottom-Left</option>
+              <option value="bottom-right">Bottom-Right</option>
+              <option value="center">Center</option>
+            </select>
+          </div>
+
+          <!-- OSD Fadeout Duration -->
+          <div id="osd-duration-group" style="margin-bottom: 0.85rem;">
+            <label for="input-osd-duration" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+              Fade-out Timeout (Seconds):
+            </label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" id="input-osd-duration" class="edit-box" min="0.5" max="30.0" step="0.5" value="2.0" style="width: 100px; text-align: center;">
+              <span style="font-size: 0.8125rem; color: var(--text-muted);">(Default: 2.0s)</span>
+            </div>
+          </div>
+
+          <!-- OSD Always On Checkbox -->
+          <div style="margin-bottom: 1rem; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);">
+            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer;">
+              <input type="checkbox" id="toggle-osd-always-on" style="accent-color: var(--primary); width: 16px; height: 16px;">
+              <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
+                Disable Fade-out (Keep OSD visible while speaking)
+              </span>
+            </label>
+          </div>
+
+          <button class="btn btn-primary" id="btn-save-osd" style="width: 100%; justify-content: center;">
+            Save OSD Settings
+          </button>
+        </div>
+
+        <!-- Audio Feedback & Typing Modes Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Audio Feedback & Typing Modes</h2>
+          </div>
+
+          <!-- Sound Cues Toggle -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+            <div>
+              <label for="toggle-sound-cues" style="font-size: 0.875rem; font-weight: 500; display: block;">
+                Sound Cues (Audio Beeps):
+              </label>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Play synthetic sine chimes on start, stop, and cancel</span>
+            </div>
             <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
-              <input type="checkbox" id="toggle-grammar" style="opacity: 0; width: 0; height: 0;">
+              <input type="checkbox" id="toggle-sound-cues" checked style="opacity: 0; width: 0; height: 0;">
               <span class="switch-slider"></span>
             </label>
           </div>
 
-          <div class="translation-options">
-            <div class="origin-phrase-box">
-              <label style="display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer;">
-                <input type="checkbox" id="toggle-add-origin-phrase" style="margin-top: 0.25rem; accent-color: var(--primary); width: 16px; height: 16px;">
-                <div>
-                  <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
-                    Add origin phrase (Include source speech when translating)
-                  </span>
-                  <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; line-height: 1.4; margin-top: 0.2rem;">
-                    When translating to any target language, output includes 2 lines: line 1 shows your original spoken text, line 2 shows the translated output.
-                  </span>
-                </div>
+          <!-- Trigger Mode (Toggle vs Hold-to-Talk) -->
+          <div style="margin-bottom: 0.85rem;">
+            <label for="select-hotkey-mode" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+              Hotkey Trigger Mode:
+            </label>
+            <select id="select-hotkey-mode" class="edit-box" style="width: 100%; cursor: pointer; padding: 0.5rem 0.75rem; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+              <option value="toggle">Toggle Mode (Click once to start, click again to stop)</option>
+              <option value="hold">Hold-to-Talk (Hold shortcut to speak, release to type)</option>
+            </select>
+          </div>
+
+          <!-- Silence VAD Auto-Stop -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
+            <div>
+              <label for="toggle-vad-enabled" style="font-size: 0.875rem; font-weight: 500; display: block;">
+                Auto-Stop on Silence (VAD):
               </label>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Automatically finish and transcribe when speech pauses</span>
+            </div>
+            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+              <input type="checkbox" id="toggle-vad-enabled" style="opacity: 0; width: 0; height: 0;">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <!-- Silence Timeout Input -->
+          <div id="vad-timeout-group" style="margin-bottom: 1rem; opacity: 0.4;">
+            <label for="input-vad-timeout" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+              Silence Duration Threshold:
+            </label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" id="input-vad-timeout" class="edit-box" min="1.0" max="5.0" step="0.5" value="2.0" style="width: 90px; text-align: center;">
+              <span style="font-size: 0.8125rem; color: var(--text-muted);">seconds (Default: 2.0s)</span>
             </div>
           </div>
+
+          <button class="btn btn-primary" id="btn-save-ux-settings" style="width: 100%; justify-content: center;">
+            Save Typing Modes
+          </button>
         </div>
 
         <!-- Hotkey & Settings Card -->
@@ -213,6 +433,135 @@
           </button>
         </div>
       </aside>
+    </div>
+  </div>
+
+  <!-- Vocabulary Modal -->
+  <div class="modal-overlay" id="vocab-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="vocab-modal-title">Add Target Vocabulary</h3>
+        <button class="modal-close" id="btn-close-vocab-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="vocab-form">
+          <div class="form-group">
+            <label for="vocab-input-target">Target Word / Phrase *</label>
+            <input type="text" id="vocab-input-target" class="search-input" placeholder="e.g. IFM, Global User, PAB" required>
+            <small>The exact canonical term you want to appear in the transcribed output.</small>
+          </div>
+          <div class="form-group">
+            <label for="vocab-input-aliases">Aliases / Spoken Variants</label>
+            <input type="text" id="vocab-input-aliases" class="search-input" placeholder="e.g. ifm, i f m, ai ép em">
+            <small>Comma-separated list. Case-insensitive matching applies automatically.</small>
+          </div>
+          <div class="form-group">
+            <label for="vocab-input-desc">Description</label>
+            <input type="text" id="vocab-input-desc" class="search-input" placeholder="e.g. Internal project acronym">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-vocab-modal">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-vocab-modal">Save Word</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Management Modal -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">User Profiles</h3>
+        <button class="modal-close" id="btn-close-profile-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Each profile maintains dedicated speech logs, custom vocabulary (<code>vocabulary.json</code>), and personalized LoRA adapter weights.
+        </p>
+
+        <!-- Current Profiles List -->
+        <div class="profile-list" id="profile-list-container">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Add New Profile Form -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 0.5rem;">
+          <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: #c7d2fe;">Create New Profile</h4>
+          <div class="form-group">
+            <label for="input-new-profile-id">Profile ID (lowercase alphanumeric identifier) *</label>
+            <input type="text" id="input-new-profile-id" class="search-input" placeholder="e.g. triet, alex, finance">
+          </div>
+          <div class="form-group">
+            <label for="input-new-profile-name">Display Name *</label>
+            <input type="text" id="input-new-profile-name" class="search-input" placeholder="e.g. Triet Bui (Technical)">
+          </div>
+          <div class="form-group">
+            <label for="input-new-profile-desc">Description</label>
+            <input type="text" id="input-new-profile-desc" class="search-input" placeholder="e.g. Software Engineering & AI vocabulary">
+          </div>
+          <button class="btn btn-primary" id="btn-create-profile" style="width: 100%; justify-content: center;">
+            Create Profile
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-done-profile-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Project & Author Modal -->
+  <div class="modal-overlay" id="about-modal">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--primary)">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          About Local ASR
+        </h3>
+        <button class="modal-close" id="btn-close-about-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; padding: 1rem 0 1.25rem;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--emerald)); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 4px 20px var(--primary-glow);">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="#ffffff">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          </div>
+          <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">Local ASR Voice Studio</h4>
+          <span class="badge-count" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px;">Version 0.1.1</span>
+        </div>
+
+        <p style="font-size: 0.875rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">
+          Local ASR is an intelligent, high-performance offline speech recognition and typing assistant powered by Qwen3-ASR and Qwen2.5, featuring Continual LoRA Fine-Tuning, inverse text normalization, and real-time translation.
+        </p>
+
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.25rem;">Author &amp; Maintainer:</div>
+          <div style="font-size: 0.95rem; font-weight: 600; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+            <span>Triet Bui (@bmtriet)</span>
+            <a href="https://github.com/bmtriet/local_asr" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8125rem; color: #818cf8; text-decoration: none; font-weight: 500;">
+              <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+              </svg>
+              GitHub Repository &rarr;
+            </a>
+          </div>
+        </div>
+
+        <a href="https://github.com/bmtriet/local_asr" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem;">
+          <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          View &amp; Star on GitHub
+        </a>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-done-about-modal">Close</button>
+      </div>
     </div>
   </div>
 

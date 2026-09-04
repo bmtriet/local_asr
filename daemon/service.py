@@ -14,6 +14,7 @@ from daemon.audio_recorder import AudioRecorder
 from daemon.injector import TextInjector
 from daemon.tray import TrayIndicator
 from asr_engine.grammar import GrammarCorrector
+from daemon.audio_feedback import SoundFeedback
 
 class VoiceTypingDaemon:
     def __init__(
@@ -28,8 +29,24 @@ class VoiceTypingDaemon:
         self.db = db or Database()
         self.db.init_db()
         self.engine = engine or ASREngine(lazy_load=True)
+        qwen_saved = self.db.get_setting("qwen25_enabled", str(getattr(self.settings, "QWEN25_ENABLED", True)))
+        self.qwen25_enabled = (qwen_saved.lower() == "true")
         self.grammar = GrammarCorrector(lazy_load=True)
-        self.recorder = AudioRecorder(sample_rate=self.settings.SAMPLE_RATE)
+
+        # Load UX settings from DB
+        cues_enabled = (self.db.get_setting("sound_cues_enabled", "true").lower() == "true")
+        self.sound_feedback = SoundFeedback(sample_rate=self.settings.SAMPLE_RATE, enabled=cues_enabled)
+
+        vad_enabled = (self.db.get_setting("vad_enabled", "false").lower() == "true")
+        vad_timeout = float(self.db.get_setting("vad_silence_timeout", "2.0") or 2.0)
+        self.hotkey_mode = self.db.get_setting("hotkey_mode", "toggle").lower() # "toggle" or "hold"
+
+        self.recorder = AudioRecorder(
+            sample_rate=self.settings.SAMPLE_RATE,
+            vad_enabled=vad_enabled,
+            vad_silence_timeout=vad_timeout,
+            on_silence_detected=self._on_vad_silence
+        )
         self.injector = TextInjector()
         from asr_engine.normalizer import VietnameseNormalizer
         self.normalizer = VietnameseNormalizer(db=self.db)
@@ -47,6 +64,13 @@ class VoiceTypingDaemon:
         self._listener: Optional[keyboard.GlobalHotKeys] = None
         self._lock = threading.Lock()
 
+    def _on_vad_silence(self):
+        """Called automatically when Silence VAD detects end of speech."""
+        with self._lock:
+            if self.is_recording:
+                print("[VoiceTyping] VAD silence detected -> Auto-stopping and transcribing...")
+                self._stop_and_process()
+
     def toggle_recording(self):
         """Toggle recording state via hotkey."""
         with self._lock:
@@ -63,7 +87,9 @@ class VoiceTypingDaemon:
         if self.tray:
             self.tray.set_state("recording")
         
-        # 2. Begin audio capture without delay
+        # 2. Play start chime & begin audio capture without delay
+        if hasattr(self, "sound_feedback") and self.sound_feedback:
+            self.sound_feedback.play_start()
         self.recorder.start_recording()
 
         # 3. Start ESC listener during speaking/recording to allow instant cancel
@@ -74,7 +100,25 @@ class VoiceTypingDaemon:
 
         # 4. Launch OSD concurrently for optional mode selection
         osd_path = os.path.join(os.path.dirname(__file__), "osd.py")
-        self._osd_process = subprocess.Popen([sys.executable, osd_path])
+        
+        # Read user-configured OSD display settings
+        osd_position = self.db.get_setting("osd_position", "top-left")
+        osd_duration_str = self.db.get_setting("osd_duration", "2.0")
+        try:
+            osd_duration = max(0.5, float(osd_duration_str))
+        except Exception:
+            osd_duration = 2.0
+        osd_always_on = (self.db.get_setting("osd_always_on", "false").lower() == "true")
+
+        osd_cmd = [
+            sys.executable, osd_path,
+            "--position", osd_position,
+            "--duration", str(osd_duration)
+        ]
+        if osd_always_on:
+            osd_cmd.append("--always-on")
+
+        self._osd_process = subprocess.Popen(osd_cmd)
         
         # 5. Start keyboard listener for mode selection keys (e, z, space)
         if self._mode_listener:
@@ -82,17 +126,20 @@ class VoiceTypingDaemon:
         self._mode_listener = keyboard.Listener(on_press=self._on_mode_key_press)
         self._mode_listener.start()
 
-        # 6. Auto-dismiss OSD after 2 seconds (recording continues uninterrupted)
+        # 6. Auto-dismiss OSD after duration (if not always_on)
         if self._mode_timer:
             self._mode_timer.cancel()
-        self._mode_timer = threading.Timer(2.0, self._on_mode_timeout)
-        self._mode_timer.daemon = True
-        self._mode_timer.start()
+            self._mode_timer = None
+
+        if not osd_always_on:
+            self._mode_timer = threading.Timer(osd_duration, self._on_mode_timeout)
+            self._mode_timer.daemon = True
+            self._mode_timer.start()
 
     def _on_mode_timeout(self):
         with self._lock:
             if self._osd_process:
-                print("[VoiceTyping] 2s OSD timeout -> Dismissing OSD, recording continues in normal mode.")
+                print("[VoiceTyping] OSD timeout -> Dismissing OSD, recording continues.")
                 self._cleanup_osd()
 
     def _on_mode_key_press(self, key):
@@ -156,6 +203,8 @@ class VoiceTypingDaemon:
             if self.is_recording:
                 self.is_recording = False
                 self.recorder.cancel_recording()
+                if hasattr(self, "sound_feedback") and self.sound_feedback:
+                    self.sound_feedback.play_cancel()
                 print("[VoiceTyping] Active recording cancelled and discarded.")
             if self.tray:
                 self.tray.set_state("idle")
@@ -176,6 +225,8 @@ class VoiceTypingDaemon:
         self.is_recording = True
         if self.tray:
             self.tray.set_state("recording")
+        if hasattr(self, "sound_feedback") and self.sound_feedback:
+            self.sound_feedback.play_start()
         self.recorder.start_recording()
 
         # Start ESC listener during speaking/recording to allow instant cancel
@@ -194,6 +245,9 @@ class VoiceTypingDaemon:
         if self.tray:
             self.tray.set_state("transcribing")
 
+        if hasattr(self, "sound_feedback") and self.sound_feedback:
+            self.sound_feedback.play_stop()
+
         result = self.recorder.stop_recording()
         if not result:
             print("[VoiceTyping] Audio too short or empty.")
@@ -206,12 +260,17 @@ class VoiceTypingDaemon:
         # Run transcription in separate worker to keep hotkey responsive
         def worker():
             try:
-                # Retrieve user reviewed vocabulary & keywords for instant adaptation
+                # Retrieve user reviewed vocabulary & keywords + custom vocabulary.json for instant adaptation
                 user_vocab = self.db.get_reviewed_vocabulary()
-                if user_vocab:
-                    print(f"[VoiceTyping] Applying user vocabulary context ({len(user_vocab)} chars)...")
+                vocab_ctx = ""
+                if self.normalizer and getattr(self.normalizer, "vocab_mgr", None):
+                    vocab_ctx = self.normalizer.vocab_mgr.get_context_string()
+                
+                combined_context = ", ".join(filter(None, [vocab_ctx, user_vocab]))
+                if combined_context:
+                    print(f"[VoiceTyping] Applying vocabulary context: {combined_context}")
 
-                text = self.engine.transcribe(audio_path, context=user_vocab)
+                text = self.engine.transcribe(audio_path, context=combined_context)
                 if text:
                     # Apply ITN / digit sequence normalization immediately
                     text = self.normalizer.normalize(text)
@@ -224,13 +283,21 @@ class VoiceTypingDaemon:
                     default_mode = self.db.get_setting("translation_mode", "normal")
                     active_mode = self.current_mode if self.current_mode != "normal" else default_mode
 
+                    # Check if Qwen2.5 model is enabled
+                    qwen_enabled = getattr(self, "qwen25_enabled", True)
+                    # Also re-sync with DB in case changed via web
+                    qwen_db_val = self.db.get_setting("qwen25_enabled")
+                    if qwen_db_val is not None:
+                        qwen_enabled = (qwen_db_val.lower() == "true")
+                        self.qwen25_enabled = qwen_enabled
+
                     # Check if grammar correction is enabled
                     is_grammar_enabled = self.settings.GRAMMAR_CORRECTION_ENABLED
                     if str(self.db.get_setting("grammar_correction_enabled", "false")).lower() == "true":
                         is_grammar_enabled = True
                     
                     final_text = text
-                    if is_grammar_enabled or active_mode != "normal":
+                    if qwen_enabled and (is_grammar_enabled or active_mode != "normal"):
                         print(f"[VoiceTyping] Applying grammar correction/translation (mode: {active_mode})...")
                         translated = self.grammar.correct(text, mode=active_mode, custom_vocab=user_vocab)
                         if active_mode == "normal":
@@ -248,6 +315,8 @@ class VoiceTypingDaemon:
                                 final_text = translated
                         else:
                             final_text = translated
+                    elif not qwen_enabled and active_mode != "normal":
+                        print(f"[VoiceTyping] Qwen2.5 is disabled. Skipping translation ({active_mode}) and using pure transcribed text.")
                     
                     # 1. Inject into focused window
                     self.injector.inject_text(final_text)
@@ -273,23 +342,89 @@ class VoiceTypingDaemon:
         formatted_parts = [f"<{p.strip()}>" if len(p.strip()) > 1 else p.strip() for p in parts]
         return "+".join(formatted_parts)
 
+    def _on_hotkey_press(self):
+        """Called when hotkey combo is activated."""
+        with self._lock:
+            if not self.is_recording:
+                self._start_recording_and_osd()
+            elif self.hotkey_mode == "toggle":
+                self._stop_and_process()
+
+    def _on_hotkey_release(self):
+        """Called when hotkey is released in hold-to-talk mode."""
+        if self.hotkey_mode == "hold":
+            with self._lock:
+                if self.is_recording:
+                    print("[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...")
+                    self._stop_and_process()
+
+    def _setup_hotkey_listener(self, hotkey_str: str):
+        """Build and return a keyboard.Listener that tracks press & release transitions for both toggle and hold modes."""
+        combo_keys = keyboard.HotKey.parse(hotkey_str)
+        combo = keyboard.HotKey(combo_keys, on_activate=lambda: None)
+
+        def on_press(key):
+            try:
+                canon = listener.canonical(key)
+                was_active = (combo._keys <= combo._state)
+                combo.press(canon)
+                is_active = (combo._keys <= combo._state)
+                if not was_active and is_active:
+                    self._on_hotkey_press()
+            except Exception:
+                pass
+
+        def on_release(key):
+            try:
+                canon = listener.canonical(key)
+                was_active = (combo._keys <= combo._state)
+                combo.release(canon)
+                is_active = (combo._keys <= combo._state)
+                if was_active and not is_active:
+                    self._on_hotkey_release()
+            except Exception:
+                pass
+
+        listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+        return listener
+
     def update_hotkey(self, new_hotkey: str):
         """Dynamically rebind hotkey without restarting service."""
         try:
             hotkey_str = self._parse_hotkey(new_hotkey)
-            new_listener = keyboard.GlobalHotKeys({
-                hotkey_str: self.toggle_recording
-            })
+            new_listener = self._setup_hotkey_listener(hotkey_str)
             new_listener.start()
             if self._listener:
                 self._listener.stop()
             self._listener = new_listener
             self.settings.HOTKEY = new_hotkey
-            print(f"[VoiceTyping] Hotkey updated to: {hotkey_str}")
+            print(f"[VoiceTyping] Hotkey updated to: {hotkey_str} (Mode: {self.hotkey_mode})")
             return True
         except Exception as e:
             print(f"[VoiceTyping] Failed to bind hotkey {new_hotkey}: {e}")
             return False
+
+    def update_ux_settings(self, sound_cues: Optional[bool] = None, hotkey_mode: Optional[str] = None, vad_enabled: Optional[bool] = None, vad_timeout: Optional[float] = None):
+        """Update live UX settings on the active daemon instance."""
+        if sound_cues is not None and hasattr(self, "sound_feedback"):
+            self.sound_feedback.enabled = sound_cues
+        if hotkey_mode is not None:
+            self.hotkey_mode = hotkey_mode.lower()
+            print(f"[VoiceTyping] Hotkey mode updated to: {self.hotkey_mode}")
+        if hasattr(self, "recorder") and self.recorder:
+            if vad_enabled is not None:
+                self.recorder.vad_enabled = vad_enabled
+            if vad_timeout is not None:
+                self.recorder.vad_silence_timeout = vad_timeout
+
+    def set_qwen25_enabled(self, enabled: bool):
+        """Dynamically enable or disable Qwen2.5 loading and unload model if disabled."""
+        self.qwen25_enabled = bool(enabled)
+        if not self.qwen25_enabled and hasattr(self, "grammar") and self.grammar:
+            self.grammar.unload_model()
+            print("[VoiceTyping] Qwen2.5 disabled and model unloaded from memory.")
+        else:
+            print(f"[VoiceTyping] Qwen2.5 enabled state set to: {self.qwen25_enabled}")
 
     def start(self, blocking: bool = False):
         """Start global hotkey listener and tray icon."""
@@ -298,11 +433,14 @@ class VoiceTypingDaemon:
         active_hotkey = db_hotkey or self.settings.HOTKEY
         self.settings.HOTKEY = active_hotkey
 
+        # Re-read active hotkey_mode from DB if present
+        saved_mode = self.db.get_setting("hotkey_mode")
+        if saved_mode:
+            self.hotkey_mode = saved_mode.lower()
+
         hotkey_str = self._parse_hotkey(active_hotkey)
-        print(f"[VoiceTyping] Listening for global hotkey: {hotkey_str}")
-        self._listener = keyboard.GlobalHotKeys({
-            hotkey_str: self.toggle_recording
-        })
+        print(f"[VoiceTyping] Listening for global hotkey: {hotkey_str} (Mode: {self.hotkey_mode})")
+        self._listener = self._setup_hotkey_listener(hotkey_str)
         self._listener.start()
 
         if self.tray:
@@ -354,4 +492,16 @@ class VoiceTypingDaemon:
         else:
             import sys
             import os
-            os.execv(sys.executable, [sys.executable] + sys.argv)
+            import subprocess
+            subprocess.Popen([sys.executable] + sys.argv, close_fds=True)
+            os._exit(0)
+
+    def switch_profile(self, profile_id: str):
+        """Switch active profile in daemon, loading profile-specific vocabulary and LoRA adapter."""
+        clean_id = profile_id.strip().lower() or "default"
+        print(f"[VoiceTyping] Switching daemon to profile '{clean_id}'...")
+        if self.normalizer and getattr(self.normalizer, "vocab_mgr", None):
+            self.normalizer.vocab_mgr.switch_profile(clean_id)
+        if self.engine:
+            self.engine.switch_profile_adapter(clean_id)
+        print(f"[VoiceTyping] Successfully switched daemon to profile '{clean_id}'")

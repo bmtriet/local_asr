@@ -21,7 +21,11 @@ Hỗ trợ đa nền tảng hoàn hảo trên cả **Linux**, **macOS** và **Wi
 - 📝 **Tùy chọn xuất song ngữ (Add Origin Phrase)**: Tùy chọn in kèm câu nói nguồn và bản dịch trên 2 dòng để tiện đối chiếu.
 - 🧠 **Bộ nhớ từ vựng ưu tiên (Hotword Context Biasing)**: Tự động trích xuất các từ bạn đã sửa (tên riêng, từ viết tắt như `Qwen`, `ASR`, dãy số...) nạp thẳng vào context prompt của mô hình để nhận diện đúng ngay từ lần nói sau.
 - 🎯 **Huấn luyện LoRA thực tế (Real PyTorch LoRA Fine-Tuning)**: Fine-tune trực tiếp trên các mẫu ghi âm đã review, tự động cập nhật và nạp trọng số LoRA mới (`adapter_model.safetensors`) lên GPU ngay trong phiên chạy.
+- 🔊 **Âm thanh phản hồi (Audio Feedback Cues)**: Tiếng synth chimes êm dịu khi bắt đầu thu âm, dừng gõ hoặc hủy (ESC).
+- 📊 **Real-time Audio VU Meter trên OSD**: Thanh đo âm lượng micro thực tế trực quan trên màn hình theo dõi mức thu âm.
+- ⚡ **Chế độ Push-to-Talk & Silence VAD**: Hỗ trợ nhấn giữ phím để nói (Hold-to-Talk) và tự động ngắt khi phát hiện im lặng.
 - 🔄 **System Tray Indicator**: Khay hệ thống đổi màu động theo trạng thái (Idle, Recording, Transcribing), hỗ trợ mở Web UI, Restart App và Thoát.
+- 📜 **Xem chi tiết bản phát hành**: Xem lịch sử cập nhật chi tiết tại [`CHANGELOG.md`](file:///home/sgvg-gmo050/Desktop/Projects/local_asr/CHANGELOG.md) hoặc giao diện web `/changelog.html`.
 
 ---
 

@@ -8,12 +8,16 @@ from training.dataset_builder import DatasetBuilder
 
 class LoRATrainer:
     """Asynchronous LoRA Fine-tuning pipeline for Qwen3-ASR."""
-    def __init__(self, db: Optional[Database] = None, output_dir: Optional[str] = None):
+    def __init__(self, db: Optional[Database] = None, output_dir: Optional[str] = None, profile_id: Optional[str] = None):
         from config import get_settings
         settings = get_settings()
         self.db = db or Database()
-        self.output_dir = output_dir or str(settings.ADAPTERS_DIR / "lora_latest")
-        self.builder = DatasetBuilder(self.db)
+        self.profile_id = profile_id or "default"
+        if output_dir:
+            self.output_dir = output_dir
+        else:
+            self.output_dir = str(settings.ADAPTERS_DIR / self.profile_id)
+        self.builder = DatasetBuilder(self.db, profile_id=self.profile_id)
 
         self.is_training = False
         self.current_epoch = 0
@@ -23,10 +27,19 @@ class LoRATrainer:
         self.status = "idle"  # idle | preparing | training | completed | failed
         self.last_error: Optional[str] = None
 
+    def switch_profile(self, profile_id: str):
+        """Switch profile for trainer."""
+        from config import get_settings
+        settings = get_settings()
+        self.profile_id = profile_id.strip().lower() or "default"
+        self.output_dir = str(settings.ADAPTERS_DIR / self.profile_id)
+        self.builder = DatasetBuilder(self.db, profile_id=self.profile_id)
+
     def get_status(self) -> Dict[str, Any]:
         return {
             "is_training": self.is_training,
             "status": self.status,
+            "profile_id": self.profile_id,
             "current_epoch": self.current_epoch,
             "total_epochs": self.total_epochs,
             "current_step": self.current_step,
