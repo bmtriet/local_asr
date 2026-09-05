@@ -17,7 +17,17 @@ def test_vietnamese_normalizer_digit_sequences():
 
 def test_vietnamese_normalizer_time_and_percentage():
     norm = VietnameseNormalizer()
+    # Spoken Vietnamese words for time
+    assert norm.normalize("Mười giờ ba mươi phút") == "10:30"
+    assert norm.normalize("mười giờ ba mươi") == "10:30"
+    assert norm.normalize("mười sáu giờ bốn mươi lăm phút") == "16:45"
+    assert norm.normalize("chín giờ rưỡi") == "9:30"
+    assert norm.normalize("mười giờ kém mười lăm") == "9:45"
+    assert norm.normalize("tôi ngủ lúc mười một giờ") == "tôi ngủ lúc 11h"
+
+    # Digits + words
     assert norm.normalize("16 giờ 30 phút") == "16:30"
+    assert norm.normalize("16 giờ 30") == "16:30"
     assert norm.normalize("tăng trưởng 15 phần trăm") == "tăng trưởng 15%"
     assert norm.normalize("kích thước 0 phẩy 5") == "kích thước 0.5"
 
