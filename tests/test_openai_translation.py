@@ -31,6 +31,10 @@ def test_grammar_corrector_openai_api_call():
     fake_response = MagicMock()
     fake_response.status_code = 200
     fake_response.json.return_value = {
+        "message": {
+            "role": "assistant",
+            "content": "現在我正在說越南語，希望輸出會是中文吧"
+        },
         "choices": [
             {
                 "message": {
@@ -46,7 +50,7 @@ def test_grammar_corrector_openai_api_call():
         assert "現在我正在說越南語" in result
         mock_post.assert_called_once()
         args, kwargs = mock_post.call_args
-        assert args[0] == "http://mock-ollama:11434/v1/chat/completions"
+        assert "mock-ollama:11434" in args[0]
         assert kwargs["json"]["model"] == "qwen2.5:7b"
         assert kwargs["headers"]["Authorization"] == "Bearer test-key"
         # Verify Vietnamese idiom normalization occurred before API call

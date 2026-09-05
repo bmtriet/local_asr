@@ -71,27 +71,69 @@ class GrammarCorrector:
         print("[GrammarCorrector] Model unloaded and GPU cache emptied.")
 
     def _call_openai_api(self, messages: list) -> str:
-        """Calls OpenAI-compatible /chat/completions endpoint (Ollama, vLLM, OpenAI, Groq, etc.)."""
-        endpoint = f"{self.api_base_url}/chat/completions"
+        """Calls OpenAI-compatible endpoint with support for Ollama (/api/chat or /v1/chat/completions)."""
         headers = {
             "Content-Type": "application/json",
         }
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
 
+        # If pointing to an Ollama server (ends with /v1 or has 11434), try Ollama's /api/chat with think: false
+        # This prevents deepseek-r1 / qwen3.5 reasoning models from consuming all tokens in internal monologue
+        base_clean = self.api_base_url.rstrip("/")
+        if base_clean.endswith("/v1"):
+            ollama_host = base_clean[:-3]
+        else:
+            ollama_host = base_clean
+
+        # Attempt 1: If Ollama host, use native /api/chat with think: false for ultra-fast instant translation
+        if ":11434" in base_clean or not self.api_key:
+            try:
+                ollama_chat_endpoint = f"{ollama_host}/api/chat"
+                ollama_payload = {
+                    "model": self.api_model,
+                    "messages": messages,
+                    "think": False,
+                    "stream": False,
+                    "options": {"temperature": 0.0}
+                }
+                with httpx.Client(timeout=15.0) as client:
+                    resp = client.post(ollama_chat_endpoint, json=ollama_payload, headers=headers)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        content = data.get("message", {}).get("content", "").strip()
+                        if content:
+                            return content
+            except Exception as e:
+                print(f"[GrammarCorrector] Ollama native /api/chat attempt skipped: {e}")
+
+        # Attempt 2: Standard OpenAI-compatible /v1/chat/completions
+        endpoint = f"{base_clean}/chat/completions" if not base_clean.endswith("/chat/completions") else base_clean
         payload = {
             "model": self.api_model,
             "messages": messages,
             "temperature": 0.0,
-            "max_tokens": 256
+            "max_tokens": 1024
         }
 
         print(f"[GrammarCorrector] Calling OpenAI-compatible endpoint: {endpoint} (model: {self.api_model})")
-        with httpx.Client(timeout=15.0) as client:
+        with httpx.Client(timeout=25.0) as client:
             response = client.post(endpoint, json=payload, headers=headers)
             response.raise_for_status()
             data = response.json()
-            return data["choices"][0]["message"]["content"].strip()
+            choice = data["choices"][0]
+            msg = choice.get("message", {})
+            content = msg.get("content", "").strip()
+
+            # If model returned thinking tokens into reasoning and content is empty
+            if not content and "reasoning" in msg and msg["reasoning"]:
+                reasoning = msg["reasoning"].strip()
+                # If finish_reason was length or there is a final line in reasoning
+                lines = [l.strip() for l in reasoning.split("\n") if l.strip()]
+                if lines:
+                    content = lines[-1].strip()
+
+            return content
 
     def correct(self, text: str, mode: str = "normal", custom_vocab: str = "") -> str:
         """Corrects grammar and spelling, or translates based on the selected mode."""

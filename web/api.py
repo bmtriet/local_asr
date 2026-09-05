@@ -478,35 +478,26 @@ def test_translation_api(payload: TestTranslationApiRequest):
         {"role": "user", "content": payload.sample_text or "Xin chào!"}
     ]
 
-    body = {
-        "model": payload.model_name.strip(),
-        "messages": test_messages,
-        "max_tokens": 64,
-        "temperature": 0.0
-    }
+    # Use GrammarCorrector's _call_openai_api to test identical behavior
+    corrector = GrammarCorrector(lazy_load=True)
+    corrector.set_config(
+        provider="remote_api",
+        api_base_url=payload.base_url,
+        api_key=payload.api_key or "",
+        api_model=payload.model_name
+    )
 
     start_time = time.time()
     try:
-        with httpx.Client(timeout=10.0) as client:
-            resp = client.post(endpoint, json=body, headers=headers)
-            latency_ms = round((time.time() - start_time) * 1000)
-            if resp.status_code == 200:
-                data = resp.json()
-                content = data["choices"][0]["message"]["content"].strip()
-                return {
-                    "success": True,
-                    "latency_ms": latency_ms,
-                    "model": payload.model_name,
-                    "reply": content,
-                    "message": f"Successfully connected! Latency: {latency_ms}ms"
-                }
-            else:
-                return {
-                    "success": False,
-                    "status_code": resp.status_code,
-                    "error": resp.text[:200],
-                    "message": f"Server responded with HTTP {resp.status_code}"
-                }
+        reply = corrector._call_openai_api(test_messages)
+        latency_ms = round((time.time() - start_time) * 1000)
+        return {
+            "success": True,
+            "latency_ms": latency_ms,
+            "model": payload.model_name,
+            "reply": reply,
+            "message": f"Successfully connected! Latency: {latency_ms}ms"
+        }
     except Exception as e:
         return {
             "success": False,
