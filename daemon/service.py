@@ -65,6 +65,8 @@ class VoiceTypingDaemon:
         self._mode_listener = None
         self._mode_timer = None
         self._esc_listener = None
+        self._streaming_thread = None
+        self._stop_streaming = threading.Event()
         
         self._listener: Optional[keyboard.GlobalHotKeys] = None
         self._lock = threading.Lock()
@@ -135,12 +137,18 @@ class VoiceTypingDaemon:
         osd_cmd = [
             sys.executable, osd_path,
             "--position", osd_position,
-            "--duration", str(osd_duration)
+            "--duration", str(osd_duration),
+            "--mode", self.current_mode
         ]
-        if osd_always_on:
+        if osd_always_on or self.hotkey_mode == "hold":
             osd_cmd.append("--always-on")
 
-        self._osd_process = subprocess.Popen(osd_cmd)
+        self._osd_process = subprocess.Popen(
+            osd_cmd,
+            stdin=subprocess.PIPE,
+            text=True,
+            bufsize=1
+        )
         
         # 5. Start keyboard listener for mode selection keys (e, z, space)
         if self._mode_listener:
@@ -148,15 +156,62 @@ class VoiceTypingDaemon:
         self._mode_listener = keyboard.Listener(on_press=self._on_mode_key_press)
         self._mode_listener.start()
 
-        # 6. Auto-dismiss OSD after duration (if not always_on)
+        # 6. Auto-dismiss OSD after duration (if not always_on and not hold mode)
         if self._mode_timer:
             self._mode_timer.cancel()
             self._mode_timer = None
 
-        if not osd_always_on:
+        if not osd_always_on and self.hotkey_mode != "hold":
             self._mode_timer = threading.Timer(osd_duration, self._on_mode_timeout)
             self._mode_timer.daemon = True
             self._mode_timer.start()
+
+        # 7. Start real-time live streaming worker if enabled
+        self._start_live_streaming_worker()
+
+    def _start_live_streaming_worker(self):
+        streaming_enabled_str = self.db.get_setting("streaming_transcription_enabled", str(self.settings.STREAMING_TRANSCRIPTION_ENABLED)).lower()
+        if streaming_enabled_str != "true":
+            return
+
+        self._stop_streaming.clear()
+
+        def stream_worker():
+            last_text = ""
+            # Wait briefly for initial speech buffer
+            time.sleep(0.4)
+            while not self._stop_streaming.is_set() and self.is_recording:
+                try:
+                    # Bounded trailing 3.5s window avoids growing memory and quadratic attention latency
+                    snapshot = self.recorder.get_current_audio_snapshot(max_seconds=3.5)
+                    if snapshot is not None and len(snapshot) >= int(self.settings.SAMPLE_RATE * 0.4):
+                        # Bounded low-latency sliding chunk decode (always <= 300ms)
+                        partial = self.engine.transcribe_sliding_chunk(
+                            snapshot,
+                            sample_rate=self.settings.SAMPLE_RATE,
+                            max_window_sec=3.5
+                        )
+                        if partial and partial != last_text:
+                            last_text = partial
+                            # Pipe partial text to OSD
+                            if self._osd_process and self._osd_process.poll() is None:
+                                try:
+                                    self._osd_process.stdin.write(f"text:{partial}\n")
+                                    self._osd_process.stdin.flush()
+                                except Exception:
+                                    pass
+                except Exception as e:
+                    print(f"[VoiceTyping] Streaming worker error: {e}")
+                
+                # Check interval ~ 0.4s
+                time.sleep(0.4)
+
+        self._streaming_thread = threading.Thread(target=stream_worker, daemon=True)
+        self._streaming_thread.start()
+
+    def _stop_live_streaming_worker(self):
+        self._stop_streaming.set()
+        self._streaming_thread = None
 
     def _on_mode_timeout(self):
         with self._lock:
@@ -172,28 +227,49 @@ class VoiceTypingDaemon:
             return False
 
         should_backspace = False
+        selected_mode = None
         try:
             if hasattr(key, 'char') and key.char:
                 char = key.char.lower()
                 if char == 'e':
-                    self.current_mode = "english"
+                    selected_mode = "english"
                     should_backspace = True
                 elif char == 'z':
-                    self.current_mode = "chinese"
+                    selected_mode = "chinese"
                     should_backspace = True
                 elif char == ' ':
-                    self.current_mode = "normal"
+                    selected_mode = "normal"
                     should_backspace = True
             elif key == keyboard.Key.space:
-                self.current_mode = "normal"
+                selected_mode = "normal"
                 should_backspace = True
         except Exception:
             pass
 
-        if should_backspace:
+        if selected_mode:
+            self.current_mode = selected_mode
             print(f"[VoiceTyping] Mode selected: {self.current_mode} (recording continues...)")
-            self._cleanup_osd()
-            self._send_backspace()
+
+            # Update OSD dynamically via stdin so the button gets highlighted while speaking
+            if self._osd_process and self._osd_process.poll() is None:
+                try:
+                    self._osd_process.stdin.write(f"{selected_mode}\n")
+                    self._osd_process.stdin.flush()
+                except Exception as e:
+                    print(f"[VoiceTyping] Error updating OSD mode: {e}")
+
+            # If in toggle mode and not always_on, schedule OSD close after brief display
+            if self.hotkey_mode == "toggle":
+                osd_always_on = (self.db.get_setting("osd_always_on", "false").lower() == "true")
+                if not osd_always_on:
+                    if self._mode_timer:
+                        self._mode_timer.cancel()
+                    self._mode_timer = threading.Timer(1.2, self._on_mode_timeout)
+                    self._mode_timer.daemon = True
+                    self._mode_timer.start()
+
+            if should_backspace:
+                self._send_backspace()
             return False
 
     def _send_backspace(self):
@@ -224,6 +300,7 @@ class VoiceTypingDaemon:
                 self._cleanup_osd()
             if self.is_recording:
                 self.is_recording = False
+                self._stop_live_streaming_worker()
                 self.recorder.cancel_recording()
                 if hasattr(self, "sound_feedback") and self.sound_feedback:
                     self.sound_feedback.play_cancel()
@@ -260,6 +337,7 @@ class VoiceTypingDaemon:
     def _stop_and_process(self):
         print("[VoiceTyping] Hotkey pressed -> Stopping recording & processing...")
         self.is_recording = False
+        self._stop_live_streaming_worker()
         self._cleanup_osd()
         if self._esc_listener:
             self._esc_listener.stop()
