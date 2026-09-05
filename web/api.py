@@ -1,7 +1,8 @@
 import os
+import json
 from pathlib import Path
 from typing import Optional, List, Any
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -65,6 +66,7 @@ class SettingsUpdateRequest(BaseModel):
     hotkey_mode: Optional[str] = None
     vad_enabled: Optional[bool] = None
     vad_silence_timeout: Optional[float] = None
+    streaming_transcription_enabled: Optional[bool] = None
 
 class ProfileCreateRequest(BaseModel):
     id: str
@@ -287,6 +289,9 @@ def get_current_settings():
     except Exception:
         vad_silence_timeout = 2.0
 
+    streaming_transcription_str = db.get_setting("streaming_transcription_enabled", str(settings.STREAMING_TRANSCRIPTION_ENABLED)).lower()
+    streaming_transcription_enabled = (streaming_transcription_str == "true")
+
     return {
         "hotkey": active_hotkey,
         "sample_rate": settings.SAMPLE_RATE,
@@ -302,7 +307,8 @@ def get_current_settings():
         "sound_cues_enabled": sound_cues_enabled,
         "hotkey_mode": hotkey_mode,
         "vad_enabled": vad_enabled,
-        "vad_silence_timeout": vad_silence_timeout
+        "vad_silence_timeout": vad_silence_timeout,
+        "streaming_transcription_enabled": streaming_transcription_enabled
     }
 
 @app.post("/api/settings")
@@ -359,6 +365,10 @@ def update_settings(payload: SettingsUpdateRequest):
 
     if payload.vad_silence_timeout is not None:
         db.set_setting("vad_silence_timeout", str(max(0.5, float(payload.vad_silence_timeout))))
+
+    if payload.streaming_transcription_enabled is not None:
+        settings.STREAMING_TRANSCRIPTION_ENABLED = payload.streaming_transcription_enabled
+        db.set_setting("streaming_transcription_enabled", str(payload.streaming_transcription_enabled).lower())
 
     if daemon_instance and hasattr(daemon_instance, "update_ux_settings"):
         daemon_instance.update_ux_settings(
@@ -524,6 +534,106 @@ async def import_vocabulary(file: UploadFile = File(...)):
         return {"status": "success", "count": len(parsed)}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to import vocabulary: {str(e)}")
+
+@app.websocket("/api/ws/streaming-transcribe")
+async def websocket_streaming_transcribe(websocket: WebSocket):
+    """
+    WebSocket endpoint for real-time live streaming audio dictation.
+    Accepts binary PCM float32/int16 audio chunks or JSON control messages.
+    Returns: {"event": "partial_text", "text": "...", "is_final": bool}
+    """
+    import numpy as np
+    await websocket.accept()
+    audio_buffer = []
+    accumulated_samples = 0
+    sample_rate = 16000
+    last_partial = ""
+
+    # Fetch context vocabulary
+    vocab_ctx = ""
+    try:
+        if vocab_mgr:
+            vocab_ctx = vocab_mgr.get_context_string()
+    except Exception:
+        pass
+
+    try:
+        while True:
+            msg = await websocket.receive()
+            if "bytes" in msg and msg["bytes"]:
+                raw_bytes = msg["bytes"]
+                # Convert raw incoming bytes (float32 mono PCM 16kHz)
+                try:
+                    chunk = np.frombuffer(raw_bytes, dtype=np.float32)
+                except Exception:
+                    chunk = np.frombuffer(raw_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+
+                if len(chunk) > 0:
+                    audio_buffer.append(chunk)
+                    accumulated_samples += len(chunk)
+
+                # Every ~0.6s (9600 samples) or more, run bounded sliding transcribe
+                if accumulated_samples >= int(sample_rate * 0.6):
+                    # Only concatenate the recent 3.5 seconds (56,000 samples) for live preview
+                    max_window_samples = int(sample_rate * 3.5)
+                    needed_chunks = []
+                    sample_cnt = 0
+                    for c in reversed(audio_buffer):
+                        needed_chunks.append(c)
+                        sample_cnt += len(c)
+                        if sample_cnt >= max_window_samples:
+                            break
+                    needed_chunks.reverse()
+                    window_wav = np.concatenate(needed_chunks, axis=0)
+                    if len(window_wav) > max_window_samples:
+                        window_wav = window_wav[-max_window_samples:]
+
+                    partial = engine.transcribe_sliding_chunk(
+                        window_wav,
+                        sample_rate=sample_rate,
+                        max_window_sec=3.5,
+                        context=vocab_ctx
+                    )
+                    if partial and partial != last_partial:
+                        last_partial = partial
+                        await websocket.send_json({
+                            "event": "partial_text",
+                            "text": partial,
+                            "is_final": False
+                        })
+            elif "text" in msg and msg["text"]:
+                try:
+                    payload = json.loads(msg["text"])
+                    event = payload.get("event")
+                    if event == "finish":
+                        if audio_buffer:
+                            full_wav = np.concatenate(audio_buffer, axis=0)
+                            final_text = engine.transcribe(full_wav, sample_rate=sample_rate, context=vocab_ctx)
+                            await websocket.send_json({
+                                "event": "final_text",
+                                "text": final_text,
+                                "is_final": True
+                            })
+                        else:
+                            await websocket.send_json({
+                                "event": "final_text",
+                                "text": "",
+                                "is_final": True
+                            })
+                        audio_buffer = []
+                        accumulated_samples = 0
+                        last_partial = ""
+                    elif event == "reset":
+                        audio_buffer = []
+                        accumulated_samples = 0
+                        last_partial = ""
+                        await websocket.send_json({"event": "reset_ack"})
+                except Exception as e:
+                    print(f"[WebSocket] Error parsing control message: {e}")
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        print(f"[WebSocket] Streaming error: {e}")
 
 static_dir = Path(__file__).resolve().parent / "static"
 if static_dir.exists():
