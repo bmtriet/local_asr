@@ -127,6 +127,28 @@ class AudioRecorder:
         sf.write(file_path, audio_data, self.sample_rate)
         return file_path, duration
 
+    def get_current_audio_snapshot(self, max_seconds: Optional[float] = None) -> Optional[np.ndarray]:
+        """Return a copy of recent or accumulated audio frames without stopping recording."""
+        with self._lock:
+            if not self.is_recording or not self._frames:
+                return None
+            if max_seconds is not None and max_seconds > 0:
+                max_samples = int(self.sample_rate * max_seconds)
+                # Walk backwards over frames to only concatenate the tail
+                needed_frames = []
+                count = 0
+                for f in reversed(self._frames):
+                    needed_frames.append(f)
+                    count += len(f)
+                    if count >= max_samples:
+                        break
+                needed_frames.reverse()
+                tail_data = np.concatenate(needed_frames, axis=0)
+                if len(tail_data) > max_samples:
+                    tail_data = tail_data[-max_samples:]
+                return tail_data.copy()
+            return np.concatenate(self._frames, axis=0).copy()
+
     def cancel_recording(self):
         """Stop capture and discard recorded audio frames without saving to file."""
         with self._lock:
