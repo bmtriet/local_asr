@@ -74,6 +74,10 @@ class ProfileCreateRequest(BaseModel):
 class ProfileSwitchRequest(BaseModel):
     profile_id: str
 
+class ProfileUpdateRequest(BaseModel):
+    name: str
+    description: Optional[str] = ""
+
 @app.get("/api/profiles")
 def get_profiles_list():
     """Retrieve all profiles with active state."""
@@ -113,6 +117,20 @@ def switch_active_profile_endpoint(payload: ProfileSwitchRequest):
         daemon_instance.switch_profile(clean_id)
 
     return {"status": "switched", "active_profile": db.get_active_profile()}
+
+@app.put("/api/profiles/{profile_id}")
+def update_profile_endpoint(profile_id: str, payload: ProfileUpdateRequest):
+    """Update profile name and description."""
+    clean_id = profile_id.strip().lower()
+    clean_name = payload.name.strip()
+    if not clean_name:
+        raise HTTPException(status_code=400, detail="Profile name cannot be empty")
+    
+    success = db.update_profile(clean_id, clean_name, payload.description or "")
+    if not success:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    return {"status": "updated", "profile_id": clean_id, "name": clean_name}
 
 @app.delete("/api/profiles/{profile_id}")
 def delete_profile_endpoint(profile_id: str):

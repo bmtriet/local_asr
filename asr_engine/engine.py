@@ -91,6 +91,23 @@ class ASREngine:
         self.active_adapter_name = adapter_name
         print(f"[ASREngine] Loaded and activated LoRA adapter: {adapter_name} from {adapter_dir}")
 
+    def unload_lora_adapter(self):
+        """Unload the currently active LoRA adapter."""
+        if not self.is_loaded or not self.active_adapter_name:
+            return
+            
+        target_model = self._get_thinker_model()
+        from peft import PeftModel
+        if isinstance(target_model, PeftModel):
+            try:
+                if hasattr(target_model, "delete_adapter"):
+                    target_model.delete_adapter(self.active_adapter_name)
+                elif hasattr(target_model, "disable_adapters"):
+                    target_model.disable_adapters()
+            except Exception as e:
+                print(f"[ASREngine] Failed to unload adapter {self.active_adapter_name}: {e}")
+        self.active_adapter_name = None
+
     def switch_profile_adapter(self, profile_id: str):
         """Switch active LoRA adapter to profile's adapter if it exists, otherwise unload."""
         from config import get_settings

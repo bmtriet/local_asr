@@ -30,9 +30,9 @@
 
       <div class="header-right">
         <!-- Changelog Link -->
-        <a href="/changelog.html" class="btn btn-secondary" title="View Version 0.1.1 Updates & Changelog" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem;">
+        <a href="/changelog.html" class="btn btn-secondary" title="View Version 0.1.2 Updates & Changelog" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem;">
           <span>Changelog</span>
-          <span class="badge-count" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; font-size: 0.7rem; padding: 0.1rem 0.4rem;">v0.1.1</span>
+          <span class="badge-count" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; font-size: 0.7rem; padding: 0.1rem 0.4rem;">v0.1.2</span>
         </a>
 
         <!-- About Button -->
@@ -511,6 +511,35 @@
     </div>
   </div>
 
+  <!-- Edit Profile Modal -->
+  <div class="modal-overlay" id="edit-profile-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Profile</h3>
+        <button class="modal-close" id="btn-close-edit-profile-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="input-edit-profile-id">
+        <div class="form-group">
+          <label>Profile ID</label>
+          <input type="text" id="display-edit-profile-id" class="search-input" disabled style="opacity: 0.7; cursor: not-allowed;">
+        </div>
+        <div class="form-group">
+          <label for="input-edit-profile-name">Display Name *</label>
+          <input type="text" id="input-edit-profile-name" class="search-input" placeholder="Profile display name">
+        </div>
+        <div class="form-group">
+          <label for="input-edit-profile-desc">Description</label>
+          <input type="text" id="input-edit-profile-desc" class="search-input" placeholder="Profile description">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-edit-profile-modal">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-edit-profile">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- About Project & Author Modal -->
   <div class="modal-overlay" id="about-modal">
     <div class="modal-dialog" style="max-width: 480px;">
@@ -532,7 +561,7 @@
             </svg>
           </div>
           <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">Local ASR Voice Studio</h4>
-          <span class="badge-count" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px;">Version 0.1.1</span>
+          <span class="badge-count" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px;">Version 0.1.2</span>
         </div>
 
         <p style="font-size: 0.875rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 1rem;">

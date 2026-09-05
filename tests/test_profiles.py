@@ -80,6 +80,20 @@ def test_api_profile_endpoints():
     })
     assert res_create.status_code == 200
 
+    # Update profile
+    res_update = client.put("/api/profiles/alex_tech", json={
+        "name": "Alex Tech Lead",
+        "description": "Updated tech lead profile"
+    })
+    assert res_update.status_code == 200
+    assert res_update.json()["name"] == "Alex Tech Lead"
+
+    # Verify update in profile list
+    res_list = client.get("/api/profiles")
+    alex_prof = next(p for p in res_list.json()["profiles"] if p["id"] == "alex_tech")
+    assert alex_prof["name"] == "Alex Tech Lead"
+    assert alex_prof["description"] == "Updated tech lead profile"
+
     # Switch to alex_tech
     res_switch = client.post("/api/profiles/active", json={"profile_id": "alex_tech"})
     assert res_switch.status_code == 200

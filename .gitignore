@@ -6,3 +6,4 @@ data/*.db
 data/adapters/
 .pytest_cache/
 .superpowers/
+data/*_backup.*

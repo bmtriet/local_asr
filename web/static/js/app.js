@@ -1107,6 +1107,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="btn btn-secondary btn-xs" title="Export complete bundle (Vocab + LoRA zip)" onclick="window.exportProfileBundle('${escapeHtml(p.id)}')">
               Export
             </button>
+            <button class="btn btn-secondary btn-xs" title="Edit profile name and description" onclick="window.openEditProfileModal('${escapeHtml(p.id)}')">
+              Edit
+            </button>
             ${!isCur ? `
               <button class="btn btn-secondary btn-xs" onclick="window.switchProfile('${escapeHtml(p.id)}')">
                 Select
@@ -1193,6 +1196,68 @@ document.addEventListener('DOMContentLoaded', () => {
   if (profileModal) {
     profileModal.addEventListener('click', (e) => {
       if (e.target === profileModal) closeProfileModal();
+    });
+  }
+
+  // Edit Profile Modal Logic
+  const editProfileModal = document.getElementById('edit-profile-modal');
+  const btnCloseEditProfileModal = document.getElementById('btn-close-edit-profile-modal');
+  const btnCancelEditProfileModal = document.getElementById('btn-cancel-edit-profile-modal');
+  const btnSaveEditProfile = document.getElementById('btn-save-edit-profile');
+  const inputEditProfileId = document.getElementById('input-edit-profile-id');
+  const displayEditProfileId = document.getElementById('display-edit-profile-id');
+  const inputEditProfileName = document.getElementById('input-edit-profile-name');
+  const inputEditProfileDesc = document.getElementById('input-edit-profile-desc');
+
+  function closeEditProfileModal() {
+    if (editProfileModal) editProfileModal.classList.remove('open');
+  }
+
+  if (btnCloseEditProfileModal) btnCloseEditProfileModal.addEventListener('click', closeEditProfileModal);
+  if (btnCancelEditProfileModal) btnCancelEditProfileModal.addEventListener('click', closeEditProfileModal);
+  if (editProfileModal) {
+    editProfileModal.addEventListener('click', (e) => {
+      if (e.target === editProfileModal) closeEditProfileModal();
+    });
+  }
+
+  window.openEditProfileModal = (profileId) => {
+    const profile = cachedProfiles.find(p => p.id === profileId);
+    if (!profile) return;
+    if (inputEditProfileId) inputEditProfileId.value = profile.id;
+    if (displayEditProfileId) displayEditProfileId.value = profile.id;
+    if (inputEditProfileName) inputEditProfileName.value = profile.name || '';
+    if (inputEditProfileDesc) inputEditProfileDesc.value = profile.description || '';
+    if (editProfileModal) editProfileModal.classList.add('open');
+    if (inputEditProfileName) inputEditProfileName.focus();
+  };
+
+  if (btnSaveEditProfile) {
+    btnSaveEditProfile.addEventListener('click', async () => {
+      const id = inputEditProfileId ? inputEditProfileId.value.trim() : '';
+      const name = inputEditProfileName ? inputEditProfileName.value.trim() : '';
+      const desc = inputEditProfileDesc ? inputEditProfileDesc.value.trim() : '';
+
+      if (!id || !name) {
+        alert('Display Name cannot be empty.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/profiles/${encodeURIComponent(id)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description: desc })
+        });
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.detail || 'Failed to update profile');
+        }
+        closeEditProfileModal();
+        await loadProfiles();
+      } catch (err) {
+        alert('Error updating profile: ' + err.message);
+      }
     });
   }
 

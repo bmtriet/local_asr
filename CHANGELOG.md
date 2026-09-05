@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.1.2] - 2026-09-05
+
+### 🚀 Added & Enhanced
+- **Profile Rename & Editing Functionality**:
+  - Implemented `PUT /api/profiles/{profile_id}` API endpoint and connected to the underlying SQLite database layer.
+  - Added an interactive **Edit Profile** modal to the Web UI allowing users to easily modify display names and descriptions for any profile (including the default profile).
+  - Added unit test coverage in `tests/test_profiles.py` verifying profile update operations.
+- **Documentation Internationalization**:
+  - Fully translated `README.md` into English with complete setup guides (Linux, macOS, Windows 1-Click/manual), architecture notes, and configuration references.
+
+### 🐛 Fixed
+- **LoRA Adapter Unload on Profile Switching**:
+  - Implemented `unload_lora_adapter` in `ASREngine` to safely detach/disable PEFT LoRA adapters when switching to a profile that does not have trained weights, preventing crashes during profile switching.
+
+---
+
 ## [0.1.1] - 2026-09-04
 
 ### 🚀 Added & Enhanced

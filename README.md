@@ -1,126 +1,127 @@
 # Local ASR & Voice Typing Daemon (Cross-Platform)
 
-Hệ thống nhận diện giọng nói và gõ văn bản cục bộ (**Local ASR Voice Typing**) hiệu năng cao, hoạt động 100% offline không cần internet. Tích hợp mô hình nhận dạng âm học tiên tiến **Qwen3-ASR (0.6B)**, mô hình chuẩn hóa ngữ pháp & dịch thuật **Qwen2.5 (0.5B)**, module chuẩn hóa số **Vietnamese ITN**, cùng cơ chế học tăng cường liên tục (**Continual LoRA Fine-Tuning**) và **Hotword Context Biasing**.
+High-performance, 100% offline local speech recognition and voice typing system (**Local ASR Voice Typing**) that operates without requiring internet access. Integrated with the state-of-the-art **Qwen3-ASR (0.6B)** acoustic model, **Qwen2.5 (0.5B)** grammar correction & translation LLM, ultrafast **Vietnamese ITN** (Inverse Text Normalization) module, **Continual LoRA Fine-Tuning**, and **Hotword Context Biasing**.
 
-Hỗ trợ đa nền tảng hoàn hảo trên cả **Linux**, **macOS** và **Windows** (tự động tối ưu cho cả **NVIDIA GPU**, **Apple Silicon MPS** và **CPU-Only**).
+Seamless cross-platform support across **Linux**, **macOS**, and **Windows** (automatically optimized for **NVIDIA GPU CUDA**, **Apple Silicon MPS**, and **CPU-Only** execution).
 
 ---
 
-## 🌟 Tính năng nổi bật
+## 🌟 Key Highlights & Features
 
-- 🎙️ **Thu âm tức thì không độ trễ (Zero-Latency Recording)**: Bấm phím tắt là mic bắt đầu ghi âm ngay lập tức, không mất chữ đầu câu.
-- 🚀 **Chuẩn hóa số tiếng Việt siêu tốc (Vietnamese ITN)**: Tự động phát hiện và chuyển đổi chuỗi số đọc (số điện thoại, mã OTP, số thẻ, giờ phút, phần trăm) sang chữ số tự nhiên trong 0.001s:
+- 🎙️ **Zero-Latency Recording**: Instant capture upon hotkey press—never miss initial syllables or sentence beginnings.
+- 🚀 **Ultrafast Vietnamese ITN**: Automatically parses spoken number sequences (phone numbers, OTP tokens, card numbers, time, currency, percentages) to natural digits in ~0.001s:
   - *"Không chín tám bảy ba một một tám sáu một"* $\rightarrow$ **`0987311861`**
   - *"Mã thẻ một chín hai một"* $\rightarrow$ **`Mã thẻ 1921`**
   - *"Mười sáu giờ ba mươi phút"* $\rightarrow$ **`16:30`**
-- 🌐 **Hộp thoại OSD chọn ngôn ngữ & Dịch thuật**:
-  - `[E]`: 🇬🇧 Dịch sang Tiếng Anh.
-  - `[Z]`: 🇨🇳 Dịch sang Tiếng Trung (Phồn thể).
-  - `[Phím cách / Sau 2s]`: Tự động ẩn OSD và tiếp tục ghi âm chế độ gốc.
-  - `[ESC]`: ❌ Hủy bỏ ngay lập tức ở cả giai đoạn chọn chế độ lẫn khi đang ghi âm.
-- 📝 **Tùy chọn xuất song ngữ (Add Origin Phrase)**: Tùy chọn in kèm câu nói nguồn và bản dịch trên 2 dòng để tiện đối chiếu.
-- 🧠 **Bộ nhớ từ vựng ưu tiên (Hotword Context Biasing)**: Tự động trích xuất các từ bạn đã sửa (tên riêng, từ viết tắt như `Qwen`, `ASR`, dãy số...) nạp thẳng vào context prompt của mô hình để nhận diện đúng ngay từ lần nói sau.
-- 🎯 **Huấn luyện LoRA thực tế (Real PyTorch LoRA Fine-Tuning)**: Fine-tune trực tiếp trên các mẫu ghi âm đã review, tự động cập nhật và nạp trọng số LoRA mới (`adapter_model.safetensors`) lên GPU ngay trong phiên chạy.
-- 🔊 **Âm thanh phản hồi (Audio Feedback Cues)**: Tiếng synth chimes êm dịu khi bắt đầu thu âm, dừng gõ hoặc hủy (ESC).
-- 📊 **Real-time Audio VU Meter trên OSD**: Thanh đo âm lượng micro thực tế trực quan trên màn hình theo dõi mức thu âm.
-- ⚡ **Chế độ Push-to-Talk & Silence VAD**: Hỗ trợ nhấn giữ phím để nói (Hold-to-Talk) và tự động ngắt khi phát hiện im lặng.
-- 🔄 **System Tray Indicator**: Khay hệ thống đổi màu động theo trạng thái (Idle, Recording, Transcribing), hỗ trợ mở Web UI, Restart App và Thoát.
-- 📜 **Xem chi tiết bản phát hành**: Xem lịch sử cập nhật chi tiết tại [`CHANGELOG.md`](file:///home/sgvg-gmo050/Desktop/Projects/local_asr/CHANGELOG.md) hoặc giao diện web `/changelog.html`.
+- 🌐 **Interactive OSD Language Selector & Translation**:
+  - `[E]`: 🇬🇧 Translate directly into English.
+  - `[Z]`: 🇨🇳 Translate directly into Traditional Chinese.
+  - `[Spacebar / After 2s timeout]`: Automatically auto-dismisses OSD and resumes original speech transcription mode.
+  - `[ESC]`: ❌ Instantly cancel at either mode selection or active recording phases.
+- 📝 **Bilingual Output (Add Origin Phrase)**: Optional dual-line output including both source transcription and target translation for instant verification.
+- 🧠 **Hotword Context Biasing & Memory**: Automatically extracts reviewed terminology, proper nouns, and corrections directly into model prompt context for accurate recognition on future passes.
+- 🎯 **Real PyTorch LoRA Fine-Tuning**: Run parameter-efficient fine-tuning directly on corrected audio samples; dynamically loads newly trained weights (`adapter_model.safetensors`) onto GPU within the active runtime.
+- 👤 **Multi-Profile Management**: Dedicated user profiles with isolated audio history, custom vocabulary (`vocabulary.json`), and separate LoRA adapter weights. Supports creating, editing profile name/description, switching, and exporting bundles.
+- 🔊 **Audio Feedback Cues**: Gentle synthesized chimes on record start, completion, and cancel (ESC).
+- 📊 **Real-time Audio VU Meter on OSD**: Visual microphone amplitude monitor displayed right on screen.
+- ⚡ **Push-to-Talk & Silence VAD**: Toggle hotkey or hold-to-talk modes with automatic silence detection cut-off.
+- 🔄 **System Tray Indicator**: Dynamic tray status indicator (Idle, Recording, Transcribing), providing quick access to Web UI, Restart, and Exit.
+- 📜 **Detailed Release Notes**: See [`CHANGELOG.md`](CHANGELOG.md) or the web dashboard at `/changelog.html`.
 
 ---
 
-## 🐧 1. Hướng dẫn Cài đặt & Chạy trên Linux (Ubuntu / Debian / Fedora / Arch)
+## 🐧 1. Installation & Setup on Linux (Ubuntu / Debian / Fedora / Arch)
 
-### Bước 1: Cài đặt thư viện hệ thống
-Mở Terminal và cài đặt các gói hỗ trợ âm thanh và bàn phím:
+### Step 1: Install System Dependencies
+Open Terminal and install required system packages for audio, clipboard, and system tray:
 
 ```bash
-# Trên Ubuntu / Debian:
+# Ubuntu / Debian:
 sudo apt update
 sudo apt install -y python3-venv python3-pip portaudio19-dev xclip xdotool libgtk-3-dev libayatana-appindicator3-dev
 
-# Trên Fedora:
+# Fedora:
 sudo dnf install -y portaudio-devel xclip xdotool gtk3-devel libappindicator-gtk3-devel
 
-# Trên Arch Linux:
+# Arch Linux:
 sudo pacman -S portaudio xclip xdotool gtk3 libappindicator-gtk3
 ```
 
-### Bước 2: Tạo môi trường ảo & Cài đặt thư viện Python
+### Step 2: Create Virtual Environment & Install Python Dependencies
 ```bash
-# Di chuyển vào thư mục dự án
+# Navigate to project directory
 cd local_asr
 
-# Khởi tạo môi trường ảo Python
+# Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Cài đặt PyTorch:
-# Nếu có NVIDIA GPU (CUDA):
+# Install PyTorch:
+# For NVIDIA GPU (CUDA):
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
-# Nếu chỉ dùng CPU (không có GPU):
+# For CPU-Only (no GPU):
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# Cài đặt các gói phụ thuộc
+# Install project dependencies
 pip install -r requirements.txt
 ```
 
-### Bước 3: Khởi động ứng dụng
-- **Chạy ngầm hoàn toàn (Khuyên dùng):**
+### Step 3: Launch Application
+- **Background Daemon (Recommended):**
   ```bash
   ./start.sh
   ```
-  *(Ứng dụng sẽ chạy trong nền, xuất hiện icon ở khay hệ thống và ghi nhật ký vào `logs/app.log`)*.
+  *(Runs silently in background with system tray icon; logs stored in `logs/app.log`)*.
 
-- **Chạy chế độ Debug xem log trực tiếp:**
+- **Foreground Debug Mode (Live Log Output):**
   ```bash
   ./start.sh --foreground
   ```
 
-- **Dừng ứng dụng:** Nhấp chuột phải vào Tray Icon chọn **Exit**, hoặc chạy lệnh:
+- **Stop Application:** Right-click Tray Icon and select **Exit**, or run:
   ```bash
   pkill -f "local_asr/main.py"
   ```
 
 ---
 
-## 🍎 2. Hướng dẫn Cài đặt & Chạy trên macOS (Apple Silicon M1/M2/M3/M4 & Intel)
+## 🍎 2. Installation & Setup on macOS (Apple Silicon M1/M2/M3/M4 & Intel)
 
-### Bước 1: Cài đặt Homebrew & Thư viện âm thanh
-Nếu máy chưa có Homebrew, hãy cài đặt [Homebrew](https://brew.sh/). Sau đó chạy:
+### Step 1: Install Homebrew & Audio Dependencies
+If Homebrew is not installed, install it from [brew.sh](https://brew.sh/). Then install portaudio:
 
 ```bash
 brew install portaudio
 ```
 
-### Bước 2: Tạo môi trường ảo & Cài đặt thư viện Python
+### Step 2: Create Virtual Environment & Install Python Packages
 ```bash
-# Di chuyển vào thư mục dự án
+# Navigate to project directory
 cd local_asr
 
-# Khởi tạo môi trường ảo Python 3.10+
+# Create virtual environment with Python 3.10+
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Nâng cấp pip
+# Upgrade pip
 pip install --upgrade pip
 
-# Cài đặt PyTorch (Bản chính thức hỗ trợ sẵn MPS Acceleration cho chip M1/M2/M3/M4)
+# Install PyTorch (Official build supports native MPS Acceleration for Apple Silicon)
 pip install torch torchvision torchaudio
 
-# Cài đặt các thư viện dự án
+# Install project dependencies
 pip install -r requirements.txt
 ```
 
-### Bước 3: Cấp quyền hệ thống cho macOS (Rất quan trọng!)
-macOS có cơ chế bảo mật nghiêm ngặt. Để ứng dụng có thể bắt phím tắt toàn cục và thu âm micro:
-1. Mở **System Settings (Cài đặt hệ thống)** $\rightarrow$ **Privacy & Security (Quyền riêng tư & Bảo mật)**.
-2. Mục **Microphone**: Bật cấp quyền cho ứng dụng **Terminal** (hoặc iTerm2 / VSCode).
-3. Mục **Accessibility (Trợ năng)**: Thêm và bật cấp quyền cho ứng dụng **Terminal** (hoặc iTerm2) để cho phép phần mềm nhận phím tắt và dán văn bản tự động.
-4. Mục **Input Monitoring (Giám sát đầu vào)**: Cấp quyền cho Terminal nếu hệ điều hành yêu cầu.
+### Step 3: Grant System Permissions (Important!)
+macOS enforces strict privacy permissions. Grant permissions to capture global shortcuts and record audio:
+1. Open **System Settings** $\rightarrow$ **Privacy & Security**.
+2. **Microphone**: Enable permission for **Terminal** (or iTerm2 / VSCode).
+3. **Accessibility**: Add and grant permission for **Terminal** (or iTerm2) to allow global hotkey detection and synthetic typing.
+4. **Input Monitoring**: Grant permission for Terminal if prompted by macOS.
 
-### Bước 4: Khởi động ứng dụng
+### Step 4: Launch Application
 ```bash
 source .venv/bin/activate
 python main.py --service all
@@ -128,102 +129,109 @@ python main.py --service all
 
 ---
 
-## 🪟 3. Hướng dẫn Cài đặt & Chạy trên Windows (Windows 10 / 11, 64-bit)
+## 🪟 3. Installation & Setup on Windows (Windows 10 / 11, 64-bit)
 
-### Yêu cầu phiên bản Python trên Windows:
-- **Phiên bản tương thích:** Python **3.10**, **3.11** hoặc **3.12** (**Bản 64-bit**).
-- **Khuyến nghị tốt nhất:** [Python 3.11.9 (64-bit)](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) (Phiên bản ổn định và tương thích tối đa với các gói PyTorch & transformers wheel).
-- **2 Lưu ý cực kỳ quan trọng khi cài đặt Python trên Windows:**
-  1. Ở màn hình cài đặt đầu tiên, **BẮT BUỘC TICK CHỌN: `[x] Add python.exe to PATH`**.
-  2. Nếu máy bạn khi gõ lệnh `python` tự động bật cửa sổ Microsoft Store:
-     - Mở **Windows Settings** $\rightarrow$ **Apps** $\rightarrow$ **Advanced app settings** $\rightarrow$ **App execution aliases**.
-     - Tìm và chuyển sang **TẮT (OFF)** cho hai mục: `App Installer (python.exe)` và `App Installer (python3.exe)`.
+### Python Version Requirements:
+- **Compatible Versions:** Python **3.10**, **3.11**, or **3.12** (**64-bit**).
+- **Recommended Release:** [Python 3.11.9 (64-bit)](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) (Optimal stability and pre-built wheel compatibility for PyTorch & Transformers).
+- **Critical Setup Checks:**
+  1. During Python installation, **ALWAYS CHECK: `[x] Add python.exe to PATH`**.
+  2. If typing `python` in Command Prompt opens the Microsoft Store:
+     - Open **Windows Settings** $\rightarrow$ **Apps** $\rightarrow$ **Advanced app settings** $\rightarrow$ **App execution aliases**.
+     - Toggle **OFF** both `App Installer (python.exe)` and `App Installer (python3.exe)`.
 
-### Cách 1: Cài đặt tự động 1-Click (Khuyên dùng)
-1. Đảm bảo đã cài Python 64-bit theo hướng dẫn trên.
-2. Nhấp đúp chuột vào file:
+### Option A: Automatic 1-Click Setup (Recommended)
+1. Verify 64-bit Python is installed as described above.
+2. Double-click:
    ```text
    setup_windows.bat
    ```
-3. Script cài đặt sẽ tự động hoàn toàn:
-   - Tự kiểm tra phiên bản Python tương thích (kiểm tra cả `python`, `py -3.11`, `py -3.10`).
-   - Tự động ghi toàn bộ nhật ký chi tiết vào file `setup_windows.log`. Nếu có bất kỳ lỗi nào xảy ra, cửa sổ CMD **luôn giữ nguyên để bạn đọc thông báo lỗi** (không bao giờ tự động tắt đột ngột).
-   - Kiểm tra card đồ họa NVIDIA. Nếu có GPU sẽ tải PyTorch CUDA, nếu không có GPU sẽ tự động tải bản PyTorch CPU siêu nhẹ (~200MB thay vì 3GB).
-   - Cài đặt đầy đủ các gói thư viện tương thích Windows.
-   - Hỏi bạn có muốn tạo lối tắt tự khởi động cùng Windows (`shell:startup`) hay không.
+3. The setup script will automatically:
+   - Validate compatible Python runtime (`python`, `py -3.11`, `py -3.10`).
+   - Log output to `setup_windows.log`. The command prompt window stays open on error for review.
+   - Detect NVIDIA GPU: automatically selects PyTorch CUDA or lightweight PyTorch CPU (~200MB instead of ~3GB).
+   - Install all Windows-compatible requirements.
+   - Offer to configure autostart via Windows Startup folder (`shell:startup`).
 
-### Cách 2: Cài đặt thủ công qua CMD / PowerShell
+### Option B: Manual Setup via CMD / PowerShell
 ```cmd
 cd local_asr
 python -m venv .venv
 .\.venv\Scripts\activate
 
-:: Có GPU NVIDIA:
+:: With NVIDIA GPU:
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
-:: Không có GPU (CPU-Only):
+:: Without GPU (CPU-Only):
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-:: Cài đặt thư viện:
+:: Install dependencies:
 pip install -r requirements.txt
 ```
 
-### Khởi động ứng dụng trên Windows
-- **Chạy ngầm hoàn toàn (Không hiện cửa sổ đen CMD):**
-  Nhấp đúp vào:
+### Launch Application on Windows
+- **Silent Background Run (No CMD Window):**
+  Double-click:
   ```text
   start.vbs
   ```
-- **Chạy chế độ Debug (Hiện cửa sổ CMD để xem nhật ký log):**
-  Nhấp đúp vào:
+- **Foreground Debug Mode (Shows CMD window for live logs):**
+  Double-click:
   ```text
   start.bat
   ```
 
 ---
 
-## 🖥️ 4. Hướng dẫn Sử dụng Giao diện Web (Dashboard)
+## 🖥️ 4. Web Dashboard & Studio Guide
 
-Truy cập giao diện quản trị Web tại địa chỉ:
+Access the web management dashboard at:
 👉 **`http://127.0.0.1:8000`**
 
-Giao diện Web hoàn toàn bằng Tiếng Anh với các chức năng chính:
-1. **Recognition History & Corrections**:
-   - Nghe lại các file âm thanh đã thu âm.
-   - Sửa lại câu nhận diện (Ground Truth) để mô hình học theo phong cách gõ của bạn.
-   - Bấm **Save Review** để lưu lại câu sửa lỗi.
-2. **LoRA Fine-Tuning**:
-   - Theo dõi số lượng mẫu chờ huấn luyện (`pending_samples`).
-   - Bấm **Start LoRA Training** để kích hoạt quá trình fine-tuning trọng số thực tế trên GPU. Trọng số mới sẽ được nạp tự động vào máy ngay khi train xong.
-3. **Settings**:
-   - Đổi phím tắt toàn cục (Global Shortcut).
-   - Bật/Tắt tính năng chuẩn hóa và sửa lỗi bằng AI (**Grammar Correction**).
-   - Bật/Tắt chế độ xuất song ngữ (**Add origin phrase**).
+Key dashboard features:
+1. **User Profiles Management**:
+   - Manage multiple profiles (e.g. personal, coding, finance).
+   - Edit profile display name and description directly.
+   - Export profile bundles containing vocabulary and LoRA adapters.
+2. **Recognition History & Corrections**:
+   - Play back recorded audio snippets.
+   - Edit ground truth transcription to teach the system your speech patterns.
+   - Click **Save Review** to queue samples for continual fine-tuning.
+3. **LoRA Fine-Tuning Studio**:
+   - Monitor count of pending training samples (`pending_samples`).
+   - Click **Start LoRA Training** to trigger actual PyTorch fine-tuning on GPU/CPU. Weights are hot-reloaded automatically.
+4. **Custom Vocabulary & Keyword Mapping**:
+   - Define domain terms, acronyms, and phonetic replacement rules.
+   - Export and import custom `vocabulary.json` profiles.
+5. **Settings & Preferences**:
+   - Reconfigure global hotkeys, audio cues, and OSD placement.
+   - Toggle AI grammar correction and bilingual dual-line transcription.
 
 ---
 
-## ⚙️ 5. Tùy biến Cấu hình (config.py)
+## ⚙️ 5. Configuration Options (config.py)
 
-Bạn có thể chỉnh sửa các giá trị mặc định trong file [config.py](config.py) hoặc thông qua biến môi trường:
+Default settings can be configured in [config.py](config.py) or overridden via environment variables prefixed with `LOCAL_ASR_`:
 
-| Tham số | Mặc định | Ý nghĩa |
+| Parameter | Default | Description |
 | :--- | :--- | :--- |
-| `HOTKEY` | `f9` | Phím tắt kích hoạt thu âm (`f9`, `alt+z`, `ctrl+space`,...) |
-| `MODEL_NAME` | `Qwen/Qwen3-ASR-0.6B` | Mô hình nhận dạng giọng nói ASR |
-| `GRAMMAR_MODEL_NAME`| `Qwen/Qwen2.5-0.5B-Instruct` | Mô hình LLM sửa ngữ pháp & dịch thuật |
-| `HOST` | `127.0.0.1` | Địa chỉ IP Web UI Server |
-| `PORT` | `8000` | Cổng dịch vụ Web UI |
-| `CPU_THREADS` | `4` | Số luồng CPU tối đa sử dụng khi không có GPU (tránh giật lag máy) |
-| `ADD_ORIGIN_PHRASE` | `False` | Xuất cả câu gốc lẫn câu dịch khi bấm phím dịch |
+| `HOTKEY` | `ctrl+alt+space` | Hotkey trigger (`ctrl+alt+space`, `f9`, `alt+z`, etc.) |
+| `MODEL_NAME` | `Qwen/Qwen3-ASR-0.6B` | Core ASR acoustic model identifier |
+| `GRAMMAR_MODEL_NAME` | `Qwen/Qwen2.5-0.5B-Instruct` | Grammar correction & translation model identifier |
+| `HOST` | `127.0.0.1` | Web UI bind host |
+| `PORT` | `8000` | Web UI bind port |
+| `CPU_THREADS` | `4` | Maximum CPU thread concurrency when running without GPU |
+| `ADD_ORIGIN_PHRASE` | `False` | Output both original phrase and translation |
+| `OSD_POSITION` | `top-left` | Screen placement of floating OSD (`top-left`, `top-right`, `center`, etc.) |
 
 ---
 
-## 🧪 6. Chạy Kiểm thử (Unit Tests)
+## 🧪 6. Automated Unit Tests
 
-Dự án đi kèm bộ kiểm thử tự động toàn diện kiểm tra mọi tính năng (Cross-platform, ITN Normalizer, LoRA Training, API, Tray Indicator):
+The project includes an automated test suite verifying cross-platform services, ITN normalizer, LoRA training, database operations, profiles, and web APIs:
 
 ```bash
-# Kích hoạt virtualenv và chạy pytest:
+# Activate virtualenv and run pytest:
 PYTHONPATH=. pytest
 ```
-*(Toàn bộ 24/24 test cases đều được bảo đảm vượt qua 100%).*
+*(All test suites pass 100% across supported environments).*

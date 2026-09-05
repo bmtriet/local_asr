@@ -162,19 +162,58 @@
       </div>
       <span class="release-badge">
         <span class="release-tag">Current</span>
-        Version 0.1.1
+        Version 0.1.2
       </span>
     </header>
 
     <div class="timeline">
-      <!-- Version 0.1.1 Release Card -->
+      <!-- Version 0.1.2 Release Card -->
       <div class="timeline-item">
         <div class="timeline-dot" style="background: var(--emerald); box-shadow: 0 0 12px var(--emerald-glow);"></div>
         <div class="release-card">
           <div class="release-header">
             <div class="release-title-group">
-              <h2 class="release-title">Version 0.1.1 - Clipboard Protection & UX Polish</h2>
+              <h2 class="release-title">Version 0.1.2 - Profile Management & Engine Stability</h2>
               <span class="badge-active-pill" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">Latest</span>
+            </div>
+            <span class="release-date">September 5, 2026</span>
+          </div>
+
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feature-icon icon-new">✏️</div>
+              <div class="feature-body">
+                <strong>Profile Rename & In-App Customization</strong>
+                <p>Introduced a dedicated profile editing modal and backend API endpoint (<code>PUT /api/profiles/{id}</code>) to rename display names and update descriptions directly within the Web Studio interface.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-fix">🛡️</div>
+              <div class="feature-body">
+                <strong>LoRA Adapter Unload Stability</strong>
+                <p>Added safe adapter unloading mechanism (<code>unload_lora_adapter</code>) when switching to profiles that do not yet have fine-tuned LoRA weights, preventing runtime crashes.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">🌍</div>
+              <div class="feature-body">
+                <strong>Complete English Documentation</strong>
+                <p>Comprehensive English translation of <code>README.md</code> encompassing setup guides for Linux, macOS, and Windows 1-Click/manual installations.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Version 0.1.1 Release Card -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="release-card">
+          <div class="release-header">
+            <div class="release-title-group">
+              <h2 class="release-title">Version 0.1.1 - Clipboard Protection & UX Polish</h2>
             </div>
             <span class="release-date">September 4, 2026</span>
           </div>
