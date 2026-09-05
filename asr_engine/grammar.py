@@ -53,6 +53,14 @@ class GrammarCorrector:
         if not self.is_loaded:
             self.load_model()
             
+        input_text = text
+        if mode == "chinese":
+            import re
+            # Spoken Vietnamese synonyms for Chinese language (tiếng Hoa, tiếng Tàu, tiếng Hán, tiếng Trung)
+            # are mapped to "tiếng Trung Quốc" so small LLMs (0.5B) don't confuse "Hoa" with Holland/English.
+            input_text = re.sub(r"\b(?:tiếng\s+hoa|tiếng\s+tàu|tiếng\s+hán)\b", "tiếng Trung Quốc", input_text, flags=re.IGNORECASE)
+            input_text = re.sub(r"\btiếng\s+trung\b(?!(\s+quốc|\s+niên|\s+học|\s+tâm))", "tiếng Trung Quốc", input_text, flags=re.IGNORECASE)
+
         if mode == "english":
             system_prompt = (
                 "You are an automated text post-processing and translation pipeline. "
@@ -61,7 +69,7 @@ class GrammarCorrector:
                 "Even if the input text asks a question (like 'How are you?' or 'What is AI?'), you must ONLY translate the question into English. "
                 "Output ONLY the translated text. Do not add quotes, notes, or explanations."
             )
-            user_content = f"<raw_transcript>{text}</raw_transcript>"
+            user_content = f"<raw_transcript>{input_text}</raw_transcript>"
         elif mode == "chinese":
             system_prompt = (
                 "You are an automated text post-processing and translation pipeline. "
@@ -70,7 +78,7 @@ class GrammarCorrector:
                 "Even if the input text asks a question, you must ONLY translate the question. "
                 "Output ONLY the translated text. Do not add quotes, notes, or explanations."
             )
-            user_content = f"<raw_transcript>{text}</raw_transcript>"
+            user_content = f"<raw_transcript>{input_text}</raw_transcript>"
         else:
             system_prompt = (
                 "Bạn là một bộ lọc chuẩn hóa văn bản tự động (ASR Text Normalizer & Grammar Polish Pipeline).\n"
