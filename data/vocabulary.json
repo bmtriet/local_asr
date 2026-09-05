@@ -65,7 +65,8 @@
   {
     "target": "update",
     "aliases": [
-      "up đến"
+      "up đến",
+      "cập date"
     ],
     "description": "update"
   },
@@ -85,5 +86,55 @@
       "đuí"
     ],
     "description": "đuối"
+  },
+  {
+    "target": "output",
+    "aliases": [
+      "ai bút",
+      "cao bút"
+    ],
+    "description": "output"
+  },
+  {
+    "target": "Ollama",
+    "aliases": [
+      "olima"
+    ],
+    "description": ""
+  },
+  {
+    "target": "tablet",
+    "aliases": [
+      "tách lật"
+    ],
+    "description": "tablet"
+  },
+  {
+    "target": "Max Lee",
+    "aliases": [
+      "max lee"
+    ],
+    "description": ""
+  },
+  {
+    "target": "Eric",
+    "aliases": [
+      "eric"
+    ],
+    "description": ""
+  },
+  {
+    "target": "Allwells",
+    "aliases": [
+      "ông well"
+    ],
+    "description": ""
+  },
+  {
+    "target": "VG",
+    "aliases": [
+      "vg"
+    ],
+    "description": ""
   }
 ]
