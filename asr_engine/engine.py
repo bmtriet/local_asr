@@ -174,3 +174,109 @@ class ASREngine:
         if text:
             text = text[0].upper() + text[1:]
         return text
+
+    def transcribe_chunk(
+        self,
+        audio_data: np.ndarray,
+        sample_rate: int = 16000,
+        context: str = "",
+        max_new_tokens: int = 48
+    ) -> str:
+        """Transcribe an audio chunk with low-latency generation settings for live streaming."""
+        if not self.is_loaded:
+            self.load_model()
+
+        wav = np.asarray(audio_data, dtype=np.float32)
+        if wav.ndim > 1:
+            wav = wav.mean(axis=1)
+
+        # Require at least 0.4s of audio before running decode
+        if len(wav) < int(sample_rate * 0.4):
+            return ""
+
+        try:
+            # Low latency generation directly via inner model & processor
+            prompt = self.model._build_text_prompt(context=context or "", force_language=None)
+            inputs = self.model.processor(text=[prompt], audio=[wav], return_tensors="pt", padding=True)
+            inputs = inputs.to(self.model.model.device).to(self.model.model.dtype)
+
+            with torch.no_grad():
+                text_ids = self.model.model.generate(
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    pad_token_id=getattr(self.model.processor.tokenizer, "eos_token_id", 151645)
+                )
+
+            decoded = self.model.processor.batch_decode(
+                text_ids.sequences[:, inputs["input_ids"].shape[1]:],
+                skip_special_tokens=True,
+                clean_up_tokenization_spaces=False
+            )
+
+            if not decoded or not decoded[0]:
+                return ""
+
+            from qwen_asr import parse_asr_output
+            _, text = parse_asr_output(decoded[0], user_language=None)
+            return text.strip()
+        except Exception as e:
+            print(f"[ASREngine] Error in transcribe_chunk: {e}")
+            return ""
+
+    def transcribe_sliding_chunk(
+        self,
+        audio_data: np.ndarray,
+        sample_rate: int = 16000,
+        max_window_sec: float = 3.5,
+        prefix_text: str = "",
+        context: str = "",
+        max_new_tokens: int = 36
+    ) -> str:
+        """
+        Transcribe audio using a strictly bounded sliding window.
+        Guarantees constant O(1) inference time regardless of speech duration.
+        """
+        if not self.is_loaded:
+            self.load_model()
+
+        wav = np.asarray(audio_data, dtype=np.float32)
+        if wav.ndim > 1:
+            wav = wav.mean(axis=1)
+
+        # Restrict audio to the trailing max_window_sec window
+        max_samples = int(sample_rate * max_window_sec)
+        if len(wav) > max_samples:
+            wav = wav[-max_samples:]
+
+        if len(wav) < int(sample_rate * 0.4):
+            return ""
+
+        try:
+            # Build prompt with context hotwords and optional prefix continuation
+            full_context = ", ".join(filter(None, [context, prefix_text])) if prefix_text else context
+            prompt = self.model._build_text_prompt(context=full_context or "", force_language=None)
+            inputs = self.model.processor(text=[prompt], audio=[wav], return_tensors="pt", padding=True)
+            inputs = inputs.to(self.model.model.device).to(self.model.model.dtype)
+
+            with torch.no_grad():
+                text_ids = self.model.model.generate(
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    pad_token_id=getattr(self.model.processor.tokenizer, "eos_token_id", 151645)
+                )
+
+            decoded = self.model.processor.batch_decode(
+                text_ids.sequences[:, inputs["input_ids"].shape[1]:],
+                skip_special_tokens=True,
+                clean_up_tokenization_spaces=False
+            )
+
+            if not decoded or not decoded[0]:
+                return ""
+
+            from qwen_asr import parse_asr_output
+            _, text = parse_asr_output(decoded[0], user_language=None)
+            return text.strip()
+        except Exception as e:
+            print(f"[ASREngine] Error in transcribe_sliding_chunk: {e}")
+            return ""
