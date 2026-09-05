@@ -29,9 +29,23 @@ class VoiceTypingDaemon:
         self.db = db or Database()
         self.db.init_db()
         self.engine = engine or ASREngine(lazy_load=True)
+        
+        # Load ASR provider config from DB
+        asr_provider = self.db.get_setting("asr_provider", getattr(self.settings, "ASR_PROVIDER", "local"))
+        asr_endpoint = self.db.get_setting("asr_api_endpoint", getattr(self.settings, "ASR_API_ENDPOINT", "http://127.0.0.1:8000/v1/audio/transcriptions"))
+        asr_key = self.db.get_setting("asr_api_key", getattr(self.settings, "ASR_API_KEY", ""))
+        self.engine.set_config(provider=asr_provider, api_endpoint=asr_endpoint, api_key=asr_key)
+
         qwen_saved = self.db.get_setting("qwen25_enabled", str(getattr(self.settings, "QWEN25_ENABLED", True)))
         self.qwen25_enabled = (qwen_saved.lower() == "true")
         self.grammar = GrammarCorrector(lazy_load=True)
+        
+        # Load Translation provider config from DB
+        trans_provider = self.db.get_setting("translation_provider", getattr(self.settings, "TRANSLATION_PROVIDER", "local"))
+        trans_url = self.db.get_setting("translation_api_base_url", getattr(self.settings, "TRANSLATION_API_BASE_URL", "http://localhost:11434/v1"))
+        trans_key = self.db.get_setting("translation_api_key", getattr(self.settings, "TRANSLATION_API_KEY", "ollama"))
+        trans_model = self.db.get_setting("translation_model_name", getattr(self.settings, "TRANSLATION_MODEL_NAME", "qwen2.5:0.5b"))
+        self.grammar.set_config(provider=trans_provider, api_base_url=trans_url, api_key=trans_key, api_model=trans_model)
 
         # Load UX settings from DB
         cues_enabled = (self.db.get_setting("sound_cues_enabled", "true").lower() == "true")
@@ -525,6 +539,31 @@ class VoiceTypingDaemon:
             print("[VoiceTyping] Qwen2.5 disabled and model unloaded from memory.")
         else:
             print(f"[VoiceTyping] Qwen2.5 enabled state set to: {self.qwen25_enabled}")
+
+    def update_provider_settings(
+        self,
+        asr_provider: Optional[str] = None,
+        asr_endpoint: Optional[str] = None,
+        asr_key: Optional[str] = None,
+        translation_provider: Optional[str] = None,
+        translation_url: Optional[str] = None,
+        translation_key: Optional[str] = None,
+        translation_model: Optional[str] = None,
+    ):
+        """Update active engine and translation provider configs at runtime."""
+        if hasattr(self, "engine") and self.engine:
+            self.engine.set_config(
+                provider=asr_provider or self.engine.provider,
+                api_endpoint=asr_endpoint or self.engine.api_endpoint,
+                api_key=asr_key if asr_key is not None else self.engine.api_key
+            )
+        if hasattr(self, "grammar") and self.grammar:
+            self.grammar.set_config(
+                provider=translation_provider or self.grammar.provider,
+                api_base_url=translation_url or self.grammar.api_base_url,
+                api_key=translation_key if translation_key is not None else self.grammar.api_key,
+                api_model=translation_model or self.grammar.api_model
+            )
 
     def start(self, blocking: bool = False):
         """Start global hotkey listener and tray icon."""

@@ -1,3 +1,5 @@
+import re
+import httpx
 import torch
 from transformers import pipeline
 from config import get_settings
@@ -5,6 +7,11 @@ from config import get_settings
 class GrammarCorrector:
     def __init__(self, lazy_load: bool = False):
         self.settings = get_settings()
+        self.provider = getattr(self.settings, "TRANSLATION_PROVIDER", "local")
+        self.api_base_url = getattr(self.settings, "TRANSLATION_API_BASE_URL", "http://localhost:11434/v1")
+        self.api_key = getattr(self.settings, "TRANSLATION_API_KEY", "ollama")
+        self.api_model = getattr(self.settings, "TRANSLATION_MODEL_NAME", "qwen2.5:0.5b")
+        
         self.model_name = self.settings.GRAMMAR_MODEL_NAME
         self.device = self.settings.DEVICE if torch.cuda.is_available() else "cpu"
         self.dtype = getattr(torch, self.settings.TORCH_DTYPE, torch.bfloat16)
@@ -14,8 +21,26 @@ class GrammarCorrector:
         self.pipeline = None
         self.is_loaded = False
         
-        if not lazy_load:
+        if not lazy_load and self.provider == "local":
             self.load_model()
+
+    def set_config(
+        self,
+        provider: str = "local",
+        api_base_url: str = "http://localhost:11434/v1",
+        api_key: str = "ollama",
+        api_model: str = "qwen2.5:0.5b"
+    ):
+        """Update provider settings dynamically."""
+        prev_provider = self.provider
+        self.provider = provider.strip().lower()
+        self.api_base_url = api_base_url.strip().rstrip("/")
+        self.api_key = api_key.strip()
+        self.api_model = api_model.strip()
+
+        # If switching away from local, unload local model to free VRAM/RAM
+        if prev_provider == "local" and self.provider != "local":
+            self.unload_model()
 
     def load_model(self):
         if self.is_loaded:
@@ -45,19 +70,38 @@ class GrammarCorrector:
             torch.cuda.empty_cache()
         print("[GrammarCorrector] Model unloaded and GPU cache emptied.")
 
+    def _call_openai_api(self, messages: list) -> str:
+        """Calls OpenAI-compatible /chat/completions endpoint (Ollama, vLLM, OpenAI, Groq, etc.)."""
+        endpoint = f"{self.api_base_url}/chat/completions"
+        headers = {
+            "Content-Type": "application/json",
+        }
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
+        payload = {
+            "model": self.api_model,
+            "messages": messages,
+            "temperature": 0.0,
+            "max_tokens": 256
+        }
+
+        print(f"[GrammarCorrector] Calling OpenAI-compatible endpoint: {endpoint} (model: {self.api_model})")
+        with httpx.Client(timeout=15.0) as client:
+            response = client.post(endpoint, json=payload, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"].strip()
+
     def correct(self, text: str, mode: str = "normal", custom_vocab: str = "") -> str:
         """Corrects grammar and spelling, or translates based on the selected mode."""
         if not text.strip():
             return text
-            
-        if not self.is_loaded:
-            self.load_model()
-            
+
         input_text = text
         if mode == "chinese":
-            import re
             # Spoken Vietnamese synonyms for Chinese language (tiếng Hoa, tiếng Tàu, tiếng Hán, tiếng Trung)
-            # are mapped to "tiếng Trung Quốc" so small LLMs (0.5B) don't confuse "Hoa" with Holland/English.
+            # are mapped to "tiếng Trung Quốc" so small LLMs don't confuse "Hoa" with Holland/English.
             input_text = re.sub(r"\b(?:tiếng\s+hoa|tiếng\s+tàu|tiếng\s+hán)\b", "tiếng Trung Quốc", input_text, flags=re.IGNORECASE)
             input_text = re.sub(r"\btiếng\s+trung\b(?!(\s+quốc|\s+niên|\s+học|\s+tâm))", "tiếng Trung Quốc", input_text, flags=re.IGNORECASE)
 
@@ -107,24 +151,27 @@ class GrammarCorrector:
             {"role": "user", "content": user_content},
         ]
 
-        print(f"[GrammarCorrector] Correcting: '{text}'")
+        print(f"[GrammarCorrector] Processing ({self.provider}): '{text}'")
         
         try:
-            outputs = self.pipeline(
-                messages,
-                max_new_tokens=256,
-                do_sample=False, # Use greedy decoding for correction
-                return_full_text=False
-            )
-            
-            corrected = outputs[0]["generated_text"].strip()
+            if self.provider == "remote_api":
+                corrected = self._call_openai_api(messages)
+            else:
+                if not self.is_loaded:
+                    self.load_model()
+                outputs = self.pipeline(
+                    messages,
+                    max_new_tokens=256,
+                    do_sample=False, # Use greedy decoding for correction
+                    return_full_text=False
+                )
+                corrected = outputs[0]["generated_text"].strip()
             
             # Clean any leftover wrapper tags if model echoes them
             if "<raw_transcript>" in corrected or "</raw_transcript>" in corrected:
                 corrected = corrected.replace("<raw_transcript>", "").replace("</raw_transcript>", "").strip()
             
             # Strip common conversational chatter/preambles that LLMs sometimes generate
-            import re
             chatter_patterns = [
                 r"^(?:đúng|chắc chắn|tất nhiên|vâng|dạ)[\s,]+(?:tôi sẽ|tôi có thể|mình sẽ)[^:\n]*[:\n]*",
                 r"^(?:dưới đây là|đây là)\s+(?:đoạn\s+)?(?:văn bản|nội dung|kết quả)[^:\n]*[:\n]*",
@@ -143,6 +190,6 @@ class GrammarCorrector:
                 corrected = corrected[0].upper() + corrected[1:]
                 return corrected
         except Exception as e:
-            print(f"[GrammarCorrector] Error during correction: {e}")
+            print(f"[GrammarCorrector] Error during correction/translation ({self.provider}): {e}")
             
         return text # fallback to original text if fails

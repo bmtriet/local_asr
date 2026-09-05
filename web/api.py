@@ -55,6 +55,13 @@ class TestVocabularyRequest(BaseModel):
 
 class SettingsUpdateRequest(BaseModel):
     hotkey: Optional[str] = None
+    asr_provider: Optional[str] = None
+    asr_api_endpoint: Optional[str] = None
+    asr_api_key: Optional[str] = None
+    translation_provider: Optional[str] = None
+    translation_api_base_url: Optional[str] = None
+    translation_api_key: Optional[str] = None
+    translation_model_name: Optional[str] = None
     qwen25_enabled: Optional[bool] = None
     grammar_correction_enabled: Optional[bool] = None
     translation_target: Optional[str] = None
@@ -67,6 +74,16 @@ class SettingsUpdateRequest(BaseModel):
     vad_enabled: Optional[bool] = None
     vad_silence_timeout: Optional[float] = None
     streaming_transcription_enabled: Optional[bool] = None
+
+class TestTranslationApiRequest(BaseModel):
+    base_url: str
+    api_key: Optional[str] = ""
+    model_name: str
+    sample_text: Optional[str] = "Xin chào, hôm nay thời tiết thế nào?"
+
+class TestAsrApiRequest(BaseModel):
+    endpoint: str
+    api_key: Optional[str] = ""
 
 class ProfileCreateRequest(BaseModel):
     id: str
@@ -292,11 +309,29 @@ def get_current_settings():
     streaming_transcription_str = db.get_setting("streaming_transcription_enabled", str(settings.STREAMING_TRANSCRIPTION_ENABLED)).lower()
     streaming_transcription_enabled = (streaming_transcription_str == "true")
 
+    # ASR Provider settings
+    asr_provider = db.get_setting("asr_provider", getattr(settings, "ASR_PROVIDER", "local"))
+    asr_api_endpoint = db.get_setting("asr_api_endpoint", getattr(settings, "ASR_API_ENDPOINT", "http://127.0.0.1:8000/v1/audio/transcriptions"))
+    asr_api_key = db.get_setting("asr_api_key", getattr(settings, "ASR_API_KEY", ""))
+
+    # Translation Provider settings
+    translation_provider = db.get_setting("translation_provider", getattr(settings, "TRANSLATION_PROVIDER", "local"))
+    translation_api_base_url = db.get_setting("translation_api_base_url", getattr(settings, "TRANSLATION_API_BASE_URL", "http://localhost:11434/v1"))
+    translation_api_key = db.get_setting("translation_api_key", getattr(settings, "TRANSLATION_API_KEY", "ollama"))
+    translation_model_name = db.get_setting("translation_model_name", getattr(settings, "TRANSLATION_MODEL_NAME", "qwen2.5:0.5b"))
+
     return {
         "hotkey": active_hotkey,
         "sample_rate": settings.SAMPLE_RATE,
         "model_name": settings.MODEL_NAME,
         "device": engine.device,
+        "asr_provider": asr_provider,
+        "asr_api_endpoint": asr_api_endpoint,
+        "asr_api_key": asr_api_key,
+        "translation_provider": translation_provider,
+        "translation_api_base_url": translation_api_base_url,
+        "translation_api_key": translation_api_key,
+        "translation_model_name": translation_model_name,
         "qwen25_enabled": qwen25_enabled,
         "grammar_correction_enabled": grammar_enabled,
         "translation_target": translation_target,
@@ -319,6 +354,53 @@ def update_settings(payload: SettingsUpdateRequest):
         db.set_setting("hotkey", cleaned_hotkey)
         if daemon_instance:
             daemon_instance.update_hotkey(cleaned_hotkey)
+
+    if payload.asr_provider is not None:
+        cleaned = payload.asr_provider.strip().lower()
+        settings.ASR_PROVIDER = cleaned
+        db.set_setting("asr_provider", cleaned)
+
+    if payload.asr_api_endpoint is not None:
+        cleaned = payload.asr_api_endpoint.strip()
+        settings.ASR_API_ENDPOINT = cleaned
+        db.set_setting("asr_api_endpoint", cleaned)
+
+    if payload.asr_api_key is not None:
+        cleaned = payload.asr_api_key.strip()
+        settings.ASR_API_KEY = cleaned
+        db.set_setting("asr_api_key", cleaned)
+
+    if payload.translation_provider is not None:
+        cleaned = payload.translation_provider.strip().lower()
+        settings.TRANSLATION_PROVIDER = cleaned
+        db.set_setting("translation_provider", cleaned)
+
+    if payload.translation_api_base_url is not None:
+        cleaned = payload.translation_api_base_url.strip().rstrip("/")
+        settings.TRANSLATION_API_BASE_URL = cleaned
+        db.set_setting("translation_api_base_url", cleaned)
+
+    if payload.translation_api_key is not None:
+        cleaned = payload.translation_api_key.strip()
+        settings.TRANSLATION_API_KEY = cleaned
+        db.set_setting("translation_api_key", cleaned)
+
+    if payload.translation_model_name is not None:
+        cleaned = payload.translation_model_name.strip()
+        settings.TRANSLATION_MODEL_NAME = cleaned
+        db.set_setting("translation_model_name", cleaned)
+
+    # Sync runtime provider settings to active daemon & engine
+    if daemon_instance and hasattr(daemon_instance, "update_provider_settings"):
+        daemon_instance.update_provider_settings(
+            asr_provider=payload.asr_provider,
+            asr_endpoint=payload.asr_api_endpoint,
+            asr_key=payload.asr_api_key,
+            translation_provider=payload.translation_provider,
+            translation_url=payload.translation_api_base_url,
+            translation_key=payload.translation_api_key,
+            translation_model=payload.translation_model_name
+        )
 
     if payload.qwen25_enabled is not None:
         settings.QWEN25_ENABLED = payload.qwen25_enabled
@@ -379,6 +461,86 @@ def update_settings(payload: SettingsUpdateRequest):
         )
         
     return {"status": "updated", "settings": get_current_settings()}
+
+@app.post("/api/settings/test-translation-api")
+def test_translation_api(payload: TestTranslationApiRequest):
+    """Test connection to an OpenAI-compatible /chat/completions endpoint (Ollama, vLLM, OpenAI, Groq, etc.)."""
+    import time
+    import httpx
+
+    endpoint = f"{payload.base_url.strip().rstrip('/')}/chat/completions"
+    headers = {"Content-Type": "application/json"}
+    if payload.api_key:
+        headers["Authorization"] = f"Bearer {payload.api_key.strip()}"
+
+    test_messages = [
+        {"role": "system", "content": "You are a translator. Translate the text to Traditional Chinese (繁體中文). Output only the translated text."},
+        {"role": "user", "content": payload.sample_text or "Xin chào!"}
+    ]
+
+    body = {
+        "model": payload.model_name.strip(),
+        "messages": test_messages,
+        "max_tokens": 64,
+        "temperature": 0.0
+    }
+
+    start_time = time.time()
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            resp = client.post(endpoint, json=body, headers=headers)
+            latency_ms = round((time.time() - start_time) * 1000)
+            if resp.status_code == 200:
+                data = resp.json()
+                content = data["choices"][0]["message"]["content"].strip()
+                return {
+                    "success": True,
+                    "latency_ms": latency_ms,
+                    "model": payload.model_name,
+                    "reply": content,
+                    "message": f"Successfully connected! Latency: {latency_ms}ms"
+                }
+            else:
+                return {
+                    "success": False,
+                    "status_code": resp.status_code,
+                    "error": resp.text[:200],
+                    "message": f"Server responded with HTTP {resp.status_code}"
+                }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "message": f"Connection failed: {str(e)}"
+        }
+
+@app.post("/api/settings/test-asr-api")
+def test_asr_api(payload: TestAsrApiRequest):
+    """Ping remote ASR endpoint to test connectivity."""
+    import time
+    import httpx
+
+    endpoint = payload.endpoint.strip()
+    headers = {}
+    if payload.api_key:
+        headers["Authorization"] = f"Bearer {payload.api_key.strip()}"
+
+    start_time = time.time()
+    try:
+        with httpx.Client(timeout=5.0) as client:
+            resp = client.get(endpoint.replace("/audio/transcriptions", "/models"), headers=headers)
+            latency_ms = round((time.time() - start_time) * 1000)
+            return {
+                "success": True,
+                "latency_ms": latency_ms,
+                "message": f"ASR host reachable! Latency: {latency_ms}ms"
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "message": f"ASR endpoint unreachable: {str(e)}"
+        }
 
 @app.get("/api/vocabulary")
 def get_vocabulary():

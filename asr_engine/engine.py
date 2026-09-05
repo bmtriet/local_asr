@@ -16,6 +16,11 @@ class ASREngine:
         from config import get_settings
         settings = get_settings()
         
+        self.settings = settings
+        self.provider = getattr(settings, "ASR_PROVIDER", "local")
+        self.api_endpoint = getattr(settings, "ASR_API_ENDPOINT", "http://127.0.0.1:8000/v1/audio/transcriptions")
+        self.api_key = getattr(settings, "ASR_API_KEY", "")
+
         self.model_name = model_name or settings.MODEL_NAME
         self.device = device or (settings.DEVICE if torch.cuda.is_available() else "cpu")
         self.dtype = getattr(torch, dtype or settings.TORCH_DTYPE, torch.bfloat16)
@@ -28,8 +33,66 @@ class ASREngine:
         self.is_loaded = False
         self.active_adapter_name: Optional[str] = None
         
-        if not lazy_load:
+        if not lazy_load and self.provider == "local":
             self.load_model()
+
+    def set_config(
+        self,
+        provider: str = "local",
+        api_endpoint: str = "http://127.0.0.1:8000/v1/audio/transcriptions",
+        api_key: str = ""
+    ):
+        """Update provider settings dynamically."""
+        prev_provider = self.provider
+        self.provider = provider.strip().lower()
+        self.api_endpoint = api_endpoint.strip()
+        self.api_key = api_key.strip()
+
+        # If switching away from local, unload local model to free VRAM/RAM
+        if prev_provider == "local" and self.provider != "local":
+            self.unload_model()
+
+    def unload_model(self):
+        """Unloads ASR model from GPU/memory to save resources."""
+        if not self.is_loaded:
+            return
+        print(f"[ASREngine] Unloading {self.model_name} from memory...")
+        self.model = None
+        self.is_loaded = False
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        print("[ASREngine] Model unloaded and GPU cache emptied.")
+
+    def _call_remote_asr_api(self, wav: np.ndarray, sample_rate: int = 16000, context: str = "") -> str:
+        """Call remote OpenAI-compatible /v1/audio/transcriptions or custom ASR endpoint."""
+        import io
+        import httpx
+        buf = io.BytesIO()
+        sf.write(buf, wav, sample_rate, format="WAV")
+        buf.seek(0)
+
+        headers = {}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
+        files = {
+            "file": ("audio.wav", buf, "audio/wav")
+        }
+        data = {
+            "prompt": context or "",
+            "language": "vi"
+        }
+
+        try:
+            print(f"[ASREngine] Calling remote ASR endpoint: {self.api_endpoint}")
+            with httpx.Client(timeout=30.0) as client:
+                response = client.post(self.api_endpoint, files=files, data=data, headers=headers)
+                response.raise_for_status()
+                res_data = response.json()
+                return res_data.get("text", "").strip()
+        except Exception as e:
+            print(f"[ASREngine] Remote ASR API call error: {e}")
+            return ""
 
     def load_model(self):
         """Loads Qwen3ASR model via official qwen_asr package."""
@@ -138,13 +201,8 @@ class ASREngine:
         else:
             if self.active_adapter_name:
                 self.unload_lora_adapter()
-                print(f"[ASREngine] Profile '{clean_id}' has no trained adapter. Reverted to base model.")
-
     def transcribe(self, audio_source: Union[str, np.ndarray], sample_rate: int = 16000, context: str = "") -> str:
         """Transcribe audio with optional context hotword biasing."""
-        if not self.is_loaded:
-            self.load_model()
-
         if isinstance(audio_source, (str, Path)):
             audio_path = str(audio_source)
             wav, sr = sf.read(audio_path)
@@ -160,6 +218,15 @@ class ASREngine:
                 wav = wav.mean(axis=1)
 
         wav = wav.astype(np.float32)
+
+        if self.provider == "remote_api":
+            text = self._call_remote_asr_api(wav, sample_rate, context=context)
+            if text:
+                text = text[0].upper() + text[1:]
+            return text
+
+        if not self.is_loaded:
+            self.load_model()
 
         # Pass user vocabulary / keywords context to Qwen3-ASR
         results = self.model.transcribe((wav, sample_rate), context=context or "")
@@ -236,9 +303,6 @@ class ASREngine:
         Transcribe audio using a strictly bounded sliding window.
         Guarantees constant O(1) inference time regardless of speech duration.
         """
-        if not self.is_loaded:
-            self.load_model()
-
         wav = np.asarray(audio_data, dtype=np.float32)
         if wav.ndim > 1:
             wav = wav.mean(axis=1)
@@ -250,6 +314,12 @@ class ASREngine:
 
         if len(wav) < int(sample_rate * 0.4):
             return ""
+
+        if self.provider == "remote_api":
+            return self._call_remote_asr_api(wav, sample_rate, context=context)
+
+        if not self.is_loaded:
+            self.load_model()
 
         try:
             # Build prompt with context hotwords and optional prefix continuation

@@ -352,6 +352,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const qwenStatusHint = document.getElementById('qwen-status-hint');
   const qwenFeaturesGroup = document.getElementById('qwen-features-group');
   const toggleAddOriginPhrase = document.getElementById('toggle-add-origin-phrase');
+
+  // Translation Provider DOM Elements
+  const radioTransProvLocal = document.getElementById('radio-trans-prov-local');
+  const radioTransProvRemote = document.getElementById('radio-trans-prov-remote');
+  const transLocalContainer = document.getElementById('trans-local-container');
+  const transRemoteContainer = document.getElementById('trans-remote-container');
+  const inputTransApiUrl = document.getElementById('input-trans-api-url');
+  const inputTransModelName = document.getElementById('input-trans-model-name');
+  const inputTransApiKey = document.getElementById('input-trans-api-key');
+  const btnTestTransApi = document.getElementById('btn-test-trans-api');
+  const btnSaveTransApi = document.getElementById('btn-save-trans-api');
+  const transApiTestStatus = document.getElementById('trans-api-test-status');
+
   const selectOsdPosition = document.getElementById('select-osd-position');
   const inputOsdDuration = document.getElementById('input-osd-duration');
   const toggleOsdAlwaysOn = document.getElementById('toggle-osd-always-on');
@@ -364,9 +377,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleVadEnabled = document.getElementById('toggle-vad-enabled');
   const inputVadTimeout = document.getElementById('input-vad-timeout');
   const vadTimeoutGroup = document.getElementById('vad-timeout-group');
+  const toggleStreamingTranscription = document.getElementById('toggle-streaming-transcription');
+  const webStreamingPlayground = document.getElementById('web-streaming-playground');
+  const btnToggleWebStreaming = document.getElementById('btn-toggle-web-streaming');
+  const webStreamingMicIcon = document.getElementById('web-streaming-mic-icon');
+  const webStreamingBtnLabel = document.getElementById('web-streaming-btn-label');
+  const webStreamingLiveBox = document.getElementById('web-streaming-live-box');
   const btnSaveUxSettings = document.getElementById('btn-save-ux-settings');
 
   let isRecordingHotkey = false;
+
+  function setTransProviderUi(provider) {
+    const isRemote = (provider === 'remote_api');
+    if (radioTransProvRemote) radioTransProvRemote.checked = isRemote;
+    if (radioTransProvLocal) radioTransProvLocal.checked = !isRemote;
+    if (transRemoteContainer) transRemoteContainer.style.display = isRemote ? 'block' : 'none';
+    if (transLocalContainer) transLocalContainer.style.display = isRemote ? 'none' : 'block';
+
+    if (qwenFeaturesGroup) {
+      qwenFeaturesGroup.style.opacity = '1.0';
+      qwenFeaturesGroup.style.pointerEvents = 'auto';
+    }
+  }
 
   function updateQwenUiState(enabled) {
     if (toggleQwen25Enabled) {
@@ -382,13 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (qwenStatusHint) {
       if (enabled) {
         qwenStatusHint.style.color = "var(--emerald)";
-        qwenStatusHint.textContent = "Active: Translation & Grammar available (~1.0GB VRAM/RAM).";
+        qwenStatusHint.textContent = "Active: Translation & Grammar available locally.";
       } else {
         qwenStatusHint.style.color = "var(--text-muted)";
         qwenStatusHint.textContent = "Disabled: Model not loaded. Saves ~1.0GB memory & boots faster.";
       }
     }
-    if (qwenFeaturesGroup) {
+    if (qwenFeaturesGroup && (!radioTransProvRemote || !radioTransProvRemote.checked)) {
       qwenFeaturesGroup.style.opacity = enabled ? "1.0" : "0.4";
       qwenFeaturesGroup.style.pointerEvents = enabled ? "auto" : "none";
     }
@@ -402,6 +434,21 @@ document.addEventListener('DOMContentLoaded', () => {
         inputHotkey.value = data.hotkey;
         updatePresetActiveBadge(data.hotkey);
       }
+
+      // Load Translation Provider Settings
+      if (data.translation_provider) {
+        setTransProviderUi(data.translation_provider);
+      }
+      if (inputTransApiUrl && data.translation_api_base_url) {
+        inputTransApiUrl.value = data.translation_api_base_url;
+      }
+      if (inputTransModelName && data.translation_model_name) {
+        inputTransModelName.value = data.translation_model_name;
+      }
+      if (inputTransApiKey && data.translation_api_key) {
+        inputTransApiKey.value = data.translation_api_key;
+      }
+
       if (data.qwen25_enabled !== undefined) {
         updateQwenUiState(!!data.qwen25_enabled);
       }
@@ -438,6 +485,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (inputVadTimeout && data.vad_silence_timeout !== undefined) {
         inputVadTimeout.value = data.vad_silence_timeout;
+      }
+      if (toggleStreamingTranscription && data.streaming_transcription_enabled !== undefined) {
+        toggleStreamingTranscription.checked = !!data.streaming_transcription_enabled;
+        if (webStreamingPlayground) {
+          webStreamingPlayground.style.display = toggleStreamingTranscription.checked ? "block" : "none";
+        }
       }
     } catch (err) {
       console.error(err);
@@ -541,6 +594,132 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Translation Provider Switch Events
+  if (radioTransProvLocal) {
+    radioTransProvLocal.addEventListener('change', async (e) => {
+      if (e.target.checked) {
+        setTransProviderUi('local');
+        try {
+          await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ translation_provider: 'local' })
+          });
+        } catch (err) {
+          console.error('Error switching translation provider to local:', err);
+        }
+      }
+    });
+  }
+
+  if (radioTransProvRemote) {
+    radioTransProvRemote.addEventListener('change', async (e) => {
+      if (e.target.checked) {
+        setTransProviderUi('remote_api');
+        try {
+          await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ translation_provider: 'remote_api' })
+          });
+        } catch (err) {
+          console.error('Error switching translation provider to remote_api:', err);
+        }
+      }
+    });
+  }
+
+  // Test Translation API connection
+  if (btnTestTransApi) {
+    btnTestTransApi.addEventListener('click', async () => {
+      const baseUrl = (inputTransApiUrl ? inputTransApiUrl.value : '').trim();
+      const modelName = (inputTransModelName ? inputTransModelName.value : '').trim();
+      const apiKey = (inputTransApiKey ? inputTransApiKey.value : '').trim();
+
+      if (!baseUrl) {
+        alert('Please enter an API Base URL (e.g. http://localhost:11434/v1).');
+        return;
+      }
+      if (!modelName) {
+        alert('Please enter a model name (e.g. qwen2.5:0.5b).');
+        return;
+      }
+
+      btnTestTransApi.disabled = true;
+      btnTestTransApi.textContent = 'Testing...';
+      if (transApiTestStatus) {
+        transApiTestStatus.style.display = 'block';
+        transApiTestStatus.style.color = 'var(--text-secondary)';
+        transApiTestStatus.textContent = 'Connecting to endpoint...';
+      }
+
+      try {
+        const res = await fetch('/api/settings/test-translation-api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base_url: baseUrl,
+            model_name: modelName,
+            api_key: apiKey,
+            sample_text: "Xin chào!"
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          transApiTestStatus.style.color = 'var(--emerald)';
+          transApiTestStatus.innerHTML = `✅ <strong>Connected (${data.latency_ms}ms)!</strong> Sample reply: <em>"${escapeHtml(data.reply)}"</em>`;
+        } else {
+          transApiTestStatus.style.color = 'var(--rose)';
+          transApiTestStatus.innerHTML = `❌ <strong>Failed:</strong> ${escapeHtml(data.message || data.error)}`;
+        }
+      } catch (err) {
+        transApiTestStatus.style.color = 'var(--rose)';
+        transApiTestStatus.textContent = `❌ Error: ${err.message}`;
+      } finally {
+        btnTestTransApi.disabled = false;
+        btnTestTransApi.textContent = '⚡ Test Connection';
+      }
+    });
+  }
+
+  // Save Translation API configuration
+  if (btnSaveTransApi) {
+    btnSaveTransApi.addEventListener('click', async () => {
+      const baseUrl = (inputTransApiUrl ? inputTransApiUrl.value : '').trim();
+      const modelName = (inputTransModelName ? inputTransModelName.value : '').trim();
+      const apiKey = (inputTransApiKey ? inputTransApiKey.value : '').trim();
+
+      if (!baseUrl) {
+        alert('Please enter an API Base URL.');
+        return;
+      }
+      if (!modelName) {
+        alert('Please enter a model name.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            translation_provider: 'remote_api',
+            translation_api_base_url: baseUrl,
+            translation_model_name: modelName,
+            translation_api_key: apiKey
+          })
+        });
+        if (res.ok) {
+          alert('Remote API Configuration saved successfully!');
+        } else {
+          alert('Failed to save API Configuration.');
+        }
+      } catch (err) {
+        alert('Error saving API config: ' + err.message);
+      }
+    });
+  }
+
   if (toggleQwen25Enabled) {
     toggleQwen25Enabled.addEventListener('change', async (e) => {
       const isEnabled = e.target.checked;
@@ -631,6 +810,126 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (toggleStreamingTranscription) {
+    toggleStreamingTranscription.addEventListener('change', (e) => {
+      if (webStreamingPlayground) {
+        webStreamingPlayground.style.display = e.target.checked ? "block" : "none";
+      }
+    });
+  }
+
+  // Web Live Dictation (Microphone streaming over WebSocket)
+  let webStreamingSocket = null;
+  let webAudioContext = null;
+  let webAudioStream = null;
+  let webAudioProcessor = null;
+  let isWebStreaming = false;
+
+  function stopWebStreaming() {
+    isWebStreaming = false;
+    if (webStreamingBtnLabel) webStreamingBtnLabel.textContent = "Start Speaking";
+    if (btnToggleWebStreaming) {
+      btnToggleWebStreaming.classList.remove('btn-primary');
+      btnToggleWebStreaming.classList.add('btn-secondary');
+    }
+    if (webStreamingProcessor) {
+      try { webStreamingProcessor.disconnect(); } catch (e) {}
+      webStreamingProcessor = null;
+    }
+    if (webAudioStream) {
+      webAudioStream.getTracks().forEach(t => t.stop());
+      webAudioStream = null;
+    }
+    if (webAudioContext) {
+      try { webAudioContext.close(); } catch (e) {}
+      webAudioContext = null;
+    }
+    if (webStreamingSocket && webStreamingSocket.readyState === WebSocket.OPEN) {
+      webStreamingSocket.send(JSON.stringify({ event: "finish" }));
+      setTimeout(() => {
+        try { webStreamingSocket.close(); } catch (e) {}
+        webStreamingSocket = null;
+      }, 500);
+    }
+  }
+
+  async function startWebStreaming() {
+    try {
+      webStreamingLiveBox.innerHTML = '<span style="color: #38bdf8;">Connecting & listening... Speak into microphone...</span>';
+      
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${wsProtocol}//${window.location.host}/api/ws/streaming-transcribe`;
+      webStreamingSocket = new WebSocket(wsUrl);
+      webStreamingSocket.binaryType = "arraybuffer";
+
+      webStreamingSocket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.event === "partial_text") {
+            webStreamingLiveBox.innerHTML = `<span style="color: #38bdf8; font-weight: 500;">${escapeHtml(data.text)}</span> <span class="streaming-cursor">|</span>`;
+            webStreamingLiveBox.scrollTop = webStreamingLiveBox.scrollHeight;
+          } else if (data.event === "final_text") {
+            webStreamingLiveBox.innerHTML = `<span style="color: #34d399; font-weight: 600;">${escapeHtml(data.text || "(No speech detected)")}</span>`;
+            webStreamingLiveBox.scrollTop = webStreamingLiveBox.scrollHeight;
+          }
+        } catch (e) {
+          console.error("WS Parse error:", e);
+        }
+      };
+
+      webStreamingSocket.onerror = (e) => {
+        console.error("WS Error:", e);
+        webStreamingLiveBox.innerHTML = '<span style="color: var(--rose);">WebSocket streaming error. Check console.</span>';
+        stopWebStreaming();
+      };
+
+      webStreamingSocket.onopen = async () => {
+        try {
+          webAudioStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          webAudioContext = new AudioContext({ sampleRate: 16000 });
+          const source = webAudioContext.createMediaStreamSource(webAudioStream);
+
+          // ScriptProcessorNode buffers chunks of PCM audio (4096 frames ~ 0.25s at 16kHz)
+          webStreamingProcessor = webAudioContext.createScriptProcessor(4096, 1, 1);
+          webStreamingProcessor.onaudioprocess = (e) => {
+            if (!isWebStreaming || !webStreamingSocket || webStreamingSocket.readyState !== WebSocket.OPEN) return;
+            const inputData = e.inputBuffer.getChannelData(0);
+            // Send float32 buffer directly over WebSocket
+            webStreamingSocket.send(inputData.buffer);
+          };
+
+          source.connect(webStreamingProcessor);
+          webStreamingProcessor.connect(webAudioContext.destination);
+
+          isWebStreaming = true;
+          if (webStreamingBtnLabel) webStreamingBtnLabel.textContent = "Stop Dictation";
+          if (btnToggleWebStreaming) {
+            btnToggleWebStreaming.classList.remove('btn-secondary');
+            btnToggleWebStreaming.classList.add('btn-primary');
+          }
+        } catch (micErr) {
+          console.error("Microphone access error:", micErr);
+          alert("Microphone access error: " + micErr.message);
+          stopWebStreaming();
+        }
+      };
+    } catch (err) {
+      alert("Error starting live dictation: " + err.message);
+      stopWebStreaming();
+    }
+  }
+
+  if (btnToggleWebStreaming) {
+    btnToggleWebStreaming.addEventListener('click', () => {
+      if (isWebStreaming) {
+        stopWebStreaming();
+      } else {
+        startWebStreaming();
+      }
+    });
+  }
+
   if (btnSaveUxSettings) {
     btnSaveUxSettings.addEventListener('click', async () => {
       try {
@@ -638,7 +937,8 @@ document.addEventListener('DOMContentLoaded', () => {
           sound_cues_enabled: toggleSoundCues ? toggleSoundCues.checked : true,
           hotkey_mode: selectHotkeyMode ? selectHotkeyMode.value : 'toggle',
           vad_enabled: toggleVadEnabled ? toggleVadEnabled.checked : false,
-          vad_silence_timeout: inputVadTimeout ? parseFloat(inputVadTimeout.value) || 2.0 : 2.0
+          vad_silence_timeout: inputVadTimeout ? parseFloat(inputVadTimeout.value) || 2.0 : 2.0,
+          streaming_transcription_enabled: toggleStreamingTranscription ? toggleStreamingTranscription.checked : false
         };
         const res = await fetch('/api/settings', {
           method: 'POST',
@@ -677,14 +977,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnImportVocabTrigger = document.getElementById('btn-import-vocab-trigger');
   const inputImportVocabFile = document.getElementById('input-import-vocab-file');
 
-  const inputTestVocab = document.getElementById('input-test-vocab');
-  const btnRunTestVocab = document.getElementById('btn-run-test-vocab');
-  const vocabTestResult = document.getElementById('vocab-test-result');
+  const inputVocabSearch = document.getElementById('input-vocab-search');
+  const btnVocabSearchClear = document.getElementById('btn-vocab-search-clear');
+
+  const vocabBadgeCloud = document.getElementById('vocab-badge-cloud');
+  const vocabDetailCard = document.getElementById('vocab-detail-card');
+  const vocabDetailTargetText = document.getElementById('vocab-detail-target-text');
+  const vocabDetailAliasCount = document.getElementById('vocab-detail-alias-count');
+  const vocabDetailAliasesList = document.getElementById('vocab-detail-aliases-list');
+  const vocabDetailDescText = document.getElementById('vocab-detail-desc-text');
+  const vocabDetailDescGroup = document.getElementById('vocab-detail-desc-group');
+  const btnVocabDetailEdit = document.getElementById('btn-vocab-detail-edit');
+  const btnVocabDetailDelete = document.getElementById('btn-vocab-detail-delete');
+  const btnVocabDetailClose = document.getElementById('btn-vocab-detail-close');
 
   let editingTargetOriginal = null;
   let cachedVocabItems = [];
+  let vocabSearchQuery = '';
   let vocabCurrentPage = 1;
-  const vocabPageSize = 5;
+  const vocabPageSize = 50; // 50 items per page as requested
+  let activeSelectedTarget = null;
+
+  function getFilteredVocabItems() {
+    if (!vocabSearchQuery) return cachedVocabItems;
+    const q = vocabSearchQuery.toLowerCase();
+    return cachedVocabItems.filter(item => {
+      const matchTarget = item.target.toLowerCase().includes(q);
+      const matchDesc = (item.description || '').toLowerCase().includes(q);
+      const matchAlias = (item.aliases || []).some(a => a.toLowerCase().includes(q));
+      return matchTarget || matchDesc || matchAlias;
+    });
+  }
 
   const vocabPaginationBar = document.getElementById('vocab-pagination-bar');
   const vocabPaginationInfo = document.getElementById('vocab-pagination-info');
@@ -713,20 +1036,19 @@ document.addEventListener('DOMContentLoaded', () => {
       renderVocabulary();
     } catch (err) {
       console.error('Failed to load vocabulary:', err);
-      if (vocabTableBody) {
-        vocabTableBody.innerHTML = `
-          <tr>
-            <td colspan="4" style="text-align: center; color: var(--rose); padding: 1.5rem;">
-              Failed to load vocabulary: ${err.message}
-            </td>
-          </tr>
+      if (vocabBadgeCloud) {
+        vocabBadgeCloud.innerHTML = `
+          <div class="vocab-cloud-empty" style="color: var(--rose);">
+            Failed to load vocabulary: ${escapeHtml(err.message)}
+          </div>
         `;
       }
     }
   }
 
   function updateVocabPagination() {
-    const totalCount = cachedVocabItems.length;
+    const filtered = getFilteredVocabItems();
+    const totalCount = filtered.length;
     const totalPages = Math.max(1, Math.ceil(totalCount / vocabPageSize));
 
     if (vocabCurrentPage > totalPages) vocabCurrentPage = totalPages;
@@ -739,7 +1061,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (vocabPaginationInfo) {
       const start = totalCount === 0 ? 0 : (vocabCurrentPage - 1) * vocabPageSize + 1;
       const end = Math.min(vocabCurrentPage * vocabPageSize, totalCount);
-      vocabPaginationInfo.textContent = `Showing ${start}-${end} of ${totalCount} words (Page ${vocabCurrentPage}/${totalPages})`;
+      const querySuffix = vocabSearchQuery ? ` (filtered from ${cachedVocabItems.length})` : '';
+      vocabPaginationInfo.textContent = `Showing ${start}-${end} of ${totalCount} words${querySuffix} (Page ${vocabCurrentPage}/${totalPages})`;
     }
 
     if (btnVocabPrevPage) btnVocabPrevPage.disabled = (vocabCurrentPage <= 1);
@@ -780,7 +1103,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnVocabNextPage) {
     btnVocabNextPage.addEventListener('click', () => {
-      const totalPages = Math.ceil(cachedVocabItems.length / vocabPageSize);
+      const filtered = getFilteredVocabItems();
+      const totalPages = Math.ceil(filtered.length / vocabPageSize);
       if (vocabCurrentPage < totalPages) {
         vocabCurrentPage++;
         renderVocabulary();
@@ -788,54 +1112,162 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function showVocabDetail(item) {
+    if (!vocabDetailCard || !item) return;
+    activeSelectedTarget = item.target;
+    
+    // Highlight active badge in cloud
+    const allBadges = document.querySelectorAll('.vocab-word-badge');
+    allBadges.forEach(b => {
+      if (b.getAttribute('data-target') === item.target) {
+        b.classList.add('selected');
+      } else {
+        b.classList.remove('selected');
+      }
+    });
+
+    vocabDetailTargetText.textContent = item.target;
+    const aliases = item.aliases || [];
+    vocabDetailAliasCount.textContent = `${aliases.length} ${aliases.length === 1 ? 'alias' : 'aliases'}`;
+    
+    if (aliases.length > 0) {
+      vocabDetailAliasesList.innerHTML = aliases.map(a => 
+        `<span class="vocab-detail-alias-badge">${escapeHtml(a)}</span>`
+      ).join('');
+    } else {
+      vocabDetailAliasesList.innerHTML = `<span style="font-size: 0.775rem; color: var(--text-muted);">(No spoken aliases configured yet)</span>`;
+    }
+
+    if (item.description && item.description.trim()) {
+      vocabDetailDescText.textContent = item.description.trim();
+      vocabDetailDescGroup.style.display = 'block';
+    } else {
+      vocabDetailDescGroup.style.display = 'none';
+    }
+
+    vocabDetailCard.style.display = 'block';
+  }
+
+  function hideVocabDetail() {
+    if (!vocabDetailCard) return;
+    vocabDetailCard.style.display = 'none';
+    activeSelectedTarget = null;
+    const allBadges = document.querySelectorAll('.vocab-word-badge');
+    allBadges.forEach(b => b.classList.remove('selected'));
+  }
+
+  if (btnVocabDetailClose) {
+    btnVocabDetailClose.addEventListener('click', hideVocabDetail);
+  }
+
+  if (btnVocabDetailEdit) {
+    btnVocabDetailEdit.addEventListener('click', () => {
+      if (!activeSelectedTarget) return;
+      const item = cachedVocabItems.find(i => i.target.toLowerCase() === activeSelectedTarget.toLowerCase());
+      if (item) {
+        openVocabModal(item);
+      }
+    });
+  }
+
+  if (btnVocabDetailDelete) {
+    btnVocabDetailDelete.addEventListener('click', () => {
+      if (!activeSelectedTarget) return;
+      window.deleteVocabItem(encodeURIComponent(activeSelectedTarget));
+    });
+  }
+
+  // Quick Search Event Listeners
+  if (inputVocabSearch) {
+    inputVocabSearch.addEventListener('input', (e) => {
+      vocabSearchQuery = (e.target.value || '').trim();
+      if (btnVocabSearchClear) {
+        btnVocabSearchClear.style.display = vocabSearchQuery ? 'inline-flex' : 'none';
+      }
+      vocabCurrentPage = 1;
+      renderVocabulary();
+    });
+  }
+
+  if (btnVocabSearchClear) {
+    btnVocabSearchClear.addEventListener('click', () => {
+      if (inputVocabSearch) {
+        inputVocabSearch.value = '';
+        inputVocabSearch.focus();
+      }
+      vocabSearchQuery = '';
+      btnVocabSearchClear.style.display = 'none';
+      vocabCurrentPage = 1;
+      renderVocabulary();
+    });
+  }
+
   function renderVocabulary() {
-    if (!vocabTableBody) return;
+    if (!vocabBadgeCloud) return;
     updateVocabPagination();
 
+    const filtered = getFilteredVocabItems();
+
     if (cachedVocabItems.length === 0) {
-      vocabTableBody.innerHTML = `
-        <tr>
-          <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">
-            No custom vocabulary yet. Click "+ Add Word" to define keywords and aliases.
-          </td>
-        </tr>
+      vocabBadgeCloud.innerHTML = `
+        <div class="vocab-cloud-empty">
+          No custom vocabulary yet. Click "+ Add Word" to define keywords and aliases.
+        </div>
       `;
+      hideVocabDetail();
       return;
     }
 
-    // Slice current 5 items for the page
+    if (filtered.length === 0) {
+      vocabBadgeCloud.innerHTML = `
+        <div class="vocab-cloud-empty">
+          No keywords match "<strong>${escapeHtml(vocabSearchQuery)}</strong>".
+        </div>
+      `;
+      hideVocabDetail();
+      return;
+    }
+
+    // Slice 50 items for the current page
     const startIdx = (vocabCurrentPage - 1) * vocabPageSize;
-    const pageItems = cachedVocabItems.slice(startIdx, startIdx + vocabPageSize);
+    const pageItems = filtered.slice(startIdx, startIdx + vocabPageSize);
 
-    vocabTableBody.innerHTML = pageItems.map(item => {
+    vocabBadgeCloud.innerHTML = pageItems.map(item => {
       const targetSafe = escapeHtml(item.target);
-      const descSafe = escapeHtml(item.description || '-');
-      const aliasesHtml = (item.aliases || []).map(a => 
-        `<span class="vocab-alias-tag">${escapeHtml(a)}</span>`
-      ).join('');
-
+      const aliasCount = (item.aliases || []).length;
+      const isSelected = activeSelectedTarget === item.target;
       return `
-        <tr>
-          <td>
-            <span class="vocab-target-badge">${targetSafe}</span>
-          </td>
-          <td>
-            ${aliasesHtml || '<span style="color: var(--text-muted); font-size: 0.75rem;">(No aliases)</span>'}
-          </td>
-          <td class="vocab-desc">${descSafe}</td>
-          <td>
-            <div class="vocab-row-actions">
-              <button class="btn btn-secondary btn-xs" onclick="window.editVocabItem('${encodeURIComponent(item.target)}')">
-                Edit
-              </button>
-              <button class="btn btn-secondary btn-xs btn-delete" onclick="window.deleteVocabItem('${encodeURIComponent(item.target)}')">
-                Delete
-              </button>
-            </div>
-          </td>
-        </tr>
+        <div class="vocab-word-badge ${isSelected ? 'selected' : ''}" data-target="${escapeHtml(item.target)}" title="Click to view aliases and mapping details">
+          <span class="vocab-word-target">${targetSafe}</span>
+          <span class="vocab-word-pill">${aliasCount}</span>
+        </div>
       `;
     }).join('');
+
+    // Attach click listener on each badge
+    vocabBadgeCloud.querySelectorAll('.vocab-word-badge').forEach(badgeEl => {
+      badgeEl.addEventListener('click', () => {
+        const targetName = badgeEl.getAttribute('data-target');
+        const item = cachedVocabItems.find(i => i.target === targetName);
+        if (item) {
+          if (activeSelectedTarget === item.target && vocabDetailCard.style.display !== 'none') {
+            hideVocabDetail();
+          } else {
+            showVocabDetail(item);
+          }
+        }
+      });
+    });
+
+    // If currently selected word is still in filtered results, update detail card
+    if (activeSelectedTarget) {
+      const currentItem = filtered.find(i => i.target === activeSelectedTarget);
+      if (currentItem) {
+        showVocabDetail(currentItem);
+      } else {
+        hideVocabDetail();
+      }
+    }
   }
 
   function openVocabModal(item = null) {
@@ -949,64 +1381,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) {
         throw new Error('Failed to delete word.');
       }
+      if (activeSelectedTarget && activeSelectedTarget.toLowerCase() === targetName.toLowerCase()) {
+        hideVocabDetail();
+      }
       await loadVocabulary();
     } catch (err) {
       alert('Error deleting word: ' + err.message);
     }
   };
-
-  // Test mapping simulator
-  async function runVocabTest() {
-    if (!inputTestVocab || !vocabTestResult) return;
-    const phrase = inputTestVocab.value.trim();
-    if (!phrase) {
-      vocabTestResult.classList.remove('active');
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/vocabulary/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: phrase })
-      });
-      const data = await res.json();
-      
-      const origSafe = escapeHtml(data.original);
-      const mappedSafe = escapeHtml(data.mapped);
-      
-      if (data.changed) {
-        vocabTestResult.innerHTML = `
-          <div><strong style="color: var(--text-secondary);">Input:</strong> "${origSafe}"</div>
-          <div style="margin-top: 0.25rem;">
-            <strong style="color: var(--emerald);">Mapped Result:</strong> 
-            <span class="mapped-highlight">"${mappedSafe}"</span>
-          </div>
-        `;
-      } else {
-        vocabTestResult.innerHTML = `
-          <div><strong style="color: var(--text-secondary);">Result:</strong> "${mappedSafe}" <span style="color: var(--text-muted); font-size: 0.75rem;">(No keywords matched)</span></div>
-        `;
-      }
-      vocabTestResult.classList.add('active');
-    } catch (err) {
-      vocabTestResult.innerHTML = `<span style="color: var(--rose);">Test error: ${err.message}</span>`;
-      vocabTestResult.classList.add('active');
-    }
-  }
-
-  if (btnRunTestVocab) {
-    btnRunTestVocab.addEventListener('click', runVocabTest);
-  }
-
-  if (inputTestVocab) {
-    inputTestVocab.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        runVocabTest();
-      }
-    });
-  }
 
   // Export & Import vocabulary.json
   if (btnExportVocab) {

@@ -12,12 +12,19 @@ class Settings(BaseSettings):
     VOCABULARY_PATH: Path = DATA_DIR / "vocabulary.json"
     
     # ASR Model settings
+    ASR_PROVIDER: str = "local" # "local" or "remote_api"
+    ASR_API_ENDPOINT: str = "http://127.0.0.1:8000/v1/audio/transcriptions"
+    ASR_API_KEY: str = ""
     MODEL_NAME: str = "Qwen/Qwen3-ASR-0.6B"
     DEVICE: str = "cuda"
     TORCH_DTYPE: str = "bfloat16"
     CPU_THREADS: int = min(4, os.cpu_count() or 4)
     
     # Grammar Correction & Translation Model settings
+    TRANSLATION_PROVIDER: str = "local" # "local" or "remote_api"
+    TRANSLATION_API_BASE_URL: str = "http://localhost:11434/v1"
+    TRANSLATION_API_KEY: str = "ollama"
+    TRANSLATION_MODEL_NAME: str = "qwen2.5:0.5b"
     QWEN25_ENABLED: bool = True
     GRAMMAR_MODEL_NAME: str = "Qwen/Qwen2.5-0.5B-Instruct"
     GRAMMAR_CORRECTION_ENABLED: bool = False
@@ -33,6 +40,9 @@ class Settings(BaseSettings):
     OSD_POSITION: str = "top-left" # top-left, top-right, bottom-left, bottom-right, center
     OSD_DURATION: float = 2.0
     OSD_ALWAYS_ON: bool = False
+
+    # Real-time Streaming Transcription settings
+    STREAMING_TRANSCRIPTION_ENABLED: bool = False
     
     # Server settings
     HOST: str = "127.0.0.1"
