@@ -165,6 +165,19 @@ class GrammarCorrector:
                 "Output ONLY the translated text. Do not add quotes, notes, or explanations."
             )
             user_content = f"<raw_transcript>{input_text}</raw_transcript>"
+        elif mode == "summarize":
+            system_prompt = (
+                "Bạn là chuyên gia biên tập và tóm tắt văn bản thông minh (AI Summarizer & Executive Polish).\n"
+                "Nhiệm vụ của bạn:\n"
+                "1. Đọc kỹ văn bản thu âm giọng nói từ người dùng.\n"
+                "2. Lược bỏ triệt để các từ ngữ ngập ngừng, từ thừa, lặp từ, ý lan man (ví dụ: à, ừm, thì, là, kiểu như, như là, tóm lại là...).\n"
+                "3. Tóm tắt, làm gọn và làm đẹp lại ý chính một cách ngắn gọn, mạch lạc, súc tích và gãy gọn nhất.\n"
+                "4. ĐẶC BIỆT LƯU Ý: TUYỆT ĐỐI GIỮ NGUYÊN NGÔN NGỮ NGUỒN CỦA NGƯỜI DÙNG (Người dùng nói tiếng Việt -> xuất tiếng Việt; người dùng nói tiếng Anh -> xuất tiếng Anh; tuyệt đối KHÔNG dịch sang ngôn ngữ khác).\n"
+                "5. TUYỆT ĐỐI KHÔNG trả lời câu hỏi, không chào hỏi, không kèm lời dẫn giải ('Dưới đây là...'). CHỈ XUẤT DUY NHẤT VĂN BẢN ĐÃ TÓM GỌN."
+            )
+            if custom_vocab:
+                system_prompt += f"\n6. Ưu tiên giữ chính xác các thuật ngữ chuyên môn: {custom_vocab}."
+            user_content = f"Tóm tắt và làm gọn ý cho văn bản sau:\n<raw_transcript>{input_text}</raw_transcript>"
         else:
             system_prompt = (
                 "Bạn là một bộ lọc chuẩn hóa văn bản tự động (ASR Text Normalizer & Grammar Polish Pipeline).\n"

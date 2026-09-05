@@ -251,6 +251,9 @@ class VoiceTypingDaemon:
                 elif char == 'z':
                     selected_mode = "chinese"
                     should_backspace = True
+                elif char == 's':
+                    selected_mode = "summarize"
+                    should_backspace = True
                 elif char == ' ':
                     selected_mode = "normal"
                     should_backspace = True
@@ -417,8 +420,8 @@ class VoiceTypingDaemon:
                         if active_mode == "normal":
                             translated = self.normalizer.normalize(translated)
                         
-                        # Check "add origin phrase" setting when translating
-                        if active_mode != "normal":
+                        # Check "add origin phrase" setting only for translation modes (english/chinese)
+                        if active_mode in ["english", "chinese"]:
                             add_origin = self.settings.ADD_ORIGIN_PHRASE
                             if str(self.db.get_setting("add_origin_phrase", "false")).lower() == "true":
                                 add_origin = True

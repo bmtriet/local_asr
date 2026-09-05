@@ -69,11 +69,13 @@ def draw_smooth_polygon(cr, points):
     cr.close_path()
 
 class GlowingFluidOSD(Gtk.Window):
-    def __init__(self, position="top-left", duration=2.0, always_on=False):
+    def __init__(self, position="top-left", duration=2.0, always_on=False, initial_mode="normal"):
         super().__init__(type=Gtk.WindowType.POPUP)
         self.position = position
         self.duration = duration
         self.always_on = always_on
+        self.active_mode = initial_mode  # "normal" | "english" | "chinese"
+        self.live_text = ""
 
         self.set_app_paintable(True)
         self.set_decorated(False)
@@ -86,13 +88,13 @@ class GlowingFluidOSD(Gtk.Window):
             self.set_visual(visual)
 
         # Window dimensions (generous margin to allow glowing waves to burst outwards freely)
-        self.win_width = 440
+        self.win_width = 480
         self.win_height = 240
         self.cx = self.win_width / 2.0
         self.cy = self.win_height / 2.0
 
-        # Ellipse base axes (Core GUI fits nicely inside rx=145, ry=72)
-        self.rx = 145.0
+        # Ellipse base axes (Core GUI fits nicely inside rx=165, ry=72)
+        self.rx = 165.0
         self.ry = 72.0
 
         # Position calculation: Detect which monitor currently has the mouse cursor
@@ -162,10 +164,42 @@ class GlowingFluidOSD(Gtk.Window):
         # Animation timer ~ 30 FPS (33ms)
         GLib.timeout_add(33, self.on_tick)
 
+        # Watch stdin for real-time mode update commands from daemon
+        try:
+            channel = GLib.IOChannel.unix_new(sys.stdin.fileno())
+            GLib.io_add_watch(channel, GLib.IO_IN | GLib.IO_HUP, self.on_stdin_data)
+        except Exception as e:
+            print(f"[OSD] Stdin listener notice: {e}")
+
         # Auto close timeout if not always_on
         if not self.always_on:
             close_ms = int(max(0.5, self.duration) * 1000)
-            GLib.timeout_add(close_ms, self.on_timeout)
+            self._timeout_id = GLib.timeout_add(close_ms, self.on_timeout)
+        else:
+            self._timeout_id = None
+
+    def on_stdin_data(self, channel, condition):
+        if condition & GLib.IO_HUP:
+            self.cleanup()
+            return False
+        try:
+            line = sys.stdin.readline()
+            if not line:
+                return False
+            raw_line = line.strip()
+            cmd = raw_line.lower()
+            if cmd in ["english", "chinese", "summarize", "normal"]:
+                self.active_mode = cmd
+                self.queue_draw()
+            elif cmd.startswith("text:"):
+                self.live_text = raw_line[5:].strip()
+                self.queue_draw()
+            elif cmd == "close":
+                self.cleanup()
+                return False
+        except Exception:
+            pass
+        return True
 
     def on_tick(self):
         self.t += 0.07
@@ -363,15 +397,25 @@ class GlowingFluidOSD(Gtk.Window):
         cr.stroke()
         cr.restore()
 
-        # "Listening..." Title text with speech activity indicator
+        # "Listening..." Title text with speech activity & translation mode indicator
         cr.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
         cr.set_font_size(12.5)
+        
+        mode_suffix = ""
+        active = getattr(self, "active_mode", "normal")
+        if active == "english":
+            mode_suffix = " (English)"
+        elif active == "chinese":
+            mode_suffix = " (Chinese)"
+        elif active == "summarize":
+            mode_suffix = " (Summarize)"
+
         if audio_boost > 0.15:
             cr.set_source_rgba(0.25, 0.90, 1.00, 1.0)
-            status_title = "Listening..."
+            status_title = f"Listening{mode_suffix}..."
         else:
             cr.set_source_rgba(0.65, 0.78, 0.90, 0.85)
-            status_title = "Ready..."
+            status_title = f"Ready{mode_suffix}..."
         cr.move_to(mic_x + 16, self.cy - 23)
         cr.show_text(status_title)
 
@@ -398,7 +442,7 @@ class GlowingFluidOSD(Gtk.Window):
         cr.restore()
 
         # Mode Shortcuts (Aligned horizontally on one line)
-        def draw_horizontal_shortcut(x_start, y_pos, key_char, label_text, border_rgba):
+        def draw_horizontal_shortcut(x_start, y_pos, key_char, label_text, border_rgba, is_active=False):
             badge_h = 16.0
             cr.save()
             cr.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
@@ -407,44 +451,64 @@ class GlowingFluidOSD(Gtk.Window):
             key_w = max(18.0, ke.width + 8.0)
 
             # Key background
-            cr.set_source_rgba(0.10, 0.16, 0.26, 0.85)
+            if is_active:
+                # Vibrant glowing background when active
+                cr.set_source_rgba(0.06, 0.75, 0.95, 0.90)
+            else:
+                cr.set_source_rgba(0.10, 0.16, 0.26, 0.85)
             cr.rectangle(x_start, y_pos, key_w, badge_h)
             cr.fill()
 
             # Key border
-            cr.set_source_rgba(*border_rgba)
-            cr.set_line_width(1.0)
+            if is_active:
+                cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
+                cr.set_line_width(1.5)
+            else:
+                cr.set_source_rgba(*border_rgba)
+                cr.set_line_width(1.0)
             cr.rectangle(x_start, y_pos, key_w, badge_h)
             cr.stroke()
 
             # Key text
-            cr.set_source_rgba(1.0, 1.0, 1.0, 0.95)
+            if is_active:
+                cr.set_source_rgba(0.02, 0.10, 0.20, 1.0)  # Dark contrast text on active badge
+            else:
+                cr.set_source_rgba(1.0, 1.0, 1.0, 0.95)
             cr.move_to(x_start + (key_w - ke.width) / 2.0 - ke.x_bearing, y_pos + (badge_h - ke.height) / 2.0 - ke.y_bearing)
             cr.show_text(key_char)
 
             # Label text
-            cr.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+            cr.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD if is_active else cairo.FONT_WEIGHT_NORMAL)
             cr.set_font_size(9.5)
-            cr.set_source_rgba(0.85, 0.90, 0.96, 0.95)
+            if is_active:
+                cr.set_source_rgba(0.38, 0.92, 1.0, 1.0)
+            else:
+                cr.set_source_rgba(0.85, 0.90, 0.96, 0.95)
             le = cr.text_extents(label_text)
             cr.move_to(x_start + key_w + 5.0, y_pos + (badge_h - le.height) / 2.0 - le.y_bearing)
             cr.show_text(label_text)
             cr.restore()
             return key_w + 5.0 + le.width
 
-        # Render all 3 options on a single horizontal line
+        # Render all 4 options on a single horizontal line
         line_y = self.cy + 10
-        gap = 14.0
+        gap = 12.0
         # Calculate total width to center align the group
-        w_e = 18.0 + 5.0 + 35.0 # English
-        w_z = 18.0 + 5.0 + 38.0 # Chinese
-        w_esc = 27.0 + 5.0 + 34.0 # Cancel
-        total_group_w = w_e + w_z + w_esc + gap * 2
-        cur_x = self.cx - total_group_w / 2.0 + 10
+        w_s = 18.0 + 5.0 + 44.0   # Summarize
+        w_e = 18.0 + 5.0 + 33.0   # English
+        w_z = 18.0 + 5.0 + 36.0   # Chinese
+        w_esc = 27.0 + 5.0 + 32.0 # Cancel
+        total_group_w = w_s + w_e + w_z + w_esc + gap * 3
+        cur_x = self.cx - total_group_w / 2.0 + 6
 
-        cur_x += draw_horizontal_shortcut(cur_x, line_y, "E", "English", (0.06, 0.71, 0.83, 0.5)) + gap
-        cur_x += draw_horizontal_shortcut(cur_x, line_y, "Z", "Chinese", (0.06, 0.71, 0.83, 0.5)) + gap
-        draw_horizontal_shortcut(cur_x, line_y, "ESC", "Cancel", (0.95, 0.25, 0.37, 0.5))
+        is_sum = (getattr(self, "active_mode", "normal") == "summarize")
+        is_eng = (getattr(self, "active_mode", "normal") == "english")
+        is_chi = (getattr(self, "active_mode", "normal") == "chinese")
+
+        cur_x += draw_horizontal_shortcut(cur_x, line_y, "S", "Summarize", (0.60, 0.40, 0.95, 0.6), is_active=is_sum) + gap
+        cur_x += draw_horizontal_shortcut(cur_x, line_y, "E", "English", (0.06, 0.71, 0.83, 0.5), is_active=is_eng) + gap
+        cur_x += draw_horizontal_shortcut(cur_x, line_y, "Z", "Chinese", (0.06, 0.71, 0.83, 0.5), is_active=is_chi) + gap
+        draw_horizontal_shortcut(cur_x, line_y, "ESC", "Cancel", (0.95, 0.25, 0.37, 0.5), is_active=False)
 
         # ----------------------------------------------------
         # 7. RIGHT-SIDE MINI EQUALIZER BARS
@@ -469,6 +533,28 @@ class GlowingFluidOSD(Gtk.Window):
             cr.move_to(bx, eq_y - bar_h)
             cr.line_to(bx, eq_y + bar_h)
             cr.stroke()
+        # ----------------------------------------------------
+        # 8. LIVE STREAMING SUBTITLE (If streaming enabled)
+        # ----------------------------------------------------
+        if getattr(self, "live_text", ""):
+            cr.save()
+            cr.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+            cr.set_font_size(10.0)
+            disp_txt = self.live_text
+            if len(disp_txt) > 42:
+                disp_txt = "..." + disp_txt[-39:]
+            te = cr.text_extents(disp_txt)
+            sub_x = self.cx - (te.width / 2.0) - te.x_bearing
+            sub_y = self.cy + 34
+            # Soft shadow
+            cr.set_source_rgba(0.0, 0.0, 0.0, 0.6)
+            cr.move_to(sub_x + 1, sub_y + 1)
+            cr.show_text(disp_txt)
+            # Bright cyan-white text
+            cr.set_source_rgba(0.38, 0.92, 1.0, 0.95)
+            cr.move_to(sub_x, sub_y)
+            cr.show_text(disp_txt)
+            cr.restore()
 
         return False
 
@@ -477,12 +563,14 @@ def main():
     parser.add_argument("--position", default="top-left", choices=["top-left", "top-right", "bottom-left", "bottom-right", "center"])
     parser.add_argument("--duration", type=float, default=2.0)
     parser.add_argument("--always-on", action="store_true")
+    parser.add_argument("--mode", default="normal", choices=["normal", "english", "chinese", "summarize"])
     args = parser.parse_args()
 
     win = GlowingFluidOSD(
         position=args.position,
         duration=args.duration,
-        always_on=args.always_on
+        always_on=args.always_on,
+        initial_mode=args.mode
     )
     win.show_all()
     Gtk.main()
