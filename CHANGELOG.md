@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.1.3] - 2026-09-05
+
+### 🚀 Added & Enhanced
+- **AI Summarize & Executive Polish Mode (Shortcut `[S]`)**:
+  - Added dedicated AI summarize & polish feature directly accessible during Voice Typing by pressing shortcut `S`.
+  - Added `[S] Summarize` glowing purple badge to the Floating OSD canvas alongside `[E]` English, `[Z]` Chinese, and `[ESC]` Cancel.
+  - Formulates concise, executive-level summaries, trims redundant spoken filler words, and strictly preserves the original spoken language (Vietnamese stays Vietnamese, English stays English).
+- **Flexible ASR & Translation Provider Switching (Localhost vs Remote API)**:
+  - Users can switch between locally loaded models and remote OpenAI-compatible API endpoints (such as Ollama or vLLM) directly via Web UI settings.
+  - Supports configurable base URLs, API keys, and custom model identifiers (e.g., `qwen3.5:0.8b`).
+- **Standalone Docker Container for Qwen3-ASR**:
+  - Provided production-ready Dockerfile and docker-compose configurations in `docker/` to containerize `Qwen3-ASR-0.6B` as a standalone OpenAI-compatible Whisper endpoint.
+- **Custom Vocabulary & Mapping UI Overhaul**:
+  - Redesigned custom vocabulary and keyword mapping from plain tables into interactive visual badge tags with pagination (50 items/page) and real-time live filtering.
+
+### 🐛 Fixed
+- **Thinking Token Loop & Reasoning Leak Prevention**:
+  - Fixed internal monologue loops on Qwen 3.5 reasoning models by using targeted executive directives (`think: False`) and safe fallback parsing, preventing token exhaustion and timeouts.
+- **Wording Conventions Standardization**:
+  - Replaced internal terminology with standardized polite conventions: "Người" (User) and "nội dung" (content).
+
+---
+
 ## [0.1.2] - 2026-09-05
 
 ### 🚀 Added & Enhanced

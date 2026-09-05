@@ -79,13 +79,12 @@ class GrammarCorrector:
             headers["Authorization"] = f"Bearer {self.api_key}"
 
         # Thinking strategy:
-        # - For 'summarize': Enable thinking (think: True) to produce superior polish & executive summaries.
-        #   Use a high num_predict limit (16384) and generous timeout (90s) so reasoning finishes completely.
-        # - For translation/grammar: Keep think: False for instant real-time response.
-        is_summarize = (mode == "summarize")
-        think_flag = True if is_summarize else False
-        num_predict = 16384 if is_summarize else 1024
-        api_timeout = 90.0 if is_summarize else 25.0
+        # qwen3.5:0.8b reasoning models can enter long internal monolgue loops if think: True is forced,
+        # exhausting token budgets and leading to timeouts. We use direct executive instruction (think: False)
+        # for crisp, high-speed (<1.5s) bullet summarization and translations.
+        think_flag = False
+        num_predict = 2048 if mode == "summarize" else 1024
+        api_timeout = 30.0
 
         base_clean = self.api_base_url.rstrip("/")
         if base_clean.endswith("/v1"):
@@ -103,7 +102,7 @@ class GrammarCorrector:
                     "think": think_flag,
                     "stream": False,
                     "options": {
-                        "temperature": 0.2 if is_summarize else 0.0,
+                        "temperature": 0.1,
                         "num_predict": num_predict
                     }
                 }
@@ -122,11 +121,11 @@ class GrammarCorrector:
         payload = {
             "model": self.api_model,
             "messages": messages,
-            "temperature": 0.2 if is_summarize else 0.0,
+            "temperature": 0.1,
             "max_tokens": num_predict
         }
 
-        print(f"[GrammarCorrector] Calling OpenAI-compatible endpoint: {endpoint} (model: {self.api_model}, think: {think_flag})")
+        print(f"[GrammarCorrector] Calling OpenAI-compatible endpoint: {endpoint} (model: {self.api_model})")
         with httpx.Client(timeout=api_timeout) as client:
             response = client.post(endpoint, json=payload, headers=headers)
             response.raise_for_status()
@@ -134,13 +133,6 @@ class GrammarCorrector:
             choice = data["choices"][0]
             msg = choice.get("message", {})
             content = msg.get("content", "").strip()
-
-            # If model returned thinking tokens into reasoning and content is empty
-            if not content and "reasoning" in msg and msg["reasoning"]:
-                reasoning = msg["reasoning"].strip()
-                lines = [l.strip() for l in reasoning.split("\n") if l.strip()]
-                if lines:
-                    content = lines[-1].strip()
 
             return content
 
@@ -175,18 +167,27 @@ class GrammarCorrector:
             )
             user_content = f"<raw_transcript>{input_text}</raw_transcript>"
         elif mode == "summarize":
+            # Detect whether source is primarily Vietnamese or English
+            has_vietnamese_accent = bool(re.search(r"[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]", input_text, flags=re.IGNORECASE))
+            if has_vietnamese_accent:
+                target_lang_directive = "BẮT BUỘC XUẤT RA BẰNG TIẾNG VIỆT 100%. TUYỆT ĐỐI KHÔNG ĐƯỢC DỊCH SANG TIẾNG ANH. Giữ nguyên các thuật ngữ tiếng Anh gốc."
+                user_req_text = "Tóm tắt các ý chính của nội dung sau bằng tiếng Việt:"
+            else:
+                target_lang_directive = "MUST OUTPUT IN THE ORIGINAL LANGUAGE (English). DO NOT TRANSLATE TO OTHER LANGUAGES."
+                user_req_text = "Summarize the key points of the following content:"
+
             system_prompt = (
                 "Bạn là chuyên gia biên tập và tóm tắt văn bản thông minh (AI Summarizer & Executive Polish).\n"
                 "Nhiệm vụ của bạn:\n"
-                "1. Đọc kỹ văn bản thu âm giọng nói từ Người.\n"
-                "2. Lược bỏ triệt để các từ ngữ ngập ngừng, từ thừa, lặp từ, ý lan man (ví dụ: à, ừm, thì, là, kiểu như, như là, tóm lại là...).\n"
-                "3. Tóm tắt, làm gọn và làm đẹp lại ý chính một cách ngắn gọn, mạch lạc, súc tích và gãy gọn nhất.\n"
-                "4. ĐẶC BIỆT LƯU Ý: TUYỆT ĐỐI GIỮ NGUYÊN NGÔN NGỮ NGUỒN CỦA Người (Người nói tiếng Việt -> xuất tiếng Việt; Người nói tiếng Anh -> xuất tiếng Anh; tuyệt đối KHÔNG dịch sang ngôn ngữ khác).\n"
-                "5. TUYỆT ĐỐI KHÔNG trả lời câu hỏi, không chào hỏi, không kèm lời dẫn giải ('Dưới đây là...'). CHỈ XUẤT DUY NHẤT NỘI DUNG ĐÃ TÓM GỌN."
+                "1. Đọc kỹ nội dung từ Người.\n"
+                "2. Lược bỏ triệt để các từ ngữ ngập ngừng, từ thừa, lặp từ, ý lan man (à, ừm, thì, là, kiểu như, như là...).\n"
+                "3. Tóm tắt và làm đẹp lại các ý chính một cách ngắn gọn, mạch lạc, súc tích (khuyến khích dùng các gạch đầu dòng '-' rõ ràng).\n"
+                f"4. ĐẶC BIỆT BẮT BUỘC: {target_lang_directive}\n"
+                "5. TUYỆT ĐỐI KHÔNG trả lời câu hỏi, không chào hỏi, không kèm lời mở đầu. CHỈ XUẤT DUY NHẤT NỘI DUNG ĐÃ TÓM GỌN."
             )
             if custom_vocab:
                 system_prompt += f"\n6. Ưu tiên giữ chính xác các thuật ngữ chuyên môn: {custom_vocab}."
-            user_content = f"Tóm tắt và làm gọn ý cho nội dung sau:\n<raw_transcript>{input_text}</raw_transcript>"
+            user_content = f"{user_req_text}\n<raw_transcript>{input_text}</raw_transcript>"
         else:
             system_prompt = (
                 "Bạn là một bộ lọc chuẩn hóa văn bản tự động (ASR Text Normalizer & Grammar Polish Pipeline).\n"

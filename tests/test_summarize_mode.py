@@ -18,7 +18,7 @@ def test_grammar_summarize_prompt_construction():
     # Verify key directives in prompt
     assert "AI Summarizer & Executive Polish" in sys_msg
     assert "Lược bỏ triệt để các từ ngữ ngập ngừng" in sys_msg
-    assert "TUYỆT ĐỐI GIỮ NGUYÊN NGÔN NGỮ NGUỒN" in sys_msg
+    assert "BẮT BUỘC XUẤT RA BẰNG TIẾNG VIỆT 100%" in sys_msg
     assert "ASR, Qwen" in sys_msg
     assert raw_text in user_msg
     assert "Dự án trễ hạn" in result

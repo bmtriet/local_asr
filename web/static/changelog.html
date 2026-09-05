@@ -162,19 +162,74 @@
       </div>
       <span class="release-badge">
         <span class="release-tag">Current</span>
-        Version 0.1.2
+        Version 0.1.3
       </span>
     </header>
 
     <div class="timeline">
-      <!-- Version 0.1.2 Release Card -->
+      <!-- Version 0.1.3 Release Card -->
       <div class="timeline-item">
         <div class="timeline-dot" style="background: var(--emerald); box-shadow: 0 0 12px var(--emerald-glow);"></div>
         <div class="release-card">
           <div class="release-header">
             <div class="release-title-group">
-              <h2 class="release-title">Version 0.1.2 - Profile Management & Engine Stability</h2>
+              <h2 class="release-title">Version 0.1.3 - AI Summarize, Provider Switching & Dockerization</h2>
               <span class="badge-active-pill" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">Latest</span>
+            </div>
+            <span class="release-date">September 5, 2026</span>
+          </div>
+
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feature-icon icon-new">✨</div>
+              <div class="feature-body">
+                <strong>AI Summarize &amp; Executive Polish (Shortcut [S])</strong>
+                <p>New executive polish feature accessible on-the-fly during voice typing with shortcut <code>S</code>. Formulates concise bullet summaries, trims spoken filler words, and strictly preserves the user's spoken language.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">⚡</div>
+              <div class="feature-body">
+                <strong>Flexible Provider Switching (Localhost vs Remote API)</strong>
+                <p>Support for toggling between local embedded models and external OpenAI-compatible endpoints (Ollama, vLLM) for both ASR and translation/grammar directly in Settings.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-new">🐳</div>
+              <div class="feature-body">
+                <strong>Standalone Docker Container for Qwen3-ASR</strong>
+                <p>Packaged standalone container in <code>docker/</code> exposing an OpenAI-compatible Whisper endpoint for deployment across servers and edge nodes.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-imp">🏷️</div>
+              <div class="feature-body">
+                <strong>Custom Vocabulary &amp; Keyword Mapping Visual Tags</strong>
+                <p>Transformed raw tables into modern visual badge tags with 50-item pagination and instant real-time search filtering.</p>
+              </div>
+            </li>
+
+            <li class="feature-item">
+              <div class="feature-icon icon-fix">🛡️</div>
+              <div class="feature-body">
+                <strong>Reasoning Monologue Loop Fix</strong>
+                <p>Fixed internal thinking token exhaustion loops on Qwen 3.5 reasoning models, ensuring sub-1.5s response times without reasoning leaks.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Version 0.1.2 Release Card -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="release-card">
+          <div class="release-header">
+            <div class="release-title-group">
+              <h2 class="release-title">Version 0.1.2 - Profile Management & Engine Stability</h2>
             </div>
             <span class="release-date">September 5, 2026</span>
           </div>
