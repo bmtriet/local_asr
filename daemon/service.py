@@ -52,7 +52,12 @@ class VoiceTypingDaemon:
         self.normalizer = VietnameseNormalizer(db=self.db)
         self._on_exit_cb = on_exit
         self._on_restart_cb = on_restart
-        self.tray = TrayIndicator(on_exit=self.stop, on_restart=self.restart) if show_tray else None
+        initial_tray_state = "idle" if (self.engine and self.engine.is_loaded) else "loading"
+        self.tray = TrayIndicator(on_exit=self.stop, on_restart=self.restart, initial_state=initial_tray_state) if show_tray else None
+
+        # If engine is not yet loaded, warm it up in background worker without blocking startup
+        if self.engine and not self.engine.is_loaded:
+            self._start_background_model_preload()
 
         self.is_recording = False
         self.current_mode = "normal"
@@ -63,6 +68,23 @@ class VoiceTypingDaemon:
         
         self._listener: Optional[keyboard.GlobalHotKeys] = None
         self._lock = threading.Lock()
+
+    def _start_background_model_preload(self):
+        """Asynchronously load the ASR engine in a worker thread to keep initial startup instantaneous."""
+        def preload_worker():
+            try:
+                print("[VoiceTyping] Background model preloading started...")
+                self.engine.load_model()
+                print("[VoiceTyping] Background model preloading complete.")
+            except Exception as e:
+                print(f"[VoiceTyping] Error during background model preloading: {e}")
+            finally:
+                # If daemon is still idle, transition tray state from loading to idle
+                if self.tray and self.tray.state == "loading":
+                    self.tray.set_state("idle")
+
+        preload_thread = threading.Thread(target=preload_worker, daemon=True)
+        preload_thread.start()
 
     def _on_vad_silence(self):
         """Called automatically when Silence VAD detects end of speech."""

@@ -1,17 +1,17 @@
 import threading
 import time
+from typing import Optional
 from PIL import Image, ImageDraw
 import pystray
 
 class TrayIndicator:
     """Manages the system tray icon with animated feedback."""
-    def __init__(self, on_exit=None, on_restart=None):
-        self.state = "idle"  # idle | recording | transcribing
-        self.icon = None
+    def __init__(self, on_exit: Optional[callable] = None, on_restart: Optional[callable] = None, initial_state: str = "idle"):
+        self.state = initial_state
         self.on_exit = on_exit
         self.on_restart = on_restart
+        self.icon = None
         self._animating = False
-        self._thread = None
         self._anim_step = 0
         self._lock = threading.Lock()
 
@@ -32,6 +32,11 @@ class TrayIndicator:
             draw.ellipse([14, 14, 50, 50], outline=(234, 179, 8, 255), width=6)
             angle = (step * 45) % 360
             draw.arc([14, 14, 50, 50], start=angle, end=angle + 90, fill=(255, 255, 255, 255), width=6)
+        elif state == "loading":
+            # Cyan spinner: Background model loading indicator
+            draw.ellipse([14, 14, 50, 50], outline=(99, 102, 241, 160), width=5)
+            angle = (step * 30) % 360
+            draw.arc([14, 14, 50, 50], start=angle, end=angle + 120, fill=(56, 189, 248, 255), width=6)
         else:
             # Idle: Sleek Emerald green microphone badge (Enlarged by ~100% for clear visibility)
             draw.ellipse([4, 4, 60, 60], fill=(16, 185, 129, 255))
@@ -58,7 +63,7 @@ class TrayIndicator:
 
     def _animation_loop(self):
         while self._animating:
-            if self.state in ["recording", "transcribing"]:
+            if self.state in ["recording", "transcribing", "loading"]:
                 self._anim_step += 1
                 with self._lock:
                     if self.icon:
@@ -84,8 +89,8 @@ class TrayIndicator:
 
         self.icon = pystray.Icon(
             "LocalASR",
-            icon=self._create_icon_image("idle"),
-            title="Local ASR (Idle)",
+            icon=self._create_icon_image(self.state),
+            title=f"Local ASR ({self.state.title()})",
             menu=menu
         )
 

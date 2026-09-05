@@ -15,6 +15,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Added unit test coverage in `tests/test_profiles.py` verifying profile update operations.
 - **Documentation Internationalization**:
   - Fully translated `README.md` into English with complete setup guides (Linux, macOS, Windows 1-Click/manual), architecture notes, and configuration references.
+- **Startup Speed Optimization**:
+  - Implemented non-blocking background model preloading (`_start_background_model_preload`), allowing the Web UI and System Tray icon to appear within ~2.5s (down from >10s).
+  - Added animated 'loading' cyan state on the System Tray indicator while the model is warming up in background.
+  - Replaced heavy top-level imports in `main.py` with lazy imports, reducing CLI command execution time from 3.8s to 0.015s (250x faster).
+  - Enabled TensorFloat-32 (TF32) matmul & cuDNN acceleration on supported NVIDIA GPUs.
 
 ### 🐛 Fixed
 - **LoRA Adapter Unload on Profile Switching**:

@@ -39,6 +39,11 @@ class ASREngine:
         from qwen_asr import Qwen3ASRModel
 
         device_map = "cuda:0" if "cuda" in self.device and torch.cuda.is_available() else "cpu"
+        if "cuda" in device_map:
+            # Enable TensorFloat-32 (TF32) on Ampere/Ada/Blackwell GPUs for faster tensor allocation & inference
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
+
         print(f"[ASREngine] Loading {self.model_name} onto {device_map} ({self.dtype})...")
         
         self.model = Qwen3ASRModel.from_pretrained(

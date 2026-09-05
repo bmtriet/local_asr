@@ -2,19 +2,16 @@ import argparse
 import sys
 import threading
 import time
-import uvicorn
-from config import get_settings
-from storage.database import Database
-from asr_engine.engine import ASREngine
-from daemon.service import VoiceTypingDaemon
-from web.api import app
 
 def run_web(settings):
+    import uvicorn
+    from web.api import app
     print(f"[Main] Starting Web UI Server on http://{settings.HOST}:{settings.PORT}")
     uvicorn.run(app, host=settings.HOST, port=settings.PORT, log_level="info")
 
 def run_daemon(engine, db):
     print("[Main] Starting Voice Typing Daemon with Tray Icon...")
+    from daemon.service import VoiceTypingDaemon
     stop_event = threading.Event()
 
     def handle_exit():
@@ -25,7 +22,6 @@ def run_daemon(engine, db):
     def handle_restart():
         stop_event.set()
         import os
-        import sys
         import subprocess
         print("[Main] Restarting application via subprocess...")
         sys.stdout.flush()
@@ -60,6 +56,10 @@ def main():
     )
     args = parser.parse_args()
 
+    from config import get_settings
+    from storage.database import Database
+    from asr_engine.engine import ASREngine
+
     settings = get_settings()
     db = Database()
     db.init_db()
@@ -67,11 +67,12 @@ def main():
     if args.service == "web":
         run_web(settings)
     elif args.service == "daemon":
-        engine = ASREngine(lazy_load=False)
+        engine = ASREngine(lazy_load=True)
         run_daemon(engine, db)
     elif args.service == "all":
-        # Preload engine on GPU first so model is immediately ready
-        engine = ASREngine(lazy_load=False)
+        # Launch engine with lazy_load=True: VoiceTypingDaemon warms up the model in background
+        # allowing Web UI and Tray Icon to become responsive within ~1.5s - 2.5s
+        engine = ASREngine(lazy_load=True)
 
         # Run Web Server in background thread
         web_thread = threading.Thread(target=run_web, args=(settings,), daemon=True)
