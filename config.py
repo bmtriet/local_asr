@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     VOCABULARY_PATH: Path = DATA_DIR / "vocabulary.json"
     
     # ASR Model settings
-    ASR_PROVIDER: str = "local" # "local" or "remote_api"
-    ASR_API_ENDPOINT: str = "http://127.0.0.1:8000/v1/audio/transcriptions"
+    ASR_PROVIDER: str = "remote_api" # "remote_api" or "local"
+    ASR_API_ENDPOINT: str = "http://127.0.0.1:9001/v1/audio/transcriptions"
     ASR_API_KEY: str = ""
     MODEL_NAME: str = "Qwen/Qwen3-ASR-0.6B"
     DEVICE: str = "cuda"
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     CPU_THREADS: int = min(4, os.cpu_count() or 4)
     
     # Grammar Correction & Translation Model settings
-    TRANSLATION_PROVIDER: str = "local" # "local" or "remote_api"
+    TRANSLATION_PROVIDER: str = "remote_api" # "remote_api" or "local"
     TRANSLATION_API_BASE_URL: str = "http://localhost:11434/v1"
     TRANSLATION_API_KEY: str = "ollama"
     TRANSLATION_MODEL_NAME: str = "qwen2.5:0.5b"

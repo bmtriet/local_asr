@@ -2,12 +2,15 @@ import os
 import io
 import time
 import tempfile
+import asyncio
 import torch
 import numpy as np
 import soundfile as sf
 import scipy.signal
+import zipfile
+import shutil
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, List
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,9 +20,11 @@ from pydantic import BaseModel
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen3-ASR-0.6B")
 DEVICE = os.getenv("DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 TORCH_DTYPE = os.getenv("TORCH_DTYPE", "bfloat16")
-PORT = int(os.getenv("PORT", "8000"))
+PORT = int(os.getenv("PORT", "9001"))
 HOST = os.getenv("HOST", "0.0.0.0")
 API_KEY = os.getenv("API_KEY", "")
+ADAPTERS_DIR = Path(os.getenv("ADAPTERS_DIR", "/app/adapters"))
+ADAPTERS_DIR.mkdir(parents=True, exist_ok=True)
 
 dtype = getattr(torch, TORCH_DTYPE, torch.bfloat16)
 if DEVICE == "cpu":
@@ -41,10 +46,111 @@ model = Qwen3ASRModel.from_pretrained(
 )
 print(f"[ASR Server] Model loaded successfully on {device_map}.")
 
+class DynamicAdapterManager:
+    """
+    Manages in-memory LoRA adapters for multi-profile/multi-tenant requests.
+    Enables concurrent hot-switching of adapters on a single base model.
+    """
+    def __init__(self, qwen_model, adapters_dir: Path):
+        self.qwen_model = qwen_model
+        self.adapters_dir = adapters_dir
+        self.loaded_adapters = set()
+        self.active_adapter: Optional[str] = None
+        self.lock = asyncio.Lock()
+        self._target_thinker = self._resolve_thinker_model()
+
+    def _resolve_thinker_model(self):
+        raw_model = getattr(self.qwen_model, "model", self.qwen_model)
+        thinker = getattr(raw_model, "thinker", None)
+        if thinker is not None:
+            return getattr(thinker, "model", thinker)
+        return raw_model
+
+    def list_disk_adapters(self) -> List[Dict[str, str]]:
+        """List all LoRA adapters available in storage."""
+        res = []
+        if not self.adapters_dir.exists():
+            return res
+        for item in self.adapters_dir.iterdir():
+            if item.is_dir():
+                has_config = (item / "adapter_config.json").exists()
+                has_weights = (item / "adapter_model.safetensors").exists() or (item / "adapter_model.bin").exists()
+                if has_config and has_weights:
+                    res.append({
+                        "name": item.name,
+                        "path": str(item),
+                        "loaded_in_memory": item.name in self.loaded_adapters
+                    })
+        return res
+
+    def _ensure_adapter_loaded(self, adapter_name: str) -> bool:
+        """Load adapter into memory if on disk and not yet loaded."""
+        if adapter_name in self.loaded_adapters:
+            return True
+
+        adapter_path = self.adapters_dir / adapter_name
+        if not adapter_path.exists():
+            return False
+
+        has_config = (adapter_path / "adapter_config.json").exists()
+        has_weights = (adapter_path / "adapter_model.safetensors").exists() or (adapter_path / "adapter_model.bin").exists()
+        if not (has_config and has_weights):
+            return False
+
+        try:
+            from peft import PeftModel
+            target_model = self._resolve_thinker_model()
+            if isinstance(target_model, PeftModel):
+                target_model.load_adapter(str(adapter_path), adapter_name=adapter_name)
+            else:
+                peft_m = PeftModel.from_pretrained(target_model, str(adapter_path), adapter_name=adapter_name)
+                raw_model = getattr(self.qwen_model, "model", self.qwen_model)
+                if hasattr(raw_model, "thinker"):
+                    raw_model.thinker.model = peft_m
+                self._target_thinker = peft_m
+
+            self.loaded_adapters.add(adapter_name)
+            print(f"[ASR Server] Successfully cached LoRA adapter '{adapter_name}' in memory.")
+            return True
+        except Exception as e:
+            print(f"[ASR Server] Error loading adapter '{adapter_name}': {e}")
+            return False
+
+    def activate_adapter(self, adapter_name: Optional[str]):
+        """
+        Hot-switch to requested adapter. If None or empty or not found, disables adapters
+        and falls back cleanly to the base model.
+        """
+        from peft import PeftModel
+        target_model = self._resolve_thinker_model()
+        if not isinstance(target_model, PeftModel):
+            return
+
+        if not adapter_name or adapter_name.strip() in ("", "default", "none", "base"):
+            if hasattr(target_model, "disable_adapters"):
+                target_model.disable_adapters()
+            self.active_adapter = None
+            return
+
+        clean_name = adapter_name.strip()
+        loaded = self._ensure_adapter_loaded(clean_name)
+        if loaded:
+            if hasattr(target_model, "enable_adapters"):
+                target_model.enable_adapters()
+            if hasattr(target_model, "set_adapter"):
+                target_model.set_adapter(clean_name)
+            self.active_adapter = clean_name
+        else:
+            if hasattr(target_model, "disable_adapters"):
+                target_model.disable_adapters()
+            self.active_adapter = None
+
+adapter_manager = DynamicAdapterManager(model, ADAPTERS_DIR)
+
 app = FastAPI(
     title="Qwen3-ASR API Server",
-    description="OpenAI-compatible Speech-to-Text and Real-time Streaming API powered by Qwen3-ASR",
-    version="1.0.0"
+    description="Multi-Profile OpenAI-compatible Speech-to-Text with Dynamic LoRA and Real-time Streaming",
+    version="1.1.0"
 )
 
 app.add_middleware(
@@ -91,6 +197,66 @@ def list_models():
         ]
     }
 
+@app.get("/v1/adapters")
+def list_adapters():
+    """List all available LoRA adapters on the server and their in-memory load state."""
+    return {
+        "adapters": adapter_manager.list_disk_adapters(),
+        "active_adapter": adapter_manager.active_adapter
+    }
+
+@app.post("/v1/adapters/upload")
+async def upload_adapter(
+    file: UploadFile = File(...),
+    adapter_name: Optional[str] = Form(None)
+):
+    """Upload a LoRA adapter zip archive (containing adapter_config.json and adapter_model.safetensors)."""
+    try:
+        content = await file.read()
+        z = zipfile.ZipFile(io.BytesIO(content), "r")
+        namelist = z.namelist()
+
+        has_config = any(n.endswith("adapter_config.json") for n in namelist)
+        has_weights = any(n.endswith("adapter_model.safetensors") or n.endswith("adapter_model.bin") for n in namelist)
+        if not (has_config and has_weights):
+            raise HTTPException(status_code=400, detail="Zip file must contain adapter_config.json and adapter_model.safetensors/bin")
+
+        clean_name = (adapter_name or "").strip().lower()
+        if not clean_name:
+            # Infer from root directory in zip or filename
+            for n in namelist:
+                if "/" in n:
+                    clean_name = n.split("/")[0].replace("lora_adapter_", "").replace("lora_", "")
+                    break
+        if not clean_name:
+            clean_name = file.filename.replace(".zip", "").replace("lora_adapter_", "").strip().lower()
+
+        target_dir = ADAPTERS_DIR / clean_name
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        for n in namelist:
+            if n.endswith("/"):
+                continue
+            # Strip outer directory if present
+            parts = n.split("/")
+            filename = parts[-1]
+            if filename in ("adapter_config.json", "adapter_model.safetensors", "adapter_model.bin", "special_tokens_map.json", "tokenizer_config.json"):
+                with open(target_dir / filename, "wb") as f:
+                    f.write(z.read(n))
+
+        # Pre-load adapter into memory
+        adapter_manager._ensure_adapter_loaded(clean_name)
+
+        return {
+            "status": "success",
+            "adapter_name": clean_name,
+            "target_dir": str(target_dir)
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to process adapter archive: {str(e)}")
+
 @app.post("/v1/audio/transcriptions")
 async def create_transcription(
     file: UploadFile = File(...),
@@ -98,11 +264,12 @@ async def create_transcription(
     prompt: Optional[str] = Form(None),
     response_format: Optional[str] = Form("json"),
     temperature: Optional[float] = Form(0.0),
-    language: Optional[str] = Form("vi")
+    language: Optional[str] = Form("vi"),
+    lora_adapter: Optional[str] = Form(None)
 ):
     """
-    OpenAI-compatible audio transcription endpoint.
-    Accepts multipart/form-data with an audio file and optional context prompt.
+    OpenAI-compatible audio transcription endpoint with Multi-Profile Dynamic LoRA support.
+    Accepts multipart/form-data with an audio file, optional context prompt, and lora_adapter name.
     """
     try:
         content = await file.read()
@@ -113,7 +280,14 @@ async def create_transcription(
         duration = len(wav) / 16000.0
 
         context_str = prompt or ""
-        results = model.transcribe((wav, 16000), context=context_str)
+        adapter_tag = lora_adapter.strip() if lora_adapter else "base"
+        print(f"[ASR Server] Transcribing audio: duration={duration:.2f}s, context_len={len(context_str)}, lang={language}, lora={adapter_tag}")
+
+        # Thread-safe lock for adapter hot-switch and inference
+        async with adapter_manager.lock:
+            adapter_manager.activate_adapter(lora_adapter)
+            results = model.transcribe((wav, 16000), context=context_str)
+
         if not results:
             text = ""
         else:
@@ -123,15 +297,20 @@ async def create_transcription(
                 text = first_res.get("text", "")
             text = str(text).strip()
 
+        print(f"[ASR Server] Transcription completed: '{text}' ({duration:.2f}s, lora={adapter_tag})")
+
         if response_format == "text":
             return text
 
         return {
             "text": text,
             "duration": round(duration, 2),
-            "language": language or "vi"
+            "language": language or "vi",
+            "lora_adapter": adapter_manager.active_adapter
         }
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Transcription error: {str(e)}")
 
 @app.websocket("/api/ws/transcribe")

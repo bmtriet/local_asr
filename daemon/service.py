@@ -31,8 +31,8 @@ class VoiceTypingDaemon:
         self.engine = engine or ASREngine(lazy_load=True)
         
         # Load ASR provider config from DB
-        asr_provider = self.db.get_setting("asr_provider", getattr(self.settings, "ASR_PROVIDER", "local"))
-        asr_endpoint = self.db.get_setting("asr_api_endpoint", getattr(self.settings, "ASR_API_ENDPOINT", "http://127.0.0.1:8000/v1/audio/transcriptions"))
+        asr_provider = self.db.get_setting("asr_provider", getattr(self.settings, "ASR_PROVIDER", "remote_api"))
+        asr_endpoint = self.db.get_setting("asr_api_endpoint", getattr(self.settings, "ASR_API_ENDPOINT", "http://127.0.0.1:9001/v1/audio/transcriptions"))
         asr_key = self.db.get_setting("asr_api_key", getattr(self.settings, "ASR_API_KEY", ""))
         self.engine.set_config(provider=asr_provider, api_endpoint=asr_endpoint, api_key=asr_key)
 
@@ -41,7 +41,7 @@ class VoiceTypingDaemon:
         self.grammar = GrammarCorrector(lazy_load=True)
         
         # Load Translation provider config from DB
-        trans_provider = self.db.get_setting("translation_provider", getattr(self.settings, "TRANSLATION_PROVIDER", "local"))
+        trans_provider = self.db.get_setting("translation_provider", getattr(self.settings, "TRANSLATION_PROVIDER", "remote_api"))
         trans_url = self.db.get_setting("translation_api_base_url", getattr(self.settings, "TRANSLATION_API_BASE_URL", "http://localhost:11434/v1"))
         trans_key = self.db.get_setting("translation_api_key", getattr(self.settings, "TRANSLATION_API_KEY", "ollama"))
         trans_model = self.db.get_setting("translation_model_name", getattr(self.settings, "TRANSLATION_MODEL_NAME", "qwen2.5:0.5b"))

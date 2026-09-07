@@ -6689,3 +6689,971 @@ INFO:     127.0.0.1:55644 - "GET /api/train/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:55644 - "GET /api/train/status HTTP/1.1" 200 OK
 INFO:     127.0.0.1:55644 - "GET /api/train/status HTTP/1.1" 200 OK
 [ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+[Main] Starting Voice Typing Daemon with Tray Icon...
+[Main] Starting Web UI Server on http://127.0.0.1:8000
+INFO:     127.0.0.1:53530 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50046 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Background model preloading started...
+[VoiceTyping] Listening for global hotkey: <f9> (Mode: hold)
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+[ASREngine] Model loaded successfully on cuda:0.
+[ASREngine] Loaded and activated LoRA adapter: custom_lora from /home/sgvg-gmo050/Desktop/Projects/local_asr/data/adapters/lora_latest
+[VoiceTyping] Background model preloading complete.
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /css/style.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:50056 - "GET /js/app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50056 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58986 - "GET /api/vocabulary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58970 - "GET /api/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58994 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58980 - "GET /api/history?page=1&limit=10&filter_type=all&search= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+[ASREngine] Unloading Qwen/Qwen3-ASR-0.6B from memory...
+[ASREngine] Model unloaded and GPU cache emptied.
+INFO:     127.0.0.1:58972 - "POST /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "POST /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+HTTP Request: GET http://10.13.34.155:9001/v1/models "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:58972 - "POST /api/settings/test-asr-api HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56392 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56392 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 500 Internal Server Error"
+[ASREngine] Remote ASR API call error: Server error '500 Internal Server Error' for url 'http://10.13.34.155:9001/v1/audio/transcriptions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+[VoiceTyping] Transcribed: '' (14.8s)
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 500 Internal Server Error"
+[ASREngine] Remote ASR API call error: Server error '500 Internal Server Error' for url 'http://10.13.34.155:9001/v1/audio/transcriptions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+[VoiceTyping] Transcribed: '' (3.1s)
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42028 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Restarting daemon & application...
+[Main] Restarting application via subprocess...
+[Main] Starting Voice Typing Daemon with Tray Icon...
+[Main] Starting Web UI Server on http://127.0.0.1:8000
+INFO:     127.0.0.1:48900 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Background model preloading started...
+[VoiceTyping] Listening for global hotkey: <f9> (Mode: hold)
+INFO:     127.0.0.1:48900 - "GET /api/train/status HTTP/1.1" 200 OK
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+INFO:     127.0.0.1:48900 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48900 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:48900 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48928 - "GET /api/vocabulary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48906 - "GET /api/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48942 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48914 - "GET /api/history?page=1&limit=10&filter_type=all&search= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+[ASREngine] Model loaded successfully on cuda:0.
+[ASREngine] Loaded and activated LoRA adapter: custom_lora from /home/sgvg-gmo050/Desktop/Projects/local_asr/data/adapters/lora_latest
+[VoiceTyping] Background model preloading complete.
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+HTTP Request: GET http://10.13.34.155:9001/v1/models "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:48908 - "POST /api/settings/test-asr-api HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 500 Internal Server Error"
+[ASREngine] Remote ASR API call error: Server error '500 Internal Server Error' for url 'http://10.13.34.155:9001/v1/audio/transcriptions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+[VoiceTyping] Transcribed: '' (2.1s)
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48908 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37646 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37646 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37656 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40040 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40040 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34284 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44004 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44004 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40310 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35904 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35904 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35904 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35904 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35904 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35904 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50710 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50710 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50728 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44528 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44544 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34290 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58162 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58162 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45926 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32810 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32810 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32812 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46070 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46070 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55914 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58774 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58774 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58784 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51040 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51040 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Stopping daemon...
+[Main] Starting Voice Typing Daemon with Tray Icon...
+[Main] Starting Web UI Server on http://127.0.0.1:8000
+INFO:     Started server process [4856]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+[VoiceTyping] Background model preloading started...
+[VoiceTyping] Listening for global hotkey: <f9> (Mode: hold)
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Model loaded successfully on cuda:0.
+[ASREngine] Loaded and activated LoRA adapter: custom_lora from /home/sgvg-gmo050/Desktop/Projects/local_asr/data/adapters/lora_latest
+[VoiceTyping] Background model preloading complete.
+INFO:     127.0.0.1:38610 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32906 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:32906 - "GET /css/style.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:32906 - "GET /js/app.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:32906 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32932 - "GET /api/vocabulary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32916 - "GET /api/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32922 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32940 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32924 - "GET /api/history?page=1&limit=10&filter_type=all&search= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32952 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:32952 - "GET /api/train/status HTTP/1.1" 200 OK
+HTTP Request: GET http://10.13.34.155:9001/v1/models "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:32952 - "POST /api/settings/test-asr-api HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32952 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32952 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:32952 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32952 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Tôi hiện tại nó đang vận hành trên Docker nha' (3.0s)
+INFO:     127.0.0.1:32952 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32952 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53236 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53236 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53238 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Thì hệ thống đã vận hành ổn định thì đặt cái chế độ mặc định sẽ sử dụng là api hết nha chứ không có dùng default là local nên là khi mà setup thì nó default sẽ là là dùng api' (14.0s)
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37716 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56578 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56578 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Review cái luồng để mà export một cái profile nha thì cái export profile sẽ có cái luồng để mà import profile cho thuận tiện như người dùng di chuyển giữa các máy' (10.4s)
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33634 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56276 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Thì bao gồm luôn có cái lora để mà người dùng có thể chuyển qua các máy với nhau' (4.9s)
+INFO:     127.0.0.1:56276 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Ở khi mở export thì sẽ có hai option để cho người dùng check box đó là thứ nhất là cái vocabulary của người dùng và cái thứ hai là cái wi lora thì mặc định nó sẽ check luôn cả hai cái tính năng này đó thì còn gì nữa mà tôi mà chưa nghĩ tới hoặc là tôi đang thiếu sốt thì có thể nhắc tôi để tôi cập nhật cái đầy đủ' (17.6s)
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56282 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38892 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52380 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58260 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58266 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58180 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57456 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36048 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Ok triển khai toàn bộ nhé' (2.6s)
+INFO:     127.0.0.1:33750 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Tôi chưa rõ cái luồn lora python ở trên profile chúng ta sắp tới nếu mà vận hành nó trên Docker thì ví dụ như nhiều người dùng có nhiều cái lora vậy thì cái lora nó nằm ở trên mấy người dùng hay là nằm ở trên cái Docker mấy chủ và dùng như hai người đang sử dụng hai cái lora khác nhau thì cái output sẽ là như thế nào tôi vẫn chưa rõ đó giải thích cho tôi nghe' (24.1s)
+INFO:     127.0.0.1:47430 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46816 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39510 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34762 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Ok tôi hiểu rồi về triển khai theo hướng đó nha muốn từ bỏ profile chạy trên Docker' (4.5s)
+INFO:     127.0.0.1:34372 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38002 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59084 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55560 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54684 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41664 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50600 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59154 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43780 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57540 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58214 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44406 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51026 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38120 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48142 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33792 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60800 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58550 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49010 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53056 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45804 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55410 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54378 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33506 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43464 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43928 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51940 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38712 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55446 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54498 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56088 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60414 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33702 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47436 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56160 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40028 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40090 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47106 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34578 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43482 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49570 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58126 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45192 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36508 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36522 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36524 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36534 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36540 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36548 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36554 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36568 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36584 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36596 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36610 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36618 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36630 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36636 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36648 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36654 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36656 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36672 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36680 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36694 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53484 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53486 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53488 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53500 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53516 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53522 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53528 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53532 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53538 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53542 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53550 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53582 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53594 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53610 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53616 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53630 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53638 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53642 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53654 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57740 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57752 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57756 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57760 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57766 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57780 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57788 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57804 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57814 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57822 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46142 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46150 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46168 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46184 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46194 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46200 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46214 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46222 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46236 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46244 - "GET /api/health HTTP/1.1" 404 Not Found
+[Main] Starting Voice Typing Daemon with Tray Icon...
+[Main] Starting Web UI Server on http://127.0.0.1:8000
+INFO:     Started server process [11402]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+[VoiceTyping] Background model preloading started...
+[VoiceTyping] Listening for global hotkey: <f9> (Mode: hold)
+[ASREngine] Loading Qwen/Qwen3-ASR-0.6B onto cuda:0 (torch.bfloat16)...
+The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+[ASREngine] Model loaded successfully on cuda:0.
+[ASREngine] Loaded and activated LoRA adapter: custom_lora from /home/sgvg-gmo050/Desktop/Projects/local_asr/data/adapters/lora_latest
+[VoiceTyping] Background model preloading complete.
+INFO:     127.0.0.1:37080 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37080 - "GET /js/app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37094 - "GET /css/style.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:37080 - "GET /api/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37114 - "GET /api/vocabulary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37094 - "GET /api/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37126 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37104 - "GET /api/history?page=1&limit=10&filter_type=all&search= HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions (lora: base)
+[ASREngine] Remote ASR API call error: [Errno 111] Connection refused
+[VoiceTyping] Transcribed: '' (5.3s)
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37100 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48948 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38358 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53846 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42856 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39336 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions (lora: base)
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Alo 123456789 mười' (2.5s)
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey pressed -> Starting recording immediately...
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+[VoiceTyping] Hotkey released (Hold mode) -> Stopping recording...
+[VoiceTyping] Hotkey pressed -> Stopping recording & processing...
+ALSA lib pcm.c:8568:(snd_pcm_recover) underrun occurred
+[VoiceTyping] Applying vocabulary context: IFM, Global User, PAB, Việt, %, 100, UI, active, update, model, đuối, output, Ollama, tablet, Max Lee, Eric, Allwells, VG, Posgrest, Docker, server, direction, Agent, local, kế hoạch, 0.6b, ASR, Action, Agent, Allwells, Anh, Anh giúp kiểm tra trạng thái PAB nha., Biết, Blinky, Blinky check được data in PAB., Bước, Bước này đang được xử lý trên IFM., Can, Center, Check, Check cái PAB này sao chưa ai vô approve vậy, Cho, Chuẩn, Chào, Chúng, Chúng ta đã kiểm tra lỗi phát sinh trong IFM, Cái, Có, Dữ, Dữ liệu từ IFM hiện chưa được đồng bộ đầy đủ., Frank, Gilda, Global, Hiện, How, How about PAB application?, I cannot log in into PAB., I'm, IFM, It's, Json, Lucas, Làm, Làm sao update được cái chatgpt app trên linux, Người, Người dùng có thể tạo Rewrite mới trên IFM., Nếu, Ok, PAB, Please, Please check the current status in PAB., Qwen, Rewrite, STT, Sau, System, Tham, Thì, Triển, Triển khai nha., Trâm, Trường, Tôi, Tôi không thấy đăng nhập vào PAB, Tôi không thấy đăng nhập vào hệ thống IFM, UI, User, Việt, Vui, Vui lòng kiểm tra lại dữ liệu trên IFM, Và, Vì, Ví, Vậy, Vừa, Xuất, Điều, Điều PAB System đang hoạt động bình thường.
+[ASREngine] Calling remote ASR endpoint: http://10.13.34.155:9001/v1/audio/transcriptions (lora: base)
+HTTP Request: POST http://10.13.34.155:9001/v1/audio/transcriptions "HTTP/1.1 200 OK"
+[VoiceTyping] Transcribed: 'Ở triển khai cái Docker container đó là tự động khởi động ngay auto start luôn' (4.5s)
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44916 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48854 - "GET /api/train/status HTTP/1.1" 200 OK

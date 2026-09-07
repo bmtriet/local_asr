@@ -23,7 +23,8 @@
     "aliases": [
       "pab",
       "p a b",
-      "pi a bi"
+      "pi a bi",
+      "bip"
     ],
     "description": "PAB Department"
   },
@@ -91,7 +92,8 @@
     "target": "output",
     "aliases": [
       "ai bút",
-      "cao bút"
+      "cao bút",
+      "output"
     ],
     "description": "output"
   },
@@ -134,6 +136,56 @@
     "target": "VG",
     "aliases": [
       "vg"
+    ],
+    "description": ""
+  },
+  {
+    "target": "Posgrest",
+    "aliases": [
+      "botred",
+      "botry"
+    ],
+    "description": ""
+  },
+  {
+    "target": "Docker",
+    "aliases": [
+      "đốc cờ"
+    ],
+    "description": ""
+  },
+  {
+    "target": "server",
+    "aliases": [
+      "sợi vơ"
+    ],
+    "description": ""
+  },
+  {
+    "target": "direction",
+    "aliases": [
+      "đa rắc chình"
+    ],
+    "description": ""
+  },
+  {
+    "target": "Agent",
+    "aliases": [
+      "asian"
+    ],
+    "description": ""
+  },
+  {
+    "target": "local",
+    "aliases": [
+      "loco"
+    ],
+    "description": ""
+  },
+  {
+    "target": "kế hoạch",
+    "aliases": [
+      "cái quạt"
     ],
     "description": ""
   }

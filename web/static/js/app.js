@@ -71,6 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (historyTotalBadge) {
         historyTotalBadge.textContent = totalCount;
       }
+      const tabBadgeHistory = document.getElementById('tab-badge-history');
+      if (tabBadgeHistory) {
+        tabBadgeHistory.textContent = totalCount;
+      }
 
       renderPagination();
 
@@ -365,6 +369,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSaveTransApi = document.getElementById('btn-save-trans-api');
   const transApiTestStatus = document.getElementById('trans-api-test-status');
 
+  // ASR Provider DOM Elements (Docker / Remote decoupling)
+  const radioAsrProvLocal = document.getElementById('radio-asr-prov-local');
+  const radioAsrProvRemote = document.getElementById('radio-asr-prov-remote');
+  const asrLocalContainer = document.getElementById('asr-local-container');
+  const asrRemoteContainer = document.getElementById('asr-remote-container');
+  const inputAsrApiEndpoint = document.getElementById('input-asr-api-endpoint');
+  const inputAsrApiKey = document.getElementById('input-asr-api-key');
+  const btnTestAsrApi = document.getElementById('btn-test-asr-api');
+  const btnSaveAsrApi = document.getElementById('btn-save-asr-api');
+  const asrApiTestStatus = document.getElementById('asr-api-test-status');
+
   const selectOsdPosition = document.getElementById('select-osd-position');
   const inputOsdDuration = document.getElementById('input-osd-duration');
   const toggleOsdAlwaysOn = document.getElementById('toggle-osd-always-on');
@@ -400,6 +415,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function setAsrProviderUi(provider) {
+    const isRemote = (provider === 'remote_api');
+    if (radioAsrProvRemote) radioAsrProvRemote.checked = isRemote;
+    if (radioAsrProvLocal) radioAsrProvLocal.checked = !isRemote;
+    if (asrRemoteContainer) asrRemoteContainer.style.display = isRemote ? 'block' : 'none';
+    if (asrLocalContainer) asrLocalContainer.style.display = isRemote ? 'none' : 'block';
+  }
+
   function updateQwenUiState(enabled) {
     if (toggleQwen25Enabled) {
       toggleQwen25Enabled.checked = enabled;
@@ -433,6 +456,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.hotkey) {
         inputHotkey.value = data.hotkey;
         updatePresetActiveBadge(data.hotkey);
+      }
+
+      // Load ASR Provider Settings (Docker / Local decoupling)
+      if (data.asr_provider) {
+        setAsrProviderUi(data.asr_provider);
+      }
+      if (inputAsrApiEndpoint && data.asr_api_endpoint) {
+        inputAsrApiEndpoint.value = data.asr_api_endpoint;
+      }
+      if (inputAsrApiKey && data.asr_api_key) {
+        inputAsrApiKey.value = data.asr_api_key;
       }
 
       // Load Translation Provider Settings
@@ -524,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRecordHotkey.textContent = 'Recording...';
     btnRecordHotkey.classList.add('btn-primary');
     btnRecordHotkey.classList.remove('btn-secondary');
-    hotkeyHintText.textContent = '🔴 Press your desired key combination now...';
+    hotkeyHintText.textContent = 'Listening: Press your desired key combination now...';
     hotkeyHintText.classList.add('recording');
   }
 
@@ -593,6 +627,124 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Error: ' + err.message);
     }
   });
+
+  // ASR Provider Switch Events (Local vs Docker/Remote API)
+  if (radioAsrProvLocal) {
+    radioAsrProvLocal.addEventListener('change', async (e) => {
+      if (e.target.checked) {
+        setAsrProviderUi('local');
+        try {
+          await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ asr_provider: 'local' })
+          });
+        } catch (err) {
+          console.error('Error switching ASR provider to local:', err);
+        }
+      }
+    });
+  }
+
+  if (radioAsrProvRemote) {
+    radioAsrProvRemote.addEventListener('change', async (e) => {
+      if (e.target.checked) {
+        setAsrProviderUi('remote_api');
+        try {
+          await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ asr_provider: 'remote_api' })
+          });
+        } catch (err) {
+          console.error('Error switching ASR provider to remote_api:', err);
+        }
+      }
+    });
+  }
+
+  // Test ASR API connection (Docker / Remote endpoint)
+  if (btnTestAsrApi) {
+    btnTestAsrApi.addEventListener('click', async () => {
+      const endpoint = (inputAsrApiEndpoint ? inputAsrApiEndpoint.value : '').trim();
+      const apiKey = (inputAsrApiKey ? inputAsrApiKey.value : '').trim();
+
+      if (!endpoint) {
+        alert('Please enter an ASR Endpoint URL (e.g. http://127.0.0.1:9001/v1/audio/transcriptions).');
+        return;
+      }
+
+      btnTestAsrApi.disabled = true;
+      btnTestAsrApi.textContent = 'Testing...';
+      if (asrApiTestStatus) {
+        asrApiTestStatus.style.display = 'block';
+        asrApiTestStatus.style.color = 'var(--text-secondary)';
+        asrApiTestStatus.textContent = 'Testing connection with Docker/remote ASR endpoint...';
+      }
+
+      try {
+        const res = await fetch('/api/settings/test-asr-api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            endpoint: endpoint,
+            api_key: apiKey
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          asrApiTestStatus.style.color = 'var(--emerald)';
+          asrApiTestStatus.innerHTML = `<strong>Connected (${data.latency_ms}ms)!</strong> Docker endpoint is responding.`;
+        } else {
+          asrApiTestStatus.style.color = 'var(--rose)';
+          asrApiTestStatus.innerHTML = `<strong>Failed:</strong> ${escapeHtml(data.message || data.error)}`;
+        }
+      } catch (err) {
+        asrApiTestStatus.style.color = 'var(--rose)';
+        asrApiTestStatus.textContent = `Error: ${err.message}`;
+      } finally {
+        btnTestAsrApi.disabled = false;
+        btnTestAsrApi.innerHTML = `
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Test Connection</span>
+        `;
+      }
+    });
+  }
+
+  // Save ASR API configuration
+  if (btnSaveAsrApi) {
+    btnSaveAsrApi.addEventListener('click', async () => {
+      const endpoint = (inputAsrApiEndpoint ? inputAsrApiEndpoint.value : '').trim();
+      const apiKey = (inputAsrApiKey ? inputAsrApiKey.value : '').trim();
+
+      if (!endpoint) {
+        alert('Please enter an ASR Endpoint URL.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            asr_provider: 'remote_api',
+            asr_api_endpoint: endpoint,
+            asr_api_key: apiKey
+          })
+        });
+        if (res.ok) {
+          alert('Docker / Remote ASR Configuration saved successfully!');
+        } else {
+          alert('Failed to save ASR API Configuration.');
+        }
+      } catch (err) {
+        alert('Error saving ASR API config: ' + err.message);
+      }
+    });
+  }
 
   // Translation Provider Switch Events
   if (radioTransProvLocal) {
@@ -667,17 +819,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         if (data.success) {
           transApiTestStatus.style.color = 'var(--emerald)';
-          transApiTestStatus.innerHTML = `✅ <strong>Connected (${data.latency_ms}ms)!</strong> Sample reply: <em>"${escapeHtml(data.reply)}"</em>`;
+          transApiTestStatus.innerHTML = `<strong>Connected (${data.latency_ms}ms)!</strong> Sample reply: <em>"${escapeHtml(data.reply)}"</em>`;
         } else {
           transApiTestStatus.style.color = 'var(--rose)';
-          transApiTestStatus.innerHTML = `❌ <strong>Failed:</strong> ${escapeHtml(data.message || data.error)}`;
+          transApiTestStatus.innerHTML = `<strong>Failed:</strong> ${escapeHtml(data.message || data.error)}`;
         }
       } catch (err) {
         transApiTestStatus.style.color = 'var(--rose)';
-        transApiTestStatus.textContent = `❌ Error: ${err.message}`;
+        transApiTestStatus.textContent = `Error: ${err.message}`;
       } finally {
         btnTestTransApi.disabled = false;
-        btnTestTransApi.textContent = '⚡ Test Connection';
+        btnTestTransApi.innerHTML = `
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Test Connection</span>
+        `;
       }
     });
   }
@@ -1033,6 +1190,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (vocabTotalBadge) {
         vocabTotalBadge.textContent = cachedVocabItems.length;
       }
+      const tabBadgeVocab = document.getElementById('tab-badge-vocab');
+      if (tabBadgeVocab) {
+        tabBadgeVocab.textContent = cachedVocabItems.length;
+      }
       renderVocabulary();
     } catch (err) {
       console.error('Failed to load vocabulary:', err);
@@ -1202,135 +1363,145 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function renderVocabulary() {
-    if (!vocabBadgeCloud) return;
-    updateVocabPagination();
+  // Modern Vocabulary Table & Quick Inline Form UI Elements
+  const vocabInlineFormPanel = document.getElementById('vocab-inline-form-panel');
+  const vocabInlineForm = document.getElementById('vocab-inline-form');
+  const vocabInlineTitle = document.getElementById('vocab-inline-title');
+  const btnToggleQuickAdd = document.getElementById('btn-toggle-quick-add');
+  const btnCloseInlineForm = document.getElementById('btn-close-inline-form');
+  const btnCancelInlineForm = document.getElementById('btn-cancel-inline-form');
+  const btnSubmitVocabInline = document.getElementById('btn-submit-vocab-inline');
 
-    const filtered = getFilteredVocabItems();
+  // Alias Chips UI Elements & State
+  const aliasChipsContainer = document.getElementById('alias-chips-container');
+  const aliasChipsList = document.getElementById('alias-chips-list');
+  const inputAliasChip = document.getElementById('input-alias-chip');
+  let currentInlineAliases = [];
 
-    if (cachedVocabItems.length === 0) {
-      vocabBadgeCloud.innerHTML = `
-        <div class="vocab-cloud-empty">
-          No custom vocabulary yet. Click "+ Add Word" to define keywords and aliases.
-        </div>
-      `;
-      hideVocabDetail();
-      return;
-    }
+  function renderInlineAliasChips() {
+    if (!aliasChipsList) return;
+    aliasChipsList.innerHTML = currentInlineAliases.map((alias, idx) => `
+      <span class="alias-chip-item">
+        <span>${escapeHtml(alias)}</span>
+        <button type="button" class="alias-chip-del" data-idx="${idx}" title="Remove alias">&times;</button>
+      </span>
+    `).join('');
 
-    if (filtered.length === 0) {
-      vocabBadgeCloud.innerHTML = `
-        <div class="vocab-cloud-empty">
-          No keywords match "<strong>${escapeHtml(vocabSearchQuery)}</strong>".
-        </div>
-      `;
-      hideVocabDetail();
-      return;
-    }
-
-    // Slice 50 items for the current page
-    const startIdx = (vocabCurrentPage - 1) * vocabPageSize;
-    const pageItems = filtered.slice(startIdx, startIdx + vocabPageSize);
-
-    vocabBadgeCloud.innerHTML = pageItems.map(item => {
-      const targetSafe = escapeHtml(item.target);
-      const aliasCount = (item.aliases || []).length;
-      const isSelected = activeSelectedTarget === item.target;
-      return `
-        <div class="vocab-word-badge ${isSelected ? 'selected' : ''}" data-target="${escapeHtml(item.target)}" title="Click to view aliases and mapping details">
-          <span class="vocab-word-target">${targetSafe}</span>
-          <span class="vocab-word-pill">${aliasCount}</span>
-        </div>
-      `;
-    }).join('');
-
-    // Attach click listener on each badge
-    vocabBadgeCloud.querySelectorAll('.vocab-word-badge').forEach(badgeEl => {
-      badgeEl.addEventListener('click', () => {
-        const targetName = badgeEl.getAttribute('data-target');
-        const item = cachedVocabItems.find(i => i.target === targetName);
-        if (item) {
-          if (activeSelectedTarget === item.target && vocabDetailCard.style.display !== 'none') {
-            hideVocabDetail();
-          } else {
-            showVocabDetail(item);
-          }
+    // Attach delete listeners
+    aliasChipsList.querySelectorAll('.alias-chip-del').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        if (!isNaN(idx)) {
+          currentInlineAliases.splice(idx, 1);
+          renderInlineAliasChips();
         }
       });
     });
-
-    // If currently selected word is still in filtered results, update detail card
-    if (activeSelectedTarget) {
-      const currentItem = filtered.find(i => i.target === activeSelectedTarget);
-      if (currentItem) {
-        showVocabDetail(currentItem);
-      } else {
-        hideVocabDetail();
-      }
-    }
   }
 
-  function openVocabModal(item = null) {
-    if (!vocabModal) return;
+  function addAliasChipFromInput() {
+    if (!inputAliasChip) return;
+    const raw = inputAliasChip.value.trim();
+    if (!raw) return;
+
+    // Support comma or semicolon if pasted
+    const parts = raw.split(/[,;]+/).map(p => p.trim()).filter(Boolean);
+    parts.forEach(part => {
+      if (!currentInlineAliases.some(a => a.toLowerCase() === part.toLowerCase())) {
+        currentInlineAliases.push(part);
+      }
+    });
+
+    inputAliasChip.value = '';
+    renderInlineAliasChips();
+  }
+
+  if (aliasChipsContainer && inputAliasChip) {
+    aliasChipsContainer.addEventListener('click', () => {
+      inputAliasChip.focus();
+    });
+
+    inputAliasChip.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addAliasChipFromInput();
+      } else if (e.key === 'Backspace' && !inputAliasChip.value && currentInlineAliases.length > 0) {
+        currentInlineAliases.pop();
+        renderInlineAliasChips();
+      }
+    });
+
+    inputAliasChip.addEventListener('blur', () => {
+      addAliasChipFromInput();
+    });
+  }
+
+  function openInlineVocabForm(item = null) {
+    if (!vocabInlineFormPanel) return;
     if (item) {
       editingTargetOriginal = item.target;
-      vocabModalTitle.textContent = 'Edit Vocabulary Word';
+      if (vocabInlineTitle) vocabInlineTitle.textContent = `Edit Target Word: "${item.target}"`;
       vocabInputTarget.value = item.target || '';
-      vocabInputAliases.value = (item.aliases || []).join(', ');
+      currentInlineAliases = Array.isArray(item.aliases) ? [...item.aliases] : [];
       vocabInputDesc.value = item.description || '';
+      if (btnSubmitVocabInline) btnSubmitVocabInline.textContent = 'Update Word';
     } else {
       editingTargetOriginal = null;
-      vocabModalTitle.textContent = 'Add Target Vocabulary';
+      if (vocabInlineTitle) vocabInlineTitle.textContent = 'Add Custom Word / Term';
       vocabInputTarget.value = '';
-      vocabInputAliases.value = '';
+      currentInlineAliases = [];
       vocabInputDesc.value = '';
+      if (btnSubmitVocabInline) btnSubmitVocabInline.textContent = 'Save Word';
     }
-    vocabModal.classList.add('open');
+    renderInlineAliasChips();
+    if (inputAliasChip) inputAliasChip.value = '';
+    vocabInlineFormPanel.style.display = 'block';
     vocabInputTarget.focus();
   }
 
-  function closeVocabModal() {
-    if (!vocabModal) return;
-    vocabModal.classList.remove('open');
+  function closeInlineVocabForm() {
+    if (!vocabInlineFormPanel) return;
+    vocabInlineFormPanel.style.display = 'none';
+    editingTargetOriginal = null;
+    currentInlineAliases = [];
+    if (inputAliasChip) inputAliasChip.value = '';
   }
 
-  if (btnAddVocab) {
-    btnAddVocab.addEventListener('click', () => openVocabModal(null));
-  }
-
-  if (btnCloseVocabModal) {
-    btnCloseVocabModal.addEventListener('click', closeVocabModal);
-  }
-
-  if (btnCancelVocabModal) {
-    btnCancelVocabModal.addEventListener('click', closeVocabModal);
-  }
-
-  if (vocabModal) {
-    vocabModal.addEventListener('click', (e) => {
-      if (e.target === vocabModal) {
-        closeVocabModal();
+  if (btnToggleQuickAdd) {
+    btnToggleQuickAdd.addEventListener('click', () => {
+      if (vocabInlineFormPanel && vocabInlineFormPanel.style.display === 'block' && !editingTargetOriginal) {
+        closeInlineVocabForm();
+      } else {
+        openInlineVocabForm(null);
       }
     });
   }
 
-  // Submit Add / Edit
-  if (btnSubmitVocabModal) {
-    btnSubmitVocabModal.addEventListener('click', async (e) => {
+  if (btnCloseInlineForm) {
+    btnCloseInlineForm.addEventListener('click', closeInlineVocabForm);
+  }
+
+  if (btnCancelInlineForm) {
+    btnCancelInlineForm.addEventListener('click', closeInlineVocabForm);
+  }
+
+  // Handle Quick Inline Form Submit
+  if (vocabInlineForm) {
+    vocabInlineForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const target = vocabInputTarget.value.trim();
       if (!target) {
-        alert('Please enter a target word.');
         vocabInputTarget.focus();
         return;
       }
 
-      const rawAliases = vocabInputAliases.value.split(',');
-      const aliases = rawAliases.map(a => a.trim()).filter(Boolean);
+      // Commit any pending text in inputAliasChip
+      addAliasChipFromInput();
+      const aliases = [...currentInlineAliases];
       const desc = vocabInputDesc.value.trim();
 
       try {
-        // If editing and target word changed, delete old one first
         if (editingTargetOriginal && editingTargetOriginal.toLowerCase() !== target.toLowerCase()) {
           await fetch(`/api/vocabulary/${encodeURIComponent(editingTargetOriginal)}`, {
             method: 'DELETE'
@@ -1352,7 +1523,7 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error(errData.detail || 'Failed to save vocabulary word.');
         }
 
-        closeVocabModal();
+        closeInlineVocabForm();
         await loadVocabulary();
       } catch (err) {
         alert('Error saving word: ' + err.message);
@@ -1360,12 +1531,84 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function renderVocabulary() {
+    updateVocabPagination();
+    const filtered = getFilteredVocabItems();
+
+    if (!vocabTableBody) return;
+
+    if (cachedVocabItems.length === 0) {
+      vocabTableBody.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+            No custom vocabulary yet. Click <strong>"+ New Word"</strong> to define keywords and aliases for speech correction.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    if (filtered.length === 0) {
+      vocabTableBody.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+            No keywords match "<strong>${escapeHtml(vocabSearchQuery)}</strong>".
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    // Slice 50 items for the current page
+    const startIdx = (vocabCurrentPage - 1) * vocabPageSize;
+    const pageItems = filtered.slice(startIdx, startIdx + vocabPageSize);
+
+    vocabTableBody.innerHTML = pageItems.map(item => {
+      const targetSafe = escapeHtml(item.target);
+      const aliases = item.aliases || [];
+      const descSafe = escapeHtml(item.description || '-');
+      const aliasChips = aliases.length > 0 
+        ? aliases.map(a => `<span class="vocab-alias-chip">${escapeHtml(a)}</span>`).join('')
+        : `<span style="color: var(--text-muted); font-size: 0.75rem; font-style: italic;">No aliases</span>`;
+
+      return `
+        <tr id="vocab-row-${encodeURIComponent(item.target)}">
+          <td class="vocab-target-cell">
+            ${targetSafe}
+          </td>
+          <td>
+            <div class="vocab-alias-chips">
+              ${aliasChips}
+            </div>
+          </td>
+          <td class="vocab-desc-cell">
+            ${descSafe}
+          </td>
+          <td class="vocab-action-cell">
+            <button class="btn-icon-action" onclick="window.editVocabItem('${encodeURIComponent(item.target)}')" title="Edit Word">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="btn-icon-action btn-del" onclick="window.deleteVocabItem('${encodeURIComponent(item.target)}')" title="Delete Word">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
   // Global window functions for edit & delete buttons
   window.editVocabItem = (encodedTarget) => {
     const targetName = decodeURIComponent(encodedTarget);
     const item = cachedVocabItems.find(i => i.target.toLowerCase() === targetName.toLowerCase());
     if (item) {
-      openVocabModal(item);
+      openInlineVocabForm(item);
     }
   };
 
@@ -1381,8 +1624,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) {
         throw new Error('Failed to delete word.');
       }
-      if (activeSelectedTarget && activeSelectedTarget.toLowerCase() === targetName.toLowerCase()) {
-        hideVocabDetail();
+      if (editingTargetOriginal && editingTargetOriginal.toLowerCase() === targetName.toLowerCase()) {
+        closeInlineVocabForm();
       }
       await loadVocabulary();
     } catch (err) {
@@ -1533,9 +1776,271 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   window.switchProfile = switchProfile;
 
+  // Export Profile Modal Elements & Logic
+  const exportProfileModal = document.getElementById('export-profile-modal');
+  const btnCloseExportModal = document.getElementById('btn-close-export-modal');
+  const btnCancelExportModal = document.getElementById('btn-cancel-export-modal');
+  const btnDoExportBundle = document.getElementById('btn-do-export-bundle');
+  const exportTargetProfileId = document.getElementById('export-target-profile-id');
+  const exportModalProfileName = document.getElementById('export-modal-profile-name');
+  const exportModalProfileId = document.getElementById('export-modal-profile-id');
+  const chkExportVocab = document.getElementById('chk-export-vocab');
+  const chkExportLora = document.getElementById('chk-export-lora');
+  const chkExportTraining = document.getElementById('chk-export-training');
+
+  function closeExportModal() {
+    if (exportProfileModal) exportProfileModal.classList.remove('open');
+  }
+
+  if (btnCloseExportModal) btnCloseExportModal.addEventListener('click', closeExportModal);
+  if (btnCancelExportModal) btnCancelExportModal.addEventListener('click', closeExportModal);
+  if (exportProfileModal) {
+    exportProfileModal.addEventListener('click', (e) => {
+      if (e.target === exportProfileModal) closeExportModal();
+    });
+  }
+
   window.exportProfileBundle = (profileId) => {
-    window.location.href = `/api/profiles/export-bundle?profile_id=${encodeURIComponent(profileId)}`;
+    const profile = cachedProfiles.find(p => p.id === profileId) || { id: profileId, name: profileId };
+    if (exportTargetProfileId) exportTargetProfileId.value = profile.id;
+    if (exportModalProfileName) exportModalProfileName.textContent = profile.name || profile.id;
+    if (exportModalProfileId) exportModalProfileId.textContent = profile.id;
+
+    // Reset defaults: both vocab and LoRA checked, training un-checked
+    if (chkExportVocab) chkExportVocab.checked = true;
+    if (chkExportLora) chkExportLora.checked = true;
+    if (chkExportTraining) chkExportTraining.checked = false;
+
+    if (exportProfileModal) exportProfileModal.classList.add('open');
   };
+
+  if (btnDoExportBundle) {
+    btnDoExportBundle.addEventListener('click', () => {
+      const pid = exportTargetProfileId ? exportTargetProfileId.value : 'default';
+      const incVocab = chkExportVocab ? chkExportVocab.checked : true;
+      const incLora = chkExportLora ? chkExportLora.checked : true;
+      const incTrain = chkExportTraining ? chkExportTraining.checked : false;
+
+      if (!incVocab && !incLora && !incTrain) {
+        alert('Please select at least one component (Vocabulary, LoRA, or Training Data) to export.');
+        return;
+      }
+
+      const params = new URLSearchParams({
+        profile_id: pid,
+        include_vocab: incVocab ? 'true' : 'false',
+        include_lora: incLora ? 'true' : 'false',
+        include_training_data: incTrain ? 'true' : 'false'
+      });
+
+      closeExportModal();
+      window.location.href = `/api/profiles/export-bundle?${params.toString()}`;
+    });
+  }
+
+  // Import Profile Modal Elements & Logic
+  const importProfileModal = document.getElementById('import-profile-modal');
+  const btnOpenImportProfile = document.getElementById('btn-open-import-profile');
+  const btnCloseImportModal = document.getElementById('btn-close-import-modal');
+  const btnCancelImportModal = document.getElementById('btn-cancel-import-modal');
+  const btnSubmitImportBundle = document.getElementById('btn-submit-import-bundle');
+  const inputImportFile = document.getElementById('input-import-file');
+  const importInspectPreview = document.getElementById('import-inspect-preview');
+  const importPreviewName = document.getElementById('import-preview-name');
+  const importPreviewBadges = document.getElementById('import-preview-badges');
+  const importPreviewDesc = document.getElementById('import-preview-desc');
+  const importFieldsContainer = document.getElementById('import-fields-container');
+  const inputImportProfileId = document.getElementById('input-import-profile-id');
+  const inputImportProfileName = document.getElementById('input-import-profile-name');
+  const inputImportProfileDesc = document.getElementById('input-import-profile-desc');
+  const chkImportOverwrite = document.getElementById('chk-import-overwrite');
+  const chkImportSetActive = document.getElementById('chk-import-set-active');
+
+  let inspectedBundleFile = null;
+
+  function closeImportModal() {
+    if (importProfileModal) importProfileModal.classList.remove('open');
+    if (inputImportFile) inputImportFile.value = '';
+    if (importInspectPreview) importInspectPreview.style.display = 'none';
+    if (importFieldsContainer) importFieldsContainer.style.display = 'none';
+    if (btnSubmitImportBundle) btnSubmitImportBundle.disabled = true;
+    inspectedBundleFile = null;
+  }
+
+  if (btnOpenImportProfile) {
+    btnOpenImportProfile.addEventListener('click', () => {
+      closeProfileModal();
+      if (importProfileModal) importProfileModal.classList.add('open');
+    });
+  }
+
+  if (btnCloseImportModal) btnCloseImportModal.addEventListener('click', closeImportModal);
+  if (btnCancelImportModal) btnCancelImportModal.addEventListener('click', closeImportModal);
+  if (importProfileModal) {
+    importProfileModal.addEventListener('click', (e) => {
+      if (e.target === importProfileModal) closeImportModal();
+    });
+  }
+
+  // Inspect zip file on file selection
+  if (inputImportFile) {
+    inputImportFile.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      inspectedBundleFile = file;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        if (btnSubmitImportBundle) {
+          btnSubmitImportBundle.disabled = true;
+          btnSubmitImportBundle.textContent = 'Inspecting Archive...';
+        }
+
+        const res = await fetch('/api/profiles/inspect-bundle', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Failed to inspect bundle.');
+        }
+
+        const info = await res.json();
+
+        // Populate preview
+        if (importPreviewName) {
+          importPreviewName.textContent = info.profile_name || info.profile_id;
+        }
+
+        let badgesHtml = `
+          <span style="font-size: 0.725rem; font-weight: 600; padding: 0.2rem 0.45rem; border-radius: 4px; background: #e0f2fe; color: #0369a1;">
+            ID: ${escapeHtml(info.profile_id)}
+          </span>
+        `;
+        if (info.has_vocabulary) {
+          badgesHtml += `
+            <span style="font-size: 0.725rem; font-weight: 600; padding: 0.2rem 0.45rem; border-radius: 4px; background: #dcfce7; color: #15803d;">
+              ✓ Vocab: ${info.vocabulary_count || 'Included'}
+            </span>
+          `;
+        }
+        if (info.has_lora) {
+          badgesHtml += `
+            <span style="font-size: 0.725rem; font-weight: 600; padding: 0.2rem 0.45rem; border-radius: 4px; background: #f3e8ff; color: #7e22ce;">
+              ✓ LoRA Weights
+            </span>
+          `;
+        }
+        if (info.has_training_samples) {
+          badgesHtml += `
+            <span style="font-size: 0.725rem; font-weight: 600; padding: 0.2rem 0.45rem; border-radius: 4px; background: #ffedd5; color: #c2410c;">
+              ✓ Samples: ${info.training_sample_count}
+            </span>
+          `;
+        }
+        if (info.is_conflict) {
+          badgesHtml += `
+            <span style="font-size: 0.725rem; font-weight: 600; padding: 0.2rem 0.45rem; border-radius: 4px; background: #fee2e2; color: #b91c1c;">
+              ⚠ ID Already Exists
+            </span>
+          `;
+        }
+
+        if (importPreviewBadges) importPreviewBadges.innerHTML = badgesHtml;
+        if (importPreviewDesc) {
+          importPreviewDesc.textContent = info.profile_description || (info.is_conflict ? 'Note: This ID is already registered. Check overwrite or specify a new ID.' : 'Ready to import.');
+        }
+
+        // Fill form fields
+        if (inputImportProfileId) inputImportProfileId.value = info.profile_id;
+        if (inputImportProfileName) inputImportProfileName.value = info.profile_name || info.profile_id;
+        if (inputImportProfileDesc) inputImportProfileDesc.value = info.profile_description || '';
+        if (chkImportOverwrite) chkImportOverwrite.checked = info.is_conflict;
+
+        if (importInspectPreview) importInspectPreview.style.display = 'block';
+        if (importFieldsContainer) importFieldsContainer.style.display = 'block';
+        if (btnSubmitImportBundle) {
+          btnSubmitImportBundle.disabled = false;
+          btnSubmitImportBundle.textContent = 'Import & Apply';
+        }
+      } catch (err) {
+        alert('Error inspecting archive: ' + err.message);
+        if (btnSubmitImportBundle) {
+          btnSubmitImportBundle.disabled = true;
+          btnSubmitImportBundle.textContent = 'Import & Apply';
+        }
+      }
+    });
+  }
+
+  // Handle Import Submit
+  if (btnSubmitImportBundle) {
+    btnSubmitImportBundle.addEventListener('click', async () => {
+      if (!inspectedBundleFile) {
+        alert('Please choose a valid .zip file first.');
+        return;
+      }
+
+      const targetId = inputImportProfileId ? inputImportProfileId.value.trim().toLowerCase() : '';
+      const targetName = inputImportProfileName ? inputImportProfileName.value.trim() : '';
+      const targetDesc = inputImportProfileDesc ? inputImportProfileDesc.value.trim() : '';
+      const overwrite = chkImportOverwrite ? chkImportOverwrite.checked : false;
+      const setActive = chkImportSetActive ? chkImportSetActive.checked : true;
+
+      if (!targetId) {
+        alert('Target Profile ID cannot be empty.');
+        inputImportProfileId.focus();
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', inspectedBundleFile);
+      formData.append('target_profile_id', targetId);
+      formData.append('target_profile_name', targetName || targetId);
+      formData.append('target_profile_desc', targetDesc);
+      formData.append('overwrite', overwrite ? 'true' : 'false');
+      formData.append('set_active', setActive ? 'true' : 'false');
+
+      try {
+        btnSubmitImportBundle.disabled = true;
+        btnSubmitImportBundle.textContent = 'Importing...';
+
+        const res = await fetch('/api/profiles/import-bundle', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Failed to import profile bundle.');
+        }
+
+        const data = await res.json();
+        closeImportModal();
+
+        alert(`Profile '${data.profile_name}' imported successfully!\n• Vocabularies: ${data.imported_vocabulary_count}\n• LoRA: ${data.imported_lora ? 'Loaded' : 'None'}\n• Samples: ${data.imported_samples_count}`);
+
+        await loadProfiles();
+        if (setActive) {
+          activeProfileId = targetId;
+          currentPage = 1;
+          await loadHistory();
+          await loadVocabulary();
+          await checkTrainStatus();
+        }
+      } catch (err) {
+        alert('Error importing profile: ' + err.message);
+      } finally {
+        if (btnSubmitImportBundle) {
+          btnSubmitImportBundle.disabled = false;
+          btnSubmitImportBundle.textContent = 'Import & Apply';
+        }
+      }
+    });
+  }
 
   window.deleteProfile = async (profileId) => {
     if (!confirm(`Are you sure you want to delete profile '${profileId}'?`)) {
@@ -1704,6 +2209,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Corporate Workspace Tabs Navigation
+  const tabButtons = document.querySelectorAll('.corporate-tab-bar .tab-nav-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+
+  function activateTab(tabId) {
+    if (!tabId) return;
+    const targetPane = document.getElementById(tabId);
+    if (!targetPane) return;
+
+    tabPanes.forEach(pane => pane.classList.remove('active'));
+    tabButtons.forEach(btn => {
+      if (btn.getAttribute('data-tab') === tabId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    targetPane.classList.add('active');
+    try {
+      localStorage.setItem('active_studio_tab', tabId);
+    } catch (e) {}
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.getAttribute('data-tab');
+      activateTab(tabId);
+    });
+  });
+
+  // Restore saved tab or default to Speech Records
+  try {
+    let savedTab = localStorage.getItem('active_studio_tab');
+    if (savedTab === 'pane-training') {
+      savedTab = 'pane-vocabulary';
+    }
+    if (savedTab && document.getElementById(savedTab)) {
+      activateTab(savedTab);
+    }
+  } catch (e) {}
+
   // Initialize
   checkStatus();
   loadProfiles();
@@ -1717,5 +2263,6 @@ document.addEventListener('DOMContentLoaded', () => {
     checkTrainStatus();
   }, 2000);
 });
+
 
 

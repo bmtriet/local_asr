@@ -28,7 +28,7 @@ cd docker
 docker build -t qwen3-asr-server:latest -f Dockerfile .
 docker run -d --name qwen3-asr-api \
   --gpus all \
-  -p 8000:8000 \
+  -p 9001:9001 \
   -v qwen3_asr_cache:/root/.cache/huggingface \
   qwen3-asr-server:latest
 ```
@@ -38,7 +38,7 @@ docker run -d --name qwen3-asr-api \
 cd docker
 docker build -t qwen3-asr-server:cpu -f Dockerfile.cpu .
 docker run -d --name qwen3-asr-api \
-  -p 8000:8000 \
+  -p 9001:9001 \
   -v qwen3_asr_cache:/root/.cache/huggingface \
   qwen3-asr-server:cpu
 ```
@@ -49,7 +49,7 @@ docker run -d --name qwen3-asr-api \
 
 ### 3.1. Health Check
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:9001/health
 ```
 Phản hồi:
 ```json
@@ -66,7 +66,7 @@ Phản hồi:
 Hỗ trợ mọi định dạng âm thanh (`wav`, `mp3`, `ogg`, `m4a`, `flac`):
 
 ```bash
-curl -X POST "http://localhost:8000/v1/audio/transcriptions" \
+curl -X POST "http://localhost:9001/v1/audio/transcriptions" \
   -F "file=@audio.wav" \
   -F "language=vi" \
   -F "prompt=Chuyên ngành y tế, công nghệ"
@@ -81,12 +81,31 @@ Phản hồi:
 }
 ```
 
-### 3.3. Sử dụng với thư viện Python `openai`
+### 3.3. Multi-Profile Dynamic LoRA Transcriptions
+Hỗ trợ phục vụ đồng thời nhiều người dùng với các LoRA chuyên biệt trên cùng 1 Base Model (tiết kiệm VRAM, hot-switch < 5ms):
+
+```bash
+# Nhận diện với LoRA chuyên ngành y tế
+curl -X POST "http://localhost:9001/v1/audio/transcriptions" \
+  -F "file=@audio.wav" \
+  -F "language=vi" \
+  -F "lora_adapter=doctor_vi"
+
+# Quản lý danh sách LoRA trên server
+curl http://localhost:9001/v1/adapters
+
+# Upload LoRA adapter mới lên Docker server (.zip)
+curl -X POST "http://localhost:9001/v1/adapters/upload" \
+  -F "file=@lora_adapter_tech.zip" \
+  -F "adapter_name=tech_en"
+```
+
+### 3.4. Sử dụng với thư viện Python `openai`
 ```python
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://<server-ip>:8000/v1",
+    base_url="http://<server-ip>:9001/v1",
     api_key="none"
 )
 
@@ -99,7 +118,7 @@ with open("speech.wav", "rb") as audio_file:
     print(transcript.text)
 ```
 
-### 3.4. WebSocket Streaming (`ws://localhost:8000/api/ws/transcribe`)
+### 3.5. WebSocket Streaming (`ws://localhost:9001/api/ws/transcribe`)
 - Gửi các binary chunk 16kHz PCM (16-bit Mono).
 - Nhận phản hồi thời gian thực qua sliding window $\le 250\text{ms}$:
   ```json
@@ -114,9 +133,9 @@ with open("speech.wav", "rb") as audio_file:
 
 ## 4. Tích hợp lại vào Ứng dụng Desktop Local ASR
 
-Khi bạn đã deploy container này lên một máy chủ khác (ví dụ: `http://192.168.1.50:8000`), trên máy cá nhân bạn chỉ cần:
+Khi bạn đã deploy container này lên một máy chủ khác (ví dụ: `http://192.168.1.50:9001`), trên máy cá nhân bạn chỉ cần:
 1. Mở Web UI: `http://localhost:8000`.
 2. Chuyển cấu hình ASR sang:
    - **ASR Provider**: `Remote API Endpoint`
-   - **Endpoint**: `http://192.168.1.50:8000/v1/audio/transcriptions`
+   - **Endpoint**: `http://192.168.1.50:9001/v1/audio/transcriptions`
 3. Máy cá nhân sẽ giải phóng hoàn toàn VRAM/RAM và gửi âm thanh sang server để nhận diện.

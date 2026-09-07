@@ -61,211 +61,428 @@
       </div>
     </header>
 
-    <!-- Grid -->
-    <div class="dashboard-grid">
-      <!-- Main Content: History & Word Corrections -->
-      <main>
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">
-              <span>Recognition History & Corrections</span>
-              <span id="history-total-badge" class="badge-count">0</span>
-            </h2>
-            <div class="header-actions">
-              <button class="btn btn-secondary" id="btn-collapse-all" title="Collapse / Expand All">
-                Collapse All
-              </button>
-              <button class="btn btn-secondary" id="btn-refresh-history">
-                Refresh
-              </button>
-            </div>
-          </div>
+    <!-- Corporate Workspace Tabs -->
+    <nav class="corporate-tab-bar" aria-label="Workspace Navigation">
+      <button class="tab-nav-btn active" data-tab="pane-history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span>Speech Records</span>
+        <span class="tab-nav-count" id="tab-badge-history">0</span>
+      </button>
 
-          <!-- Filter & Search Toolbar -->
-          <div class="history-toolbar">
-            <div class="search-box-wrapper">
-              <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16">
-                <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-              </svg>
-              <input type="text" id="input-search-history" class="search-input" placeholder="Search spoken text history...">
-            </div>
+      <button class="tab-nav-btn" data-tab="pane-vocabulary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+          <line x1="7" y1="7" x2="7.01" y2="7"></line>
+        </svg>
+        <span>Vocabulary &amp; Model Adaptation</span>
+        <span class="tab-nav-count" id="tab-badge-vocab">0</span>
+      </button>
 
-            <div class="filter-group">
-              <button class="filter-btn active" data-filter="all">All</button>
-              <button class="filter-btn" data-filter="unreviewed">Unreviewed</button>
-              <button class="filter-btn" data-filter="reviewed">Reviewed</button>
-            </div>
+      <button class="tab-nav-btn" data-tab="pane-models">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+          <rect x="9" y="9" width="6" height="6"></rect>
+          <line x1="9" y1="1" x2="9" y2="4"></line>
+          <line x1="15" y1="1" x2="15" y2="4"></line>
+          <line x1="9" y1="20" x2="9" y2="23"></line>
+          <line x1="15" y1="20" x2="15" y2="23"></line>
+          <line x1="20" y1="9" x2="23" y2="9"></line>
+          <line x1="20" y1="14" x2="23" y2="14"></line>
+          <line x1="1" y1="9" x2="4" y2="9"></line>
+          <line x1="1" y1="14" x2="4" y2="14"></line>
+        </svg>
+        <span>AI Models &amp; Inference</span>
+      </button>
 
-            <div class="page-size-selector">
-              <label for="select-page-size">Show:</label>
-              <select id="select-page-size" class="select-dropdown">
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-          </div>
+      <button class="tab-nav-btn" data-tab="pane-system">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="21" x2="4" y2="14"></line>
+          <line x1="4" y1="10" x2="4" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12" y2="3"></line>
+          <line x1="20" y1="21" x2="20" y2="16"></line>
+          <line x1="20" y1="12" x2="20" y2="3"></line>
+          <line x1="1" y1="14" x2="7" y2="14"></line>
+          <line x1="9" y1="8" x2="15" y2="8"></line>
+          <line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+        <span>System &amp; Controls</span>
+      </button>
+    </nav>
 
-          <div id="history-container" class="history-list">
-            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">Loading history...</p>
-          </div>
-
-          <!-- Pagination Bar -->
-          <div id="pagination-bar" class="pagination-bar">
-            <div class="pagination-info" id="pagination-info">Page 1 / 1</div>
-            <div class="pagination-buttons">
-              <button class="btn btn-secondary pagination-btn" id="btn-prev-page" disabled>&larr; Prev</button>
-              <div id="pagination-numbers" class="pagination-numbers"></div>
-              <button class="btn btn-secondary pagination-btn" id="btn-next-page" disabled>Next &rarr;</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Custom Vocabulary Card -->
-        <div class="card vocab-card">
-          <div class="card-header">
-            <h2 class="card-title">
-              <span>Custom Vocabulary & Keyword Mapping</span>
-              <span id="vocab-total-badge" class="badge-count">0</span>
-            </h2>
-            <div class="vocab-actions">
-              <button class="btn btn-secondary" id="btn-export-vocab" title="Download vocabulary.json">
-                Export
-              </button>
-              <button class="btn btn-secondary" id="btn-import-vocab-trigger" title="Upload vocabulary.json">
-                Import
-              </button>
-              <input type="file" id="input-import-vocab-file" accept=".json" style="display: none;">
-              <button class="btn btn-primary" id="btn-add-vocab">
-                + Add Word
-              </button>
-            </div>
-          </div>
-
-          <!-- Quick Search Filter Bar -->
-          <div class="vocab-search-bar" style="margin-bottom: 0.85rem;">
-            <div class="search-box" style="flex: 1;">
-              <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-              </svg>
-              <input type="text" id="input-vocab-search" class="search-input" placeholder="Quick search keywords, aliases or descriptions...">
-              <button id="btn-vocab-search-clear" class="btn-clear-search" style="display: none;" title="Clear search">&times;</button>
-            </div>
-          </div>
-
-          <!-- Vocabulary Tag & Badge Cloud Container -->
-          <div class="vocab-badge-cloud-wrapper">
-            <div id="vocab-badge-cloud" class="vocab-badge-cloud">
-              <div class="vocab-cloud-empty">
-                Loading custom vocabulary tags...
-              </div>
-            </div>
-
-            <!-- Detail Inspector Card when a word badge is clicked -->
-            <div id="vocab-detail-card" class="vocab-detail-card" style="display: none;">
-              <div class="vocab-detail-header">
-                <div class="vocab-detail-title-group">
-                  <span class="vocab-detail-target" id="vocab-detail-target-text">-</span>
-                  <span class="vocab-detail-alias-count" id="vocab-detail-alias-count">0 aliases</span>
-                </div>
-                <div class="vocab-detail-actions">
-                  <button class="btn btn-secondary btn-xs" id="btn-vocab-detail-edit">Edit</button>
-                  <button class="btn btn-secondary btn-xs btn-delete" id="btn-vocab-detail-delete">Delete</button>
-                  <button class="vocab-detail-close" id="btn-vocab-detail-close" title="Close inspector">&times;</button>
-                </div>
-              </div>
-              <div class="vocab-detail-body">
-                <div class="vocab-detail-section">
-                  <span class="vocab-detail-label">Aliases / Spoken Variants (mapped to target):</span>
-                  <div class="vocab-detail-aliases" id="vocab-detail-aliases-list"></div>
-                </div>
-                <div class="vocab-detail-section" id="vocab-detail-desc-group">
-                  <span class="vocab-detail-label">Description / Note:</span>
-                  <p class="vocab-detail-desc" id="vocab-detail-desc-text">-</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Vocabulary Pagination Bar (50 items per page) -->
-          <div id="vocab-pagination-bar" class="pagination-bar" style="margin-top: 0.75rem; padding-top: 0.75rem;">
-            <div class="pagination-info" id="vocab-pagination-info">Showing 1-50 of 0 words</div>
-            <div class="pagination-buttons">
-              <button class="btn btn-secondary pagination-btn" id="btn-vocab-prev-page" disabled>&larr; Prev</button>
-              <div id="vocab-pagination-numbers" class="pagination-numbers"></div>
-              <button class="btn btn-secondary pagination-btn" id="btn-vocab-next-page" disabled>Next &rarr;</button>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <!-- Sidebar: Training & Settings -->
-      <aside>
-        <!-- LoRA Continual Learning Card -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">LoRA Fine-Tuning</h2>
-          </div>
-
-          <div class="metric-row">
-            <span>Reviewed samples ready:</span>
-            <strong id="metric-pending-samples" style="color: var(--amber);">0</strong>
-          </div>
-          <div class="metric-row">
-            <span>Trainer status:</span>
-            <strong id="metric-train-status" style="color: var(--emerald);">Idle</strong>
-          </div>
-          <div class="metric-row">
-            <span>Current loss:</span>
-            <strong id="metric-train-loss">-</strong>
-          </div>
-
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="training-progress-bar"></div>
-          </div>
-
-          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-            <button class="btn btn-primary" id="btn-start-training" style="flex: 1; justify-content: center;">
-              Start LoRA Training
+    <!-- TAB 1: Speech Records (Recognition History) -->
+    <div class="tab-pane active" id="pane-history">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+              <path d="M12 8v4l3 3"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+            <span>Recognition History &amp; Corrections</span>
+            <span id="history-total-badge" class="badge-count">0</span>
+          </h2>
+          <div class="header-actions">
+            <button class="btn btn-secondary" id="btn-collapse-all" title="Collapse / Expand All">
+              Collapse All
             </button>
-            <button class="btn btn-secondary" id="btn-export-lora" title="Download trained LoRA adapter weights (.zip) to use in other tools" style="justify-content: center;">
-              Export LoRA
+            <button class="btn btn-secondary" id="btn-refresh-history">
+              Refresh
             </button>
           </div>
         </div>
 
-        <!-- Grammar Correction Card -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Text Normalization & Translation (AI)</h2>
+        <!-- Filter & Search Toolbar -->
+        <div class="history-toolbar">
+          <div class="search-box-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="input-search-history" class="search-input" placeholder="Search spoken text history...">
           </div>
-          <style>
-            .switch-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 20px; }
-            .switch-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-            input:checked + .switch-slider { background-color: var(--primary); }
-            input:checked + .switch-slider:before { transform: translateX(20px); }
-            .translation-options { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
-            .form-group-label { font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.4rem; display: block; }
-            .origin-phrase-box { padding: 0.65rem 0.75rem; border-radius: var(--radius-sm); background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); transition: all 0.3s ease; }
-            .qwen-box { padding: 0.75rem; border-radius: var(--radius-sm); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); margin-bottom: 0.85rem; }
-            .qwen-box.disabled { background: rgba(148, 163, 184, 0.08); border-color: rgba(148, 163, 184, 0.2); }
-          </style>
+
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="unreviewed">Unreviewed</button>
+            <button class="filter-btn" data-filter="reviewed">Reviewed</button>
+          </div>
+
+          <div class="page-size-selector">
+            <label for="select-page-size">Show:</label>
+            <select id="select-page-size" class="select-dropdown">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="history-container" class="history-list">
+          <p style="color: var(--text-muted); text-align: center; padding: 2rem;">Loading history...</p>
+        </div>
+
+        <!-- Pagination Bar -->
+        <div id="pagination-bar" class="pagination-bar">
+          <div class="pagination-info" id="pagination-info">Page 1 / 1</div>
+          <div class="pagination-buttons">
+            <button class="btn btn-secondary pagination-btn" id="btn-prev-page" disabled>&larr; Prev</button>
+            <div id="pagination-numbers" class="pagination-numbers"></div>
+            <button class="btn btn-secondary pagination-btn" id="btn-next-page" disabled>Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Vocabulary & Model Adaptation -->
+    <div class="tab-pane" id="pane-vocabulary">
+      <div class="vocab-adaptation-grid">
+        <!-- Main Column: Custom Vocabulary Management (Data Table + Quick Add) -->
+        <div class="vocab-main-col">
+          <div class="card vocab-card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                <span>Custom Vocabulary &amp; Keyword Mapping</span>
+                <span id="vocab-total-badge" class="badge-count">0</span>
+              </h2>
+              <div class="vocab-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-export-vocab" title="Download vocabulary.json">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Export</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-import-vocab-trigger" title="Upload vocabulary.json">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Import</span>
+                </button>
+                <input type="file" id="input-import-vocab-file" accept=".json" style="display: none;">
+                <button class="btn btn-primary btn-sm" id="btn-toggle-quick-add">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span id="btn-quick-add-label">+ New Word</span>
+                </button>
+                <!-- Hidden button to keep backward compatibility with any modal code if needed -->
+                <button id="btn-add-vocab" style="display: none;"></button>
+              </div>
+            </div>
+
+            <!-- Quick Inline Add / Edit Panel -->
+            <div id="vocab-inline-form-panel" class="vocab-inline-panel" style="display: none;">
+              <div class="vocab-inline-header">
+                <span class="vocab-inline-title" id="vocab-inline-title">Add Custom Word / Term</span>
+                <button type="button" class="btn-close-inline" id="btn-close-inline-form" title="Close">&times;</button>
+              </div>
+              <form id="vocab-inline-form" class="vocab-inline-form">
+                <div class="inline-form-grid">
+                  <div class="inline-field">
+                    <label for="vocab-input-target">Target Word / Phrase <span style="color: var(--rose);">*</span></label>
+                    <input type="text" id="vocab-input-target" class="search-input" placeholder="e.g. IFM, Global User, PAB" required autocomplete="off">
+                  </div>
+                  <div class="inline-field">
+                    <label for="input-alias-chip">Aliases / Spoken Variants (Type &amp; press Enter)</label>
+                    <div class="alias-chips-container" id="alias-chips-container">
+                      <div class="alias-chips-list" id="alias-chips-list"></div>
+                      <input type="text" id="input-alias-chip" class="alias-chip-input" placeholder="Type variant &amp; press Enter..." autocomplete="off">
+                    </div>
+                    <input type="hidden" id="vocab-input-aliases">
+                  </div>
+                  <div class="inline-field full-width">
+                    <label for="vocab-input-desc">Description / Domain Note (Optional)</label>
+                    <input type="text" id="vocab-input-desc" class="search-input" placeholder="e.g. Project codename or executive terminology">
+                  </div>
+                </div>
+                <div class="inline-form-actions">
+                  <span class="inline-hint" id="vocab-inline-hint">Tip: Target word will replace any match of its aliases in voice transcripts.</span>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-inline-form">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="btn-submit-vocab-inline">Save Word</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- Filter & Search Bar -->
+            <div class="vocab-filter-row">
+              <div class="search-box vocab-search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="input-vocab-search" class="search-input" placeholder="Search canonical target words, spoken aliases, or notes...">
+                <button id="btn-vocab-search-clear" class="btn-clear-search" style="display: none;" title="Clear search">&times;</button>
+              </div>
+            </div>
+
+            <!-- Clean Enterprise Data Table Container -->
+            <div class="vocab-table-wrapper">
+              <table class="vocab-table" id="vocab-table">
+                <thead>
+                  <tr>
+                    <th style="width: 24%;">Canonical Target</th>
+                    <th style="width: 44%;">Spoken Aliases</th>
+                    <th style="width: 22%;">Description / Note</th>
+                    <th style="width: 10%; text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="vocab-table-body">
+                  <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading custom vocabulary...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Hidden container for backward compatibility if any legacy selector references it -->
+            <div id="vocab-badge-cloud" style="display: none;"></div>
+            <div id="vocab-detail-card" style="display: none;">
+              <span id="vocab-detail-target-text"></span>
+              <span id="vocab-detail-alias-count"></span>
+              <div id="vocab-detail-aliases-list"></div>
+              <p id="vocab-detail-desc-text"></p>
+              <div id="vocab-detail-desc-group"></div>
+              <button id="btn-vocab-detail-edit"></button>
+              <button id="btn-vocab-detail-delete"></button>
+              <button id="btn-vocab-detail-close"></button>
+            </div>
+
+            <!-- Vocabulary Pagination Bar -->
+            <div id="vocab-pagination-bar" class="pagination-bar" style="margin-top: 0.85rem; padding-top: 0.75rem;">
+              <div class="pagination-info" id="vocab-pagination-info">Showing 0-0 of 0 words</div>
+              <div class="pagination-buttons">
+                <button class="btn btn-secondary pagination-btn" id="btn-vocab-prev-page" disabled>&larr; Prev</button>
+                <div id="vocab-pagination-numbers" class="pagination-numbers"></div>
+                <button class="btn btn-secondary pagination-btn" id="btn-vocab-next-page" disabled>Next &rarr;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Column: Model Adaptation (LoRA Continual Learning Widget) -->
+        <div class="vocab-side-col">
+          <div class="card lora-adaptation-card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                <span>Model Adaptation</span>
+              </h2>
+              <span id="metric-train-status" class="status-pill status-idle">Idle</span>
+            </div>
+
+            <p class="lora-desc">
+              Fine-tune the local Qwen3-ASR model with speech corrections and keywords from your active profile.
+            </p>
+
+            <!-- Stat Widgets in 2x2 or row format -->
+            <div class="lora-stats-grid">
+              <div class="lora-stat-box">
+                <span class="lora-stat-label">Reviewed Samples</span>
+                <span class="lora-stat-value" id="metric-pending-samples" style="color: var(--amber);">0</span>
+              </div>
+              <div class="lora-stat-box">
+                <span class="lora-stat-label">Training Loss</span>
+                <span class="lora-stat-value" id="metric-train-loss">-</span>
+              </div>
+            </div>
+
+            <div class="progress-bar-container" style="margin: 1rem 0 0.5rem 0;">
+              <div class="progress-bar" id="training-progress-bar"></div>
+            </div>
+
+            <div class="lora-action-buttons">
+              <button class="btn btn-primary" id="btn-start-training" style="flex: 1; justify-content: center;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Start Training</span>
+              </button>
+              <button class="btn btn-secondary" id="btn-export-lora" title="Download trained LoRA adapter weights (.zip)" style="justify-content: center;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: AI Models & Inference -->
+    <div class="tab-pane" id="pane-models">
+      <div class="pane-compact-container">
+        <div class="card">
+          <!-- SECTION 1: ASR Speech-to-Text Engine (Local / Docker Container) -->
+          <div class="card-header" style="margin-bottom: 0.85rem;">
+            <h2 class="card-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              <span>Qwen3-ASR Processing Architecture</span>
+            </h2>
+          </div>
+
+          <div id="asr-master-card" class="qwen-box" style="background: #eff6ff; border-color: #bfdbfe; margin-bottom: 1.5rem;">
+            <!-- ASR Provider Selector: Localhost Process vs Docker / Remote API -->
+            <div style="margin-bottom: 0.85rem;">
+              <span class="form-group-label" style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem; display: block;">
+                ASR Speech Recognition Backend:
+              </span>
+              <div style="display: flex; gap: 0.75rem;">
+                <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); background: var(--bg-card); border: 1px solid var(--border-color);" id="lbl-asr-prov-local">
+                  <input type="radio" name="asr-provider" id="radio-asr-prov-local" value="local" style="accent-color: var(--primary);">
+                  <span style="font-size: 0.8125rem; font-weight: 500;">Local Embedded (In-Process PyTorch)</span>
+                </label>
+                <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); background: var(--bg-card); border: 1px solid var(--border-color);" id="lbl-asr-prov-remote">
+                  <input type="radio" name="asr-provider" id="radio-asr-prov-remote" value="remote_api" checked style="accent-color: var(--primary);">
+                  <span style="font-size: 0.8125rem; font-weight: 500;">Docker Container / Remote Endpoint</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Local ASR Info Box -->
+            <div id="asr-local-container" style="display: none;">
+              <div style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+                Mô hình <strong>Qwen3-ASR-0.6B</strong> chạy trực tiếp trên GPU/CPU của máy tính này. Khởi chạy nhanh, không yêu cầu cấu hình mạng riêng biệt.
+              </div>
+            </div>
+
+            <!-- Remote ASR / Docker Configuration Container -->
+            <div id="asr-remote-container" style="display: block; padding-top: 0.5rem; border-top: 1px solid var(--border-color); margin-top: 0.5rem;">
+              <div style="font-size: 0.75rem; color: #1e40af; background: #dbeafe; padding: 0.5rem 0.75rem; border-radius: 4px; margin-bottom: 0.75rem; line-height: 1.4;">
+                <strong>Docker Deployment:</strong> Tách biệt tiến trình xử lý nhận dạng giọng nói sang container độc lập (hoặc server chuyên dụng). Xem hướng dẫn tại <code>docker/README.md</code> (hỗ trợ cả GPU lẫn CPU).
+              </div>
+
+              <!-- ASR API Endpoint URL -->
+              <div style="margin-bottom: 0.6rem;">
+                <label for="input-asr-api-endpoint" class="form-group-label">ASR Endpoint URL (OpenAI-compatible):</label>
+                <input type="text" id="input-asr-api-endpoint" class="edit-box" placeholder="http://127.0.0.1:9001/v1/audio/transcriptions" style="width: 100%; font-family: monospace; font-size: 0.8125rem; padding: 0.5rem 0.65rem;">
+              </div>
+
+              <!-- ASR API Key (Optional) -->
+              <div style="margin-bottom: 0.6rem;">
+                <label for="input-asr-api-key" class="form-group-label">API Key / Token (Tùy chọn):</label>
+                <input type="password" id="input-asr-api-key" class="edit-box" placeholder="Bearer token (nếu có bảo mật)" style="width: 100%; font-size: 0.8125rem; padding: 0.5rem 0.65rem;">
+              </div>
+
+              <!-- Test & Save Buttons -->
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.6rem;">
+                <button type="button" class="btn btn-secondary btn-xs" id="btn-test-asr-api" style="flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  <span>Test Connection</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-xs" id="btn-save-asr-api" style="flex: 1; justify-content: center;">
+                  Save ASR Config
+                </button>
+              </div>
+
+              <div id="asr-api-test-status" style="font-size: 0.75rem; margin-top: 0.4rem; display: none; line-height: 1.35;"></div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Text Normalization, Translation & Executive Polish -->
+          <div class="card-header" style="margin-bottom: 0.85rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+            <h2 class="card-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <rect x="9" y="9" width="6" height="6"></rect>
+                <line x1="9" y1="1" x2="9" y2="4"></line>
+                <line x1="15" y1="1" x2="15" y2="4"></line>
+                <line x1="9" y1="20" x2="9" y2="23"></line>
+                <line x1="15" y1="20" x2="15" y2="23"></line>
+                <line x1="20" y1="9" x2="23" y2="9"></line>
+                <line x1="20" y1="14" x2="23" y2="14"></line>
+                <line x1="1" y1="9" x2="4" y2="9"></line>
+                <line x1="1" y1="14" x2="4" y2="14"></line>
+              </svg>
+              <span>LLM Post-Processing (Grammar &amp; Translation)</span>
+            </h2>
+          </div>
 
           <div id="qwen-master-card" class="qwen-box">
             <!-- Provider Selector: Localhost vs Remote API -->
-            <div style="margin-bottom: 0.75rem;">
+            <div style="margin-bottom: 0.85rem;">
               <span class="form-group-label" style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem; display: block;">
                 Inference Provider:
               </span>
-              <div style="display: flex; gap: 0.5rem;">
-                <label style="flex: 1; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); background: var(--bg-card); border: 1px solid var(--border-color);" id="lbl-trans-prov-local">
+              <div style="display: flex; gap: 0.75rem;">
+                <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); background: var(--bg-card); border: 1px solid var(--border-color);" id="lbl-trans-prov-local">
                   <input type="radio" name="trans-provider" id="radio-trans-prov-local" value="local" checked style="accent-color: var(--primary);">
-                  <span style="font-size: 0.75rem; font-weight: 500;">Localhost (Qwen2.5)</span>
+                  <span style="font-size: 0.8125rem; font-weight: 500;">Localhost (Embedded Qwen2.5)</span>
                 </label>
-                <label style="flex: 1; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); background: var(--bg-card); border: 1px solid var(--border-color);" id="lbl-trans-prov-remote">
+                <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); background: var(--bg-card); border: 1px solid var(--border-color);" id="lbl-trans-prov-remote">
                   <input type="radio" name="trans-provider" id="radio-trans-prov-remote" value="remote_api" style="accent-color: var(--primary);">
-                  <span style="font-size: 0.75rem; font-weight: 500;">API Endpoint (OpenAI Style)</span>
+                  <span style="font-size: 0.8125rem; font-weight: 500;">API Endpoint (OpenAI / Ollama)</span>
                 </label>
               </div>
             </div>
@@ -278,7 +495,7 @@
                     Load Qwen2.5-0.5B Local Model
                   </label>
                   <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
-                    For Translation & Smart Grammar (~1.0GB VRAM/RAM)
+                    For Translation &amp; Smart Grammar (~1.0GB VRAM/RAM)
                   </div>
                 </div>
                 <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px; flex-shrink: 0;">
@@ -286,39 +503,35 @@
                   <span class="switch-slider"></span>
                 </label>
               </div>
-              <div id="qwen-status-hint" style="font-size: 0.75rem; color: var(--emerald); margin-top: 0.5rem; line-height: 1.35;">
-                Active: Translation & Grammar available locally.
-              </div>
             </div>
 
-            <!-- Remote OpenAI API Config Container -->
-            <div id="trans-remote-container" style="display: none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border-color);">
-              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.6rem;">
-                Compatible with <strong>Ollama</strong> (<code>http://localhost:11434/v1</code>), <strong>vLLM</strong>, <strong>OpenAI</strong>, <strong>Groq</strong>, etc.
-              </div>
-
+            <!-- Remote API Configuration Container -->
+            <div id="trans-remote-container" style="display: none; padding-top: 0.5rem; border-top: 1px solid var(--border-color); margin-top: 0.5rem;">
               <!-- Base URL -->
-              <div style="margin-bottom: 0.5rem;">
-                <label for="input-trans-api-url" class="form-group-label" style="margin-bottom: 0.2rem;">API Base URL:</label>
-                <input type="text" id="input-trans-api-url" class="edit-box" placeholder="http://localhost:11434/v1" style="width: 100%; font-family: monospace; font-size: 0.75rem; padding: 0.4rem 0.6rem;">
+              <div style="margin-bottom: 0.6rem;">
+                <label for="input-trans-api-url" class="form-group-label">API Base URL:</label>
+                <input type="text" id="input-trans-api-url" class="edit-box" placeholder="http://localhost:11434/v1" style="width: 100%; font-family: monospace; font-size: 0.8125rem; padding: 0.5rem 0.65rem;">
               </div>
 
               <!-- Model Name -->
-              <div style="margin-bottom: 0.5rem;">
-                <label for="input-trans-model-name" class="form-group-label" style="margin-bottom: 0.2rem;">Model Name (e.g. qwen2.5:0.5b, llama3.2, gpt-4o-mini):</label>
-                <input type="text" id="input-trans-model-name" class="edit-box" placeholder="qwen2.5:0.5b" style="width: 100%; font-family: monospace; font-size: 0.75rem; padding: 0.4rem 0.6rem;">
+              <div style="margin-bottom: 0.6rem;">
+                <label for="input-trans-model-name" class="form-group-label">Model Name (e.g. qwen2.5:0.5b, llama3.2, gpt-4o-mini):</label>
+                <input type="text" id="input-trans-model-name" class="edit-box" placeholder="qwen2.5:0.5b" style="width: 100%; font-family: monospace; font-size: 0.8125rem; padding: 0.5rem 0.65rem;">
               </div>
 
               <!-- API Key -->
               <div style="margin-bottom: 0.6rem;">
-                <label for="input-trans-api-key" class="form-group-label" style="margin-bottom: 0.2rem;">API Key (optional for Ollama):</label>
-                <input type="password" id="input-trans-api-key" class="edit-box" placeholder="ollama / sk-..." style="width: 100%; font-size: 0.75rem; padding: 0.4rem 0.6rem;">
+                <label for="input-trans-api-key" class="form-group-label">API Key (optional for Ollama):</label>
+                <input type="password" id="input-trans-api-key" class="edit-box" placeholder="ollama / sk-..." style="width: 100%; font-size: 0.8125rem; padding: 0.5rem 0.65rem;">
               </div>
 
               <!-- Test & Save Buttons -->
               <div style="display: flex; gap: 0.5rem; margin-top: 0.6rem;">
-                <button type="button" class="btn btn-secondary btn-xs" id="btn-test-trans-api" style="flex: 1; justify-content: center;">
-                  ⚡ Test Connection
+                <button type="button" class="btn btn-secondary btn-xs" id="btn-test-trans-api" style="flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  <span>Test Connection</span>
                 </button>
                 <button type="button" class="btn btn-primary btn-xs" id="btn-save-trans-api" style="flex: 1; justify-content: center;">
                   Save API Config
@@ -330,7 +543,7 @@
           </div>
           
           <div id="qwen-features-group" style="transition: opacity 0.3s ease;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
               <label for="toggle-grammar" style="font-size: 0.875rem; font-weight: 500;">Auto Grammar Correction:</label>
               <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
                 <input type="checkbox" id="toggle-grammar" style="opacity: 0; width: 0; height: 0;">
@@ -350,182 +563,225 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- OSD Overlay Settings Card -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">OSD Overlay Display Settings</h2>
-          </div>
+    <!-- TAB 4: System & Controls -->
+    <div class="tab-pane" id="pane-system">
+      <div class="pane-settings-container">
+        <div class="pane-grid-2col">
+          <!-- Left Column: Hotkey Settings + OSD Overlay Display Settings -->
+          <div class="pane-col">
+            <!-- Hotkey & Shortcuts -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                    <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                    <line x1="6" y1="8" x2="6.01" y2="8"></line>
+                    <line x1="10" y1="8" x2="10.01" y2="8"></line>
+                    <line x1="14" y1="8" x2="14.01" y2="8"></line>
+                    <line x1="18" y1="8" x2="18.01" y2="8"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                    <line x1="6" y1="16" x2="18" y2="16"></line>
+                  </svg>
+                  <span>Global Shortcut Settings</span>
+                </h2>
+              </div>
 
-          <!-- OSD Position -->
-          <div style="margin-bottom: 0.85rem;">
-            <label for="select-osd-position" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
-              Screen Position:
-            </label>
-            <select id="select-osd-position" class="edit-box" style="width: 100%; cursor: pointer; padding: 0.5rem 0.75rem; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
-              <option value="top-left">Top-Left</option>
-              <option value="top-right">Top-Right</option>
-              <option value="bottom-left">Bottom-Left</option>
-              <option value="bottom-right">Bottom-Right</option>
-              <option value="center">Center</option>
-            </select>
-          </div>
+              <div style="margin-bottom: 1.25rem;">
+                <label style="font-size: 0.8125rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">
+                  Active trigger shortcut:
+                </label>
+                <div class="hotkey-record-wrapper">
+                  <input type="text" id="input-hotkey" class="edit-box hotkey-input" value="ctrl+alt+space" readonly>
+                  <button class="btn btn-secondary" id="btn-record-hotkey" title="Record key combination from keyboard">
+                    Record Key
+                  </button>
+                </div>
+                <p id="hotkey-hint-text" class="hotkey-hint">
+                  Click "Record Key" and press your desired shortcut combination.
+                </p>
+              </div>
 
-          <!-- OSD Fadeout Duration -->
-          <div id="osd-duration-group" style="margin-bottom: 0.85rem;">
-            <label for="input-osd-duration" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
-              Fade-out Timeout (Seconds):
-            </label>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <input type="number" id="input-osd-duration" class="edit-box" min="0.5" max="30.0" step="0.5" value="2.0" style="width: 100px; text-align: center;">
-              <span style="font-size: 0.8125rem; color: var(--text-muted);">(Default: 2.0s)</span>
-            </div>
-          </div>
+              <!-- Recommended presets -->
+              <div style="margin-bottom: 1rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+                  Recommended shortcut presets:
+                </span>
+                <div class="preset-badges">
+                  <button class="badge-preset active" data-keys="ctrl+alt+space">ctrl+alt+space</button>
+                  <button class="badge-preset" data-keys="f8">f8</button>
+                  <button class="badge-preset" data-keys="f9">f9</button>
+                  <button class="badge-preset" data-keys="ctrl+shift+space">ctrl+shift+space</button>
+                  <button class="badge-preset" data-keys="alt+space">alt+space</button>
+                </div>
+              </div>
 
-          <!-- OSD Always On Checkbox -->
-          <div style="margin-bottom: 1rem; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25);">
-            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer;">
-              <input type="checkbox" id="toggle-osd-always-on" style="accent-color: var(--primary); width: 16px; height: 16px;">
-              <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
-                Disable Fade-out (Keep OSD visible while speaking)
-              </span>
-            </label>
-          </div>
-
-          <button class="btn btn-primary" id="btn-save-osd" style="width: 100%; justify-content: center;">
-            Save OSD Settings
-          </button>
-        </div>
-
-        <!-- Audio Feedback & Typing Modes Card -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Audio Feedback & Typing Modes</h2>
-          </div>
-
-          <!-- Sound Cues Toggle -->
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
-            <div>
-              <label for="toggle-sound-cues" style="font-size: 0.875rem; font-weight: 500; display: block;">
-                Sound Cues (Audio Beeps):
-              </label>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Play synthetic sine chimes on start, stop, and cancel</span>
-            </div>
-            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
-              <input type="checkbox" id="toggle-sound-cues" checked style="opacity: 0; width: 0; height: 0;">
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-
-          <!-- Trigger Mode (Toggle vs Hold-to-Talk) -->
-          <div style="margin-bottom: 0.85rem;">
-            <label for="select-hotkey-mode" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
-              Hotkey Trigger Mode:
-            </label>
-            <select id="select-hotkey-mode" class="edit-box" style="width: 100%; cursor: pointer; padding: 0.5rem 0.75rem; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
-              <option value="toggle">Toggle Mode (Click once to start, click again to stop)</option>
-              <option value="hold">Hold-to-Talk (Hold shortcut to speak, release to type)</option>
-            </select>
-          </div>
-
-          <!-- Silence VAD Auto-Stop -->
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
-            <div>
-              <label for="toggle-vad-enabled" style="font-size: 0.875rem; font-weight: 500; display: block;">
-                Auto-Stop on Silence (VAD):
-              </label>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Automatically finish and transcribe when speech pauses</span>
-            </div>
-            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
-              <input type="checkbox" id="toggle-vad-enabled" style="opacity: 0; width: 0; height: 0;">
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-
-          <!-- Silence Timeout Input -->
-          <div id="vad-timeout-group" style="margin-bottom: 0.85rem; opacity: 0.4;">
-            <label for="input-vad-timeout" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
-              Silence Duration Threshold:
-            </label>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <input type="number" id="input-vad-timeout" class="edit-box" min="1.0" max="5.0" step="0.5" value="2.0" style="width: 90px; text-align: center;">
-              <span style="font-size: 0.8125rem; color: var(--text-muted);">seconds (Default: 2.0s)</span>
-            </div>
-          </div>
-
-          <!-- Real-Time Streaming Transcription Toggle -->
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
-            <div>
-              <label for="toggle-streaming-transcription" style="font-size: 0.875rem; font-weight: 500; display: block;">
-                Live Streaming Transcription:
-              </label>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Stream partial text incrementally while speaking</span>
-            </div>
-            <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
-              <input type="checkbox" id="toggle-streaming-transcription" style="opacity: 0; width: 0; height: 0;">
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-
-          <!-- Web Live Streaming Dictation Playground -->
-          <div id="web-streaming-playground" style="margin-bottom: 1rem; padding: 0.75rem; border-radius: var(--radius-sm); background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.2); display: none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span style="font-size: 0.8125rem; font-weight: 600; color: #38bdf8;">Web Live Dictation:</span>
-              <button class="btn btn-secondary btn-xs" id="btn-toggle-web-streaming" style="display: flex; align-items: center; gap: 0.35rem;">
-                <span id="web-streaming-mic-icon">🎙️</span>
-                <span id="web-streaming-btn-label">Start Speaking</span>
+              <button class="btn btn-primary" id="btn-save-hotkey" style="width: 100%; justify-content: center;">
+                Save Shortcut
               </button>
             </div>
-            <div id="web-streaming-live-box" style="min-height: 48px; max-height: 120px; overflow-y: auto; padding: 0.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 4px; font-size: 0.825rem; color: #f1f5f9; line-height: 1.4;">
-              <span style="color: var(--text-muted); font-style: italic;">Live transcription will appear here in real time...</span>
-            </div>
-          </div>
 
-          <button class="btn btn-primary" id="btn-save-ux-settings" style="width: 100%; justify-content: center;">
-            Save Typing Modes
-          </button>
-        </div>
+            <!-- OSD Overlay Settings Card -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                  <span>OSD Overlay Display Settings</span>
+                </h2>
+              </div>
 
-        <!-- Hotkey & Settings Card -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Global Shortcut Settings</h2>
-          </div>
+              <!-- OSD Position -->
+              <div style="margin-bottom: 0.85rem;">
+                <label for="select-osd-position" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+                  Screen Position:
+                </label>
+                <select id="select-osd-position" class="edit-box" style="width: 100%; cursor: pointer; padding: 0.5rem 0.75rem; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                  <option value="top-left">Top-Left</option>
+                  <option value="top-right">Top-Right</option>
+                  <option value="bottom-left">Bottom-Left</option>
+                  <option value="bottom-right">Bottom-Right</option>
+                  <option value="center">Center</option>
+                </select>
+              </div>
 
-          <div style="margin-bottom: 1.25rem;">
-            <label style="font-size: 0.8125rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">
-              Active trigger shortcut:
-            </label>
-            <div class="hotkey-record-wrapper">
-              <input type="text" id="input-hotkey" class="edit-box hotkey-input" value="ctrl+alt+space" readonly>
-              <button class="btn btn-secondary" id="btn-record-hotkey" title="Record key combination from keyboard">
-                Record Key
+              <!-- OSD Fadeout Duration -->
+              <div id="osd-duration-group" style="margin-bottom: 0.85rem;">
+                <label for="input-osd-duration" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+                  Fade-out Timeout (Seconds):
+                </label>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="number" id="input-osd-duration" class="edit-box" min="0.5" max="30.0" step="0.5" value="2.0" style="width: 100px; text-align: center;">
+                  <span style="font-size: 0.8125rem; color: var(--text-muted);">(Default: 2.0s)</span>
+                </div>
+              </div>
+
+              <!-- OSD Always On Checkbox -->
+              <div style="margin-bottom: 1rem; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); background: #f0fdf4; border: 1px solid #bbf7d0;">
+                <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer;">
+                  <input type="checkbox" id="toggle-osd-always-on" style="accent-color: var(--primary); width: 16px; height: 16px;">
+                  <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
+                    Disable Fade-out (Keep OSD visible while speaking)
+                  </span>
+                </label>
+              </div>
+
+              <button class="btn btn-primary" id="btn-save-osd" style="width: 100%; justify-content: center;">
+                Save OSD Settings
               </button>
             </div>
-            <p id="hotkey-hint-text" class="hotkey-hint">
-              Click "Record Key" and press your desired shortcut combination.
-            </p>
           </div>
 
-          <!-- Recommended presets -->
-          <div style="margin-bottom: 1rem;">
-            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
-              Recommended shortcut presets:
-            </span>
-            <div class="preset-badges">
-              <button class="badge-preset active" data-keys="ctrl+alt+space">ctrl+alt+space</button>
-              <button class="badge-preset" data-keys="f8">f8</button>
-              <button class="badge-preset" data-keys="f9">f9</button>
-              <button class="badge-preset" data-keys="ctrl+shift+space">ctrl+shift+space</button>
-              <button class="badge-preset" data-keys="alt+space">alt+space</button>
+          <!-- Right Column: Audio Feedback & Typing Modes Card -->
+          <div class="pane-col">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  </svg>
+                  <span>Audio Feedback &amp; Typing Modes</span>
+                </h2>
+              </div>
+
+              <!-- Sound Cues Toggle -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                <div>
+                  <label for="toggle-sound-cues" style="font-size: 0.875rem; font-weight: 500; display: block;">
+                    Sound Cues (Audio Beeps):
+                  </label>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Play synthetic sine chimes on start, stop, and cancel</span>
+                </div>
+                <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                  <input type="checkbox" id="toggle-sound-cues" checked style="opacity: 0; width: 0; height: 0;">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <!-- Trigger Mode (Toggle vs Hold-to-Talk) -->
+              <div style="margin-bottom: 0.85rem;">
+                <label for="select-hotkey-mode" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+                  Hotkey Trigger Mode:
+                </label>
+                <select id="select-hotkey-mode" class="edit-box" style="width: 100%; cursor: pointer; padding: 0.5rem 0.75rem; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                  <option value="toggle">Toggle Mode (Click once to start, click again to stop)</option>
+                  <option value="hold">Hold-to-Talk (Hold shortcut to speak, release to type)</option>
+                </select>
+              </div>
+
+              <!-- Silence VAD Auto-Stop -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
+                <div>
+                  <label for="toggle-vad-enabled" style="font-size: 0.875rem; font-weight: 500; display: block;">
+                    Auto-Stop on Silence (VAD):
+                  </label>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Automatically finish and transcribe when speech pauses</span>
+                </div>
+                <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                  <input type="checkbox" id="toggle-vad-enabled" style="opacity: 0; width: 0; height: 0;">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <!-- Silence Timeout Input -->
+              <div id="vad-timeout-group" style="margin-bottom: 0.85rem; opacity: 0.4;">
+                <label for="input-vad-timeout" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;">
+                  Silence Duration Threshold:
+                </label>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="number" id="input-vad-timeout" class="edit-box" min="1.0" max="5.0" step="0.5" value="2.0" style="width: 90px; text-align: center;">
+                  <span style="font-size: 0.8125rem; color: var(--text-muted);">seconds (Default: 2.0s)</span>
+                </div>
+              </div>
+
+              <!-- Real-Time Streaming Transcription Toggle -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
+                <div>
+                  <label for="toggle-streaming-transcription" style="font-size: 0.875rem; font-weight: 500; display: block;">
+                    Live Streaming Transcription:
+                  </label>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Stream partial text incrementally while speaking</span>
+                </div>
+                <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                  <input type="checkbox" id="toggle-streaming-transcription" style="opacity: 0; width: 0; height: 0;">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <!-- Web Live Streaming Dictation Playground -->
+              <div id="web-streaming-playground" style="margin-bottom: 1rem; padding: 0.75rem; border-radius: var(--radius-sm); background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.2); display: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <span style="font-size: 0.8125rem; font-weight: 600; color: #38bdf8;">Web Live Dictation:</span>
+                  <button class="btn btn-secondary btn-xs" id="btn-toggle-web-streaming" style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span id="web-streaming-mic-icon" style="display: inline-flex; align-items: center;">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                      </svg>
+                    </span>
+                    <span id="web-streaming-btn-label">Start Speaking</span>
+                  </button>
+                </div>
+                <div id="web-streaming-live-box" style="min-height: 48px; max-height: 120px; overflow-y: auto; padding: 0.5rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.825rem; color: var(--text-primary); line-height: 1.4;">
+                  <span style="color: var(--text-muted); font-style: italic;">Live transcription will appear here in real time...</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="btn-save-ux-settings" style="width: 100%; justify-content: center;">
+                Save Typing Modes
+              </button>
             </div>
           </div>
-
-          <button class="btn btn-primary" id="btn-save-hotkey" style="width: 100%; justify-content: center;">
-            Save Shortcut
-          </button>
         </div>
-      </aside>
+      </div>
     </div>
   </div>
 
@@ -578,9 +834,19 @@
           <!-- Populated by JavaScript -->
         </div>
 
-        <!-- Add New Profile Form -->
+        <!-- Profile Action Toolbar: Create & Import -->
         <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 0.5rem;">
-          <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: #c7d2fe;">Create New Profile</h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <h4 style="font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--primary);">Create New Profile</h4>
+            <button class="btn btn-secondary btn-xs" id="btn-open-import-profile" style="display: flex; align-items: center; gap: 0.35rem;">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Import Profile (.zip)
+            </button>
+          </div>
           <div class="form-group">
             <label for="input-new-profile-id">Profile ID (lowercase alphanumeric identifier) *</label>
             <input type="text" id="input-new-profile-id" class="search-input" placeholder="e.g. triet, alex, finance">
@@ -600,6 +866,155 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="btn-done-profile-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Profile Modal -->
+  <div class="modal-overlay" id="export-profile-modal">
+    <div class="modal-dialog" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.4rem;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Export Profile Bundle
+        </h3>
+        <button class="modal-close" id="btn-close-export-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="export-target-profile-id">
+        <div style="background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem;">
+          <div style="font-size: 0.8125rem; font-weight: 600; color: var(--primary);" id="export-modal-profile-name">
+            Profile Name
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">
+            Profile ID: <code id="export-modal-profile-id" style="font-weight: 600;">default</code>
+          </div>
+        </div>
+
+        <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.85rem;">
+          Select package components to include in the portable archive (<code>.zip</code>):
+        </p>
+
+        <!-- Option 1: Vocabulary -->
+        <label style="display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; padding: 0.65rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 0.6rem;">
+          <input type="checkbox" id="chk-export-vocab" checked style="margin-top: 0.2rem; accent-color: var(--primary);">
+          <div>
+            <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
+              Custom Vocabulary (Keywords & Aliases)
+            </span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.15rem;">
+              Exports <code>vocabulary.json</code> mapping phonetic speech variations to canonical terms.
+            </span>
+          </div>
+        </label>
+
+        <!-- Option 2: LoRA Weights -->
+        <label style="display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; padding: 0.65rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 0.6rem;">
+          <input type="checkbox" id="chk-export-lora" checked style="margin-top: 0.2rem; accent-color: var(--primary);">
+          <div>
+            <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
+              LoRA Adapter Weights
+            </span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.15rem;">
+              Exports trained fine-tuned weights (<code>adapter_model.safetensors</code>).
+            </span>
+          </div>
+        </label>
+
+        <!-- Option 3: Training Samples -->
+        <label style="display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; padding: 0.65rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 0.5rem;">
+          <input type="checkbox" id="chk-export-training" style="margin-top: 0.2rem; accent-color: var(--primary);">
+          <div>
+            <span style="font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); display: block;">
+              Reviewed Training Samples (Dataset)
+            </span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.15rem;">
+              Exports audio correction logs for continual fine-tuning on another machine.
+            </span>
+          </div>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-export-modal">Cancel</button>
+        <button class="btn btn-primary" id="btn-do-export-bundle" style="display: flex; align-items: center; gap: 0.4rem;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download Bundle (.zip)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Profile Modal -->
+  <div class="modal-overlay" id="import-profile-modal">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.4rem;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Import Profile Bundle
+        </h3>
+        <button class="modal-close" id="btn-close-import-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="input-import-file">Select Exported Profile Archive (.zip) *</label>
+          <input type="file" id="input-import-file" accept=".zip" class="search-input" style="padding: 0.4rem 0.6rem;">
+        </div>
+
+        <!-- Inspect Preview Box -->
+        <div id="import-inspect-preview" style="display: none; background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 0.85rem;">
+          <div style="font-size: 0.8125rem; font-weight: 600; color: #0284c7; margin-bottom: 0.35rem;" id="import-preview-name">
+            Profile Preview
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem;" id="import-preview-badges">
+            <!-- Badges rendered by JS -->
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);" id="import-preview-desc"></div>
+        </div>
+
+        <!-- Import Form Fields -->
+        <div id="import-fields-container" style="display: none;">
+          <div class="form-group">
+            <label for="input-import-profile-id">Target Profile ID *</label>
+            <input type="text" id="input-import-profile-id" class="search-input" placeholder="e.g. doctor_vi">
+          </div>
+          <div class="form-group">
+            <label for="input-import-profile-name">Display Name *</label>
+            <input type="text" id="input-import-profile-name" class="search-input" placeholder="Display name">
+          </div>
+          <div class="form-group">
+            <label for="input-import-profile-desc">Description</label>
+            <input type="text" id="input-import-profile-desc" class="search-input" placeholder="Description">
+          </div>
+
+          <div style="margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 0.4rem;">
+              <input type="checkbox" id="chk-import-overwrite" style="accent-color: var(--primary);">
+              <span style="font-size: 0.8125rem; font-weight: 500;">Overwrite if Profile ID already exists</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="chk-import-set-active" checked style="accent-color: var(--primary);">
+              <span style="font-size: 0.8125rem; font-weight: 500;">Set as Active Profile immediately & reload model</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-import-modal">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-import-bundle" disabled style="display: flex; align-items: center; gap: 0.4rem;">
+          Import & Apply
+        </button>
       </div>
     </div>
   </div>
@@ -661,11 +1076,11 @@
           Local ASR is an intelligent, high-performance offline speech recognition and typing assistant powered by Qwen3-ASR and Qwen2.5, featuring Continual LoRA Fine-Tuning, inverse text normalization, and real-time translation.
         </p>
 
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
           <div style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.25rem;">Author &amp; Maintainer:</div>
-          <div style="font-size: 0.95rem; font-weight: 600; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
             <span>Triet Bui (@bmtriet)</span>
-            <a href="https://github.com/bmtriet/local_asr" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8125rem; color: #818cf8; text-decoration: none; font-weight: 500;">
+            <a href="https://github.com/bmtriet/local_asr" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8125rem; color: var(--primary); text-decoration: none; font-weight: 500;">
               <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
               </svg>

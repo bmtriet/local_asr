@@ -7,7 +7,7 @@ from config import get_settings
 class GrammarCorrector:
     def __init__(self, lazy_load: bool = False):
         self.settings = get_settings()
-        self.provider = getattr(self.settings, "TRANSLATION_PROVIDER", "local")
+        self.provider = getattr(self.settings, "TRANSLATION_PROVIDER", "remote_api")
         self.api_base_url = getattr(self.settings, "TRANSLATION_API_BASE_URL", "http://localhost:11434/v1")
         self.api_key = getattr(self.settings, "TRANSLATION_API_KEY", "ollama")
         self.api_model = getattr(self.settings, "TRANSLATION_MODEL_NAME", "qwen2.5:0.5b")
@@ -26,7 +26,7 @@ class GrammarCorrector:
 
     def set_config(
         self,
-        provider: str = "local",
+        provider: str = "remote_api",
         api_base_url: str = "http://localhost:11434/v1",
         api_key: str = "ollama",
         api_model: str = "qwen2.5:0.5b"

@@ -113,6 +113,28 @@ class Database:
             conn.commit()
             return True
 
+    def upsert_profile(self, profile_id: str, name: str, description: str = "", set_active: bool = False) -> bool:
+        profile_id = profile_id.strip().lower()
+        if not profile_id:
+            return False
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if set_active:
+                cursor.execute("UPDATE profiles SET is_active = 0")
+            cursor.execute(
+                """
+                INSERT INTO profiles (id, name, description, is_active)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    name = excluded.name,
+                    description = excluded.description,
+                    is_active = CASE WHEN ? = 1 THEN 1 ELSE profiles.is_active END
+                """,
+                (profile_id, name.strip() or profile_id, description.strip(), 1 if set_active else 0, 1 if set_active else 0)
+            )
+            conn.commit()
+            return True
+
     def update_profile(self, profile_id: str, name: str, description: str = "") -> bool:
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -302,6 +324,33 @@ class Database:
             )
             conn.commit()
             return cursor.rowcount > 0
+
+    def import_transcriptions_for_profile(self, profile_id: str, samples: List[Dict[str, Any]]) -> int:
+        """Import reviewed training/transcription samples for a profile."""
+        if not samples:
+            return 0
+        imported_count = 0
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            for sample in samples:
+                raw_text = sample.get("raw_text", "").strip()
+                if not raw_text:
+                    continue
+                corrected_text = sample.get("corrected_text", raw_text).strip()
+                duration = float(sample.get("duration", 0.0) or 0.0)
+                audio_path = sample.get("audio_path", "")
+                is_reviewed = int(sample.get("is_reviewed", 1))
+                used_in_training = int(sample.get("used_in_training", 0))
+                cursor.execute(
+                    """
+                    INSERT INTO transcriptions (audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training, profile_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (audio_path, duration, raw_text, corrected_text, is_reviewed, used_in_training, profile_id)
+                )
+                imported_count += 1
+            conn.commit()
+        return imported_count
 
     def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
         """Get a setting value by key."""

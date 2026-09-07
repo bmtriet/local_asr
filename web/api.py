@@ -310,12 +310,12 @@ def get_current_settings():
     streaming_transcription_enabled = (streaming_transcription_str == "true")
 
     # ASR Provider settings
-    asr_provider = db.get_setting("asr_provider", getattr(settings, "ASR_PROVIDER", "local"))
-    asr_api_endpoint = db.get_setting("asr_api_endpoint", getattr(settings, "ASR_API_ENDPOINT", "http://127.0.0.1:8000/v1/audio/transcriptions"))
+    asr_provider = db.get_setting("asr_provider", getattr(settings, "ASR_PROVIDER", "remote_api"))
+    asr_api_endpoint = db.get_setting("asr_api_endpoint", getattr(settings, "ASR_API_ENDPOINT", "http://127.0.0.1:9001/v1/audio/transcriptions"))
     asr_api_key = db.get_setting("asr_api_key", getattr(settings, "ASR_API_KEY", ""))
 
     # Translation Provider settings
-    translation_provider = db.get_setting("translation_provider", getattr(settings, "TRANSLATION_PROVIDER", "local"))
+    translation_provider = db.get_setting("translation_provider", getattr(settings, "TRANSLATION_PROVIDER", "remote_api"))
     translation_api_base_url = db.get_setting("translation_api_base_url", getattr(settings, "TRANSLATION_API_BASE_URL", "http://localhost:11434/v1"))
     translation_api_key = db.get_setting("translation_api_key", getattr(settings, "TRANSLATION_API_KEY", "ollama"))
     translation_model_name = db.get_setting("translation_model_name", getattr(settings, "TRANSLATION_MODEL_NAME", "qwen2.5:0.5b"))
@@ -629,43 +629,119 @@ def export_lora_adapter(profile_id: Optional[str] = None):
     )
 
 @app.get("/api/profiles/export-bundle")
-def export_profile_bundle(profile_id: Optional[str] = None):
-    """Export complete bundle (vocabulary.json + LoRA weights) for a profile as a zip archive."""
+def export_profile_bundle(
+    profile_id: Optional[str] = None,
+    include_vocab: bool = True,
+    include_lora: bool = True,
+    include_training_data: bool = False
+):
+    """Export complete bundle for a profile with optional vocabulary, LoRA weights, and training samples."""
     import shutil
     import tempfile
+    import json
+    from datetime import datetime
 
     if not profile_id:
         profile_id = db.get_active_profile().get("id", "default")
     clean_id = profile_id.strip().lower()
 
+    # Fetch profile info from DB
+    profile_info = None
+    for p in db.get_profiles():
+        if p["id"].lower() == clean_id:
+            profile_info = p
+            break
+    if not profile_info:
+        profile_info = {"id": clean_id, "name": clean_id, "description": ""}
+
     temp_bundle_dir = tempfile.mkdtemp()
     bundle_root = Path(temp_bundle_dir) / f"profile_{clean_id}"
     bundle_root.mkdir(parents=True, exist_ok=True)
 
-    # 1. Copy vocabulary.json
-    if clean_id == "default":
-        vocab_path = settings.VOCABULARY_PATH
-    else:
-        vocab_path = settings.DATA_DIR / "profiles" / clean_id / "vocabulary.json"
+    has_vocab = False
+    vocab_count = 0
+    # 1. Export vocabulary if requested
+    if include_vocab:
+        if clean_id == "default":
+            vocab_path = settings.VOCABULARY_PATH
+        else:
+            vocab_path = settings.DATA_DIR / "profiles" / clean_id / "vocabulary.json"
 
-    if vocab_path.exists():
-        shutil.copy2(str(vocab_path), str(bundle_root / "vocabulary.json"))
-    else:
-        with open(bundle_root / "vocabulary.json", "w", encoding="utf-8") as f:
-            f.write("[]")
+        if vocab_path.exists():
+            try:
+                with open(vocab_path, "r", encoding="utf-8") as vf:
+                    data = json.load(vf)
+                    if isinstance(data, list):
+                        vocab_count = len(data)
+                shutil.copy2(str(vocab_path), str(bundle_root / "vocabulary.json"))
+                has_vocab = True
+            except Exception:
+                pass
 
-    # 2. Copy LoRA adapter weights if available
-    adapter_path = settings.ADAPTERS_DIR / clean_id
-    if not adapter_path.exists() and clean_id == "default":
-        legacy = settings.ADAPTERS_DIR / "lora_latest"
-        if legacy.exists():
-            adapter_path = legacy
+    # 2. Export LoRA adapter weights if requested
+    has_lora = False
+    if include_lora:
+        adapter_path = settings.ADAPTERS_DIR / clean_id
+        if not adapter_path.exists() and clean_id == "default":
+            legacy = settings.ADAPTERS_DIR / "lora_latest"
+            if legacy.exists():
+                adapter_path = legacy
 
-    if adapter_path.exists():
-        adapter_dest = bundle_root / "lora_adapter"
-        shutil.copytree(str(adapter_path), str(adapter_dest), dirs_exist_ok=True)
+        if adapter_path.exists():
+            has_config = (adapter_path / "adapter_config.json").exists()
+            has_weights = (adapter_path / "adapter_model.safetensors").exists() or (adapter_path / "adapter_model.bin").exists()
+            if has_config and has_weights:
+                adapter_dest = bundle_root / "lora_adapter"
+                shutil.copytree(str(adapter_path), str(adapter_dest), dirs_exist_ok=True)
+                has_lora = True
 
-    # 3. Create zip archive
+    # 3. Export Reviewed Training Data if requested
+    has_training_data = False
+    training_sample_count = 0
+    if include_training_data:
+        reviewed_samples = db.get_samples_for_training(profile_id=clean_id)
+        if not reviewed_samples:
+            # Also check all reviewed samples for this profile regardless of used_in_training flag
+            reviewed_samples = db.get_transcriptions(limit=1000, filter_type="reviewed", profile_id=clean_id)
+
+        if reviewed_samples:
+            clean_samples = [
+                {
+                    "raw_text": s.get("raw_text", ""),
+                    "corrected_text": s.get("corrected_text", ""),
+                    "duration": s.get("duration", 0.0),
+                    "is_reviewed": 1
+                }
+                for s in reviewed_samples if s.get("raw_text")
+            ]
+            training_sample_count = len(clean_samples)
+            if clean_samples:
+                with open(bundle_root / "training_samples.json", "w", encoding="utf-8") as tf:
+                    json.dump(clean_samples, tf, ensure_ascii=False, indent=2)
+                has_training_data = True
+
+    # 4. Create profile_manifest.json
+    manifest = {
+        "manifest_version": "1.0",
+        "exported_at": datetime.utcnow().isoformat() + "Z",
+        "profile": {
+            "id": profile_info["id"],
+            "name": profile_info["name"],
+            "description": profile_info.get("description", ""),
+        },
+        "base_model": settings.MODEL_NAME,
+        "contents": {
+            "vocabulary": has_vocab,
+            "vocabulary_count": vocab_count,
+            "lora_adapter": has_lora,
+            "training_samples": has_training_data,
+            "training_sample_count": training_sample_count
+        }
+    }
+    with open(bundle_root / "profile_manifest.json", "w", encoding="utf-8") as mf:
+        json.dump(manifest, mf, ensure_ascii=False, indent=2)
+
+    # 5. Create zip archive
     zip_path = shutil.make_archive(os.path.join(temp_bundle_dir, f"local_asr_profile_{clean_id}"), "zip", str(bundle_root))
 
     return FileResponse(
@@ -673,6 +749,211 @@ def export_profile_bundle(profile_id: Optional[str] = None):
         media_type="application/zip",
         filename=f"local_asr_profile_{clean_id}.zip"
     )
+
+@app.post("/api/profiles/inspect-bundle")
+async def inspect_profile_bundle(file: UploadFile = File(...)):
+    """Inspect an uploaded profile zip bundle without extracting, returning its manifest info."""
+    import zipfile
+    import json
+    import io
+
+    content = await file.read()
+    try:
+        with zipfile.ZipFile(io.BytesIO(content), "r") as zf:
+            namelist = zf.namelist()
+            manifest_file = None
+            for name in namelist:
+                if name.endswith("profile_manifest.json"):
+                    manifest_file = name
+                    break
+
+            if manifest_file:
+                manifest_data = json.loads(zf.read(manifest_file).decode("utf-8"))
+                profile_meta = manifest_data.get("profile", {})
+                contents = manifest_data.get("contents", {})
+                profile_id = profile_meta.get("id", "imported_profile")
+                
+                # Check if this profile ID already exists in DB
+                existing = [p["id"].lower() for p in db.get_profiles()]
+                is_conflict = profile_id.lower() in existing
+
+                return {
+                    "valid": True,
+                    "has_manifest": True,
+                    "manifest": manifest_data,
+                    "profile_id": profile_id,
+                    "profile_name": profile_meta.get("name", profile_id),
+                    "profile_description": profile_meta.get("description", ""),
+                    "has_vocabulary": contents.get("vocabulary", False),
+                    "vocabulary_count": contents.get("vocabulary_count", 0),
+                    "has_lora": contents.get("lora_adapter", False),
+                    "has_training_samples": contents.get("training_samples", False),
+                    "training_sample_count": contents.get("training_sample_count", 0),
+                    "is_conflict": is_conflict
+                }
+            else:
+                # Legacy or loose zip bundle inspection
+                has_vocab = any("vocabulary.json" in n for n in namelist)
+                has_lora = any("adapter_config.json" in n for n in namelist)
+                inferred_id = "imported_profile"
+                for n in namelist:
+                    if n.startswith("profile_") and "/" in n:
+                        inferred_id = n.split("/")[0].replace("profile_", "")
+                        break
+
+                existing = [p["id"].lower() for p in db.get_profiles()]
+                is_conflict = inferred_id.lower() in existing
+
+                return {
+                    "valid": True,
+                    "has_manifest": False,
+                    "manifest": None,
+                    "profile_id": inferred_id,
+                    "profile_name": inferred_id.capitalize(),
+                    "profile_description": "Imported Profile Bundle",
+                    "has_vocabulary": has_vocab,
+                    "vocabulary_count": 0,
+                    "has_lora": has_lora,
+                    "has_training_samples": False,
+                    "training_sample_count": 0,
+                    "is_conflict": is_conflict
+                }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid or corrupted zip archive: {str(e)}")
+
+@app.post("/api/profiles/import-bundle")
+async def import_profile_bundle(
+    file: UploadFile = File(...),
+    target_profile_id: Optional[str] = Form(None),
+    target_profile_name: Optional[str] = Form(None),
+    target_profile_desc: Optional[str] = Form(None),
+    overwrite: bool = Form(False),
+    set_active: bool = Form(True)
+):
+    """Import an exported profile zip archive into the system, extracting vocabulary, LoRA, and history."""
+    import zipfile
+    import json
+    import io
+    import shutil
+
+    content = await file.read()
+    try:
+        z = zipfile.ZipFile(io.BytesIO(content), "r")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid zip file: {str(e)}")
+
+    namelist = z.namelist()
+    manifest_name = next((n for n in namelist if n.endswith("profile_manifest.json")), None)
+    manifest = {}
+    if manifest_name:
+        try:
+            manifest = json.loads(z.read(manifest_name).decode("utf-8"))
+        except Exception:
+            pass
+
+    extracted_id = manifest.get("profile", {}).get("id", "imported_profile")
+    extracted_name = manifest.get("profile", {}).get("name", extracted_id)
+    extracted_desc = manifest.get("profile", {}).get("description", "")
+
+    final_id = (target_profile_id or extracted_id).strip().lower()
+    final_name = (target_profile_name or extracted_name).strip() or final_id
+    final_desc = (target_profile_desc if target_profile_desc is not None else extracted_desc).strip()
+
+    if not final_id:
+        raise HTTPException(status_code=400, detail="Profile ID cannot be empty.")
+
+    # Check existence
+    existing_ids = [p["id"].lower() for p in db.get_profiles()]
+    if final_id in existing_ids and not overwrite:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Profile '{final_id}' already exists. Please choose another ID or enable 'Overwrite'."
+        )
+
+    # Upsert profile in DB
+    db.upsert_profile(final_id, final_name, final_desc, set_active=set_active)
+
+    # Prepare target directories
+    if final_id == "default":
+        vocab_dest_file = settings.VOCABULARY_PATH
+    else:
+        profile_dir = settings.DATA_DIR / "profiles" / final_id
+        profile_dir.mkdir(parents=True, exist_ok=True)
+        vocab_dest_file = profile_dir / "vocabulary.json"
+
+    adapter_dest_dir = settings.ADAPTERS_DIR / final_id
+
+    imported_vocab_count = 0
+    imported_lora = False
+    imported_sample_count = 0
+
+    # 1. Extract vocabulary.json
+    vocab_zip_entry = next((n for n in namelist if n.endswith("vocabulary.json")), None)
+    if vocab_zip_entry:
+        vocab_bytes = z.read(vocab_zip_entry)
+        try:
+            parsed_vocab = json.loads(vocab_bytes.decode("utf-8"))
+            if isinstance(parsed_vocab, list):
+                imported_vocab_count = len(parsed_vocab)
+        except Exception:
+            pass
+        vocab_dest_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(vocab_dest_file, "wb") as vf:
+            vf.write(vocab_bytes)
+
+    # 2. Extract LoRA Adapter weights
+    lora_entries = [n for n in namelist if "lora_adapter/" in n and not n.endswith("/")]
+    if lora_entries:
+        adapter_dest_dir.mkdir(parents=True, exist_ok=True)
+        for entry in lora_entries:
+            # Strip prefix up to lora_adapter/
+            idx = entry.find("lora_adapter/")
+            rel_path = entry[idx + len("lora_adapter/"):]
+            if not rel_path:
+                continue
+            out_file = adapter_dest_dir / rel_path
+            out_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(out_file, "wb") as of:
+                of.write(z.read(entry))
+        has_config = (adapter_dest_dir / "adapter_config.json").exists()
+        has_weights = (adapter_dest_dir / "adapter_model.safetensors").exists() or (adapter_dest_dir / "adapter_model.bin").exists()
+        imported_lora = has_config and has_weights
+
+    # 3. Extract training_samples.json
+    samples_zip_entry = next((n for n in namelist if n.endswith("training_samples.json")), None)
+    if samples_zip_entry:
+        try:
+            samples_bytes = z.read(samples_zip_entry)
+            samples_list = json.loads(samples_bytes.decode("utf-8"))
+            if isinstance(samples_list, list):
+                imported_sample_count = db.import_transcriptions_for_profile(final_id, samples_list)
+        except Exception as e:
+            print(f"[Import Profile] Warning: failed to import training samples: {e}")
+
+    # 4. If set_active, reload active profile components into runtime
+    if set_active:
+        try:
+            vocab_mgr.load_for_profile(final_id)
+            if imported_lora and adapter_dest_dir.exists():
+                engine.load_lora_adapter(str(adapter_dest_dir))
+                if daemon_instance and hasattr(daemon_instance, "engine") and daemon_instance.engine:
+                    daemon_instance.engine.load_lora_adapter(str(adapter_dest_dir))
+            else:
+                engine.unload_lora_adapter()
+                if daemon_instance and hasattr(daemon_instance, "engine") and daemon_instance.engine:
+                    daemon_instance.engine.unload_lora_adapter()
+        except Exception as e:
+            print(f"[Import Profile] Warning during hot-reload: {e}")
+
+    return {
+        "status": "success",
+        "profile_id": final_id,
+        "profile_name": final_name,
+        "is_active": set_active,
+        "imported_vocabulary_count": imported_vocab_count,
+        "imported_lora": imported_lora,
+        "imported_samples_count": imported_sample_count
+    }
 
 @app.post("/api/vocabulary/import")
 async def import_vocabulary(file: UploadFile = File(...)):

@@ -17,8 +17,8 @@ class ASREngine:
         settings = get_settings()
         
         self.settings = settings
-        self.provider = getattr(settings, "ASR_PROVIDER", "local")
-        self.api_endpoint = getattr(settings, "ASR_API_ENDPOINT", "http://127.0.0.1:8000/v1/audio/transcriptions")
+        self.provider = getattr(settings, "ASR_PROVIDER", "remote_api")
+        self.api_endpoint = getattr(settings, "ASR_API_ENDPOINT", "http://127.0.0.1:9001/v1/audio/transcriptions")
         self.api_key = getattr(settings, "ASR_API_KEY", "")
 
         self.model_name = model_name or settings.MODEL_NAME
@@ -38,8 +38,8 @@ class ASREngine:
 
     def set_config(
         self,
-        provider: str = "local",
-        api_endpoint: str = "http://127.0.0.1:8000/v1/audio/transcriptions",
+        provider: str = "remote_api",
+        api_endpoint: str = "http://127.0.0.1:9001/v1/audio/transcriptions",
         api_key: str = ""
     ):
         """Update provider settings dynamically."""
@@ -64,7 +64,7 @@ class ASREngine:
         print("[ASREngine] Model unloaded and GPU cache emptied.")
 
     def _call_remote_asr_api(self, wav: np.ndarray, sample_rate: int = 16000, context: str = "") -> str:
-        """Call remote OpenAI-compatible /v1/audio/transcriptions or custom ASR endpoint."""
+        """Call remote OpenAI-compatible /v1/audio/transcriptions or custom ASR endpoint with dynamic LoRA."""
         import io
         import httpx
         buf = io.BytesIO()
@@ -82,9 +82,12 @@ class ASREngine:
             "prompt": context or "",
             "language": "vi"
         }
+        # Send current active profile LoRA adapter if specified
+        if getattr(self, "active_profile_id", None) and self.active_profile_id not in ("default", "none"):
+            data["lora_adapter"] = self.active_profile_id
 
         try:
-            print(f"[ASREngine] Calling remote ASR endpoint: {self.api_endpoint}")
+            print(f"[ASREngine] Calling remote ASR endpoint: {self.api_endpoint} (lora: {data.get('lora_adapter', 'base')})")
             with httpx.Client(timeout=30.0) as client:
                 response = client.post(self.api_endpoint, files=files, data=data, headers=headers)
                 response.raise_for_status()
@@ -181,6 +184,7 @@ class ASREngine:
         from config import get_settings
         settings = get_settings()
         clean_id = profile_id.strip().lower() or "default"
+        self.active_profile_id = clean_id
         
         # Check both data/adapters/<profile_id> and data/adapters/lora_latest (for default legacy)
         adapter_path = settings.ADAPTERS_DIR / clean_id

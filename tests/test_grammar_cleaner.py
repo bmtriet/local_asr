@@ -4,6 +4,7 @@ from asr_engine.grammar import GrammarCorrector
 
 def test_grammar_corrector_strips_conversational_chatter():
     corrector = GrammarCorrector(lazy_load=True)
+    corrector.provider = "local"
     corrector.is_loaded = True
     
     # Mock LLM pipeline output containing chatter preamble
@@ -18,6 +19,7 @@ def test_grammar_corrector_strips_conversational_chatter():
 
 def test_grammar_corrector_strips_english_chatter():
     corrector = GrammarCorrector(lazy_load=True)
+    corrector.provider = "local"
     corrector.is_loaded = True
     
     corrector.pipeline = MagicMock(return_value=[{

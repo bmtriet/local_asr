@@ -7,17 +7,19 @@ services:
       dockerfile: Dockerfile
     image: qwen3-asr-server:latest
     container_name: qwen3-asr-api
-    restart: unless-stopped
+    restart: always
     ports:
-      - "8000:8000"
+      - "9001:9001"
     environment:
       - MODEL_NAME=Qwen/Qwen3-ASR-0.6B
       - DEVICE=cuda
       - TORCH_DTYPE=bfloat16
-      - PORT=8000
+      - PORT=9001
     volumes:
       # Mount cache so weights are not re-downloaded on container restart
       - hf-cache:/root/.cache/huggingface
+      # Mount adapters directory for multi-profile LoRA weights
+      - ./adapters:/app/adapters
     deploy:
       resources:
         reservations:

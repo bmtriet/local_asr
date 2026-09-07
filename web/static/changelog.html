@@ -35,13 +35,13 @@
       border-radius: 9999px;
       font-size: 0.8125rem;
       font-weight: 700;
-      background: rgba(99, 102, 241, 0.15);
-      color: #818cf8;
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid rgba(79, 70, 229, 0.2);
     }
     .release-tag {
       background: var(--emerald);
-      color: #0b0f19;
+      color: #ffffff;
       font-size: 0.7rem;
       font-weight: 700;
       padding: 0.15rem 0.45rem;
@@ -51,7 +51,7 @@
     .timeline {
       position: relative;
       padding-left: 2rem;
-      border-left: 2px solid rgba(255, 255, 255, 0.08);
+      border-left: 2px solid var(--border-color);
       margin-top: 1.5rem;
     }
     .timeline-item {
@@ -66,7 +66,7 @@
       height: 16px;
       border-radius: 50%;
       background: var(--primary);
-      box-shadow: 0 0 10px var(--primary-glow);
+      box-shadow: 0 0 8px var(--primary-glow);
       border: 3px solid var(--bg-primary);
     }
     .release-card {
@@ -74,7 +74,7 @@
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 1.5rem;
-      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
     }
     .release-header {
       display: flex;
@@ -94,6 +94,7 @@
     .release-title {
       font-size: 1.25rem;
       font-weight: 700;
+      color: var(--text-primary);
     }
     .release-date {
       font-size: 0.8125rem;
@@ -123,10 +124,11 @@
       font-size: 0.85rem;
       margin-top: 0.15rem;
     }
-    .icon-new { background: rgba(16, 185, 129, 0.15); color: var(--emerald); }
-    .icon-imp { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .icon-new { background: #ecfdf5; color: var(--emerald); }
+    .icon-imp { background: #f0f9ff; color: #0284c7; }
+    .icon-fix { background: #fff1f2; color: var(--rose); }
     .feature-body strong {
-      color: #fff;
+      color: var(--text-primary);
     }
     .feature-body p {
       color: var(--text-secondary);

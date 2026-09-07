@@ -14,7 +14,7 @@ import numpy as np
 import soundfile as sf
 import io
 
-SERVER_URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
+SERVER_URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:9001"
 
 print(f"=== Testing Qwen3-ASR Server at {SERVER_URL} ===")
 
@@ -43,14 +43,23 @@ buf = io.BytesIO()
 sf.write(buf, wav, sr, format="WAV")
 buf.seek(0)
 
-print("3. Sending audio to POST /v1/audio/transcriptions...")
+# 4. Test /v1/adapters
+try:
+    res = requests.get(f"{SERVER_URL}/v1/adapters", timeout=5)
+    print("4. Available LoRA Adapters:", res.status_code, res.json())
+except Exception as e:
+    print("4. List Adapters FAILED:", e)
+
+# 5. Sending audio with dynamic lora_adapter tag (e.g. doctor_profile)
+buf.seek(0)
+print("5. Sending audio with lora_adapter='doctor_profile'...")
 start = time.time()
 try:
     files = {"file": ("test.wav", buf, "audio/wav")}
-    data = {"language": "vi", "prompt": "Xin chào"}
+    data = {"language": "vi", "prompt": "Xin chào", "lora_adapter": "doctor_profile"}
     res = requests.post(f"{SERVER_URL}/v1/audio/transcriptions", files=files, data=data, timeout=30)
     latency = round((time.time() - start) * 1000)
-    print(f"Transcription Response ({latency}ms):", res.status_code, res.json())
-    print("\n✅ All endpoint tests passed!")
+    print(f"Dynamic LoRA Response ({latency}ms):", res.status_code, res.json())
+    print("\n✅ All endpoint & Multi-Profile LoRA tests passed!")
 except Exception as e:
-    print("Transcription request FAILED:", e)
+    print("Dynamic LoRA transcription request FAILED:", e)
